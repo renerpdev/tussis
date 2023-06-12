@@ -1,0 +1,6 @@
+{
+  "targets": {},
+  "projects": {
+    "prod": "tussis-app"
+  }
+}

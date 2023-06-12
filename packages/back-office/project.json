@@ -5,9 +5,8 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nx/webpack:webpack",
+      "executor": "@simondotm/nx-firebase:build",
       "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
       "options": {
         "target": "node",
         "compiler": "tsc",
@@ -24,18 +23,12 @@
       }
     },
     "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
+      "executor": "nx:run-commands",
       "options": {
-        "buildTarget": "back-office:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "back-office:build:development"
-        },
-        "production": {
-          "buildTarget": "back-office:build:production"
-        }
+        "commands": [
+          "nx run back-office:build --watch",
+          "nx run back-office:emulate"
+        ]
       }
     },
     "lint": {
@@ -57,6 +50,33 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run back-office:build:production",
+          "firebase deploy --only functions,storage,database,firestore --config firebase.json"
+        ]
+      }
+    },
+    "getconfig": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "firebase functions:config:get --config firebase.json > packages/back-office/.runtimeconfig.json"
+      }
+    },
+    "emulate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "node -e \"setTimeout(()=>{},5000)\"",
+          "kill-port --port 9099,5001,8080,9000,5000,8085,9199,9299,4000,4400,4500",
+          "firebase functions:config:get  --config firebase.json > dist/packages/back-office/.runtimeconfig.json",
+          "firebase emulators:start  --config firebase.json"
+        ],
+        "parallel": false
       }
     }
   },

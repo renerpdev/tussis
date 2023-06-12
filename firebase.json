@@ -1,0 +1,58 @@
+{
+  "database": {
+    "rules": "packages/back-office/database.rules.json"
+  },
+  "firestore": {
+    "rules": "packages/back-office/firestore.rules",
+    "indexes": "packages/back-office/firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist/packages/front-office",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "storage": {
+    "rules": "packages/back-office/storage.rules"
+  },
+  "functions": {
+    "codebase": "back-office",
+    "predeploy": ["npx nx build back-office"],
+    "runtime": "nodejs16",
+    "source": "dist/packages/back-office"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "database": {
+      "port": 9000
+    },
+    "hosting": {
+      "port": 5002
+    },
+    "pubsub": {
+      "port": 8085
+    },
+    "storage": {
+      "port": 9199
+    },
+    "eventarc": {
+      "port": 9299
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  }
+}

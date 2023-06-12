@@ -72,6 +72,15 @@
       "options": {
         "buildTarget": "front-office:build"
       }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run front-office:build:production",
+          "firebase deploy --only hosting --config firebase.json"
+        ]
+      }
     }
   },
   "tags": []
