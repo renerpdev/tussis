@@ -1,8 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 
 import { Route, Routes, Link } from 'react-router-dom';
+
+const api_url =
+  process.env.NODE_ENV === 'production'
+    ? 'https://us-central1-tussis-app.cloudfunctions.net'
+    : 'http://127.0.0.1:5001/tussis-app/us-central1';
 
 export function App() {
   const [data, setData] = React.useState<any>();
@@ -12,7 +17,7 @@ export function App() {
     const controller = new AbortController();
     (async () => {
       try {
-        const response = await fetch('http://localhost:3000/api', {
+        const response = await fetch(`${api_url}/api`, {
           // connect the controller with the fetch request
           signal: controller.signal,
         });
