@@ -1,6 +1,7 @@
 {
-  "targets": {},
   "projects": {
-    "prod": "tussis-app"
-  }
+    "default": "tussis-app"
+  },
+  "targets": {},
+  "etags": {}
 }
