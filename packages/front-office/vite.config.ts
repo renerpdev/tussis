@@ -23,6 +23,10 @@ export default defineConfig({
     }),
   ],
 
+  define: {
+    LAST_DEPLOY_DATE: `"${new Date(Date.now())}"`,
+  },
+
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [
