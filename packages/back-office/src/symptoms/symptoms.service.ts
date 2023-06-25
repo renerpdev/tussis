@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
+// TODO: remove this import later
+import { randomUUID } from 'crypto';
+import { Symptom } from './entities/symptom.entity';
 
-@Injectable()
+@Injectable({ scope: Scope.DEFAULT })
 export class SymptomsService {
-  create(createSymptomDto: CreateSymptomDto) {
-    return 'This action adds a new symptom';
+  private readonly symptoms: Symptom[] = [];
+
+  create(createSymptomDto: CreateSymptomDto): Symptom {
+    const newSymptom: Symptom = {
+      id: randomUUID(),
+      ...createSymptomDto,
+    };
+    this.symptoms.push(newSymptom);
+
+    return newSymptom;
   }
 
-  findAll() {
-    return `This action returns all symptoms`;
+  findAll(): Symptom[] {
+    return this.symptoms;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} symptom`;
+  findOne(id: string): Symptom {
+    const existingSymptom = this.symptoms.find((s) => s.id === id);
+    if (!existingSymptom) {
+      throw new Error();
+    }
+    return existingSymptom;
   }
 
-  update(id: number, updateSymptomDto: UpdateSymptomDto) {
-    return `This action updates a #${id} symptom`;
+  update(id: string, updateSymptomDto: UpdateSymptomDto): Symptom {
+    const symptomIndex = this.symptoms.findIndex((s) => s.id === id);
+    const existingSymptom = this.symptoms[symptomIndex];
+    if (!existingSymptom) {
+      throw new Error();
+    }
+
+    const updatedSymptom: Symptom = {
+      ...existingSymptom,
+      ...updateSymptomDto,
+    };
+
+    this.symptoms.splice(symptomIndex, 1, updatedSymptom);
+
+    return updatedSymptom;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} symptom`;
+  remove(id: string): Symptom {
+    const symptomIndex = this.symptoms.findIndex((s) => s.id === id);
+    const existingSymptom = this.symptoms[symptomIndex];
+
+    this.symptoms.splice(symptomIndex, 1);
+
+    return existingSymptom;
   }
 }

@@ -4,6 +4,7 @@ import { SymptomsController } from './symptoms.controller';
 
 @Module({
   controllers: [SymptomsController],
-  providers: [SymptomsService]
+  providers: [SymptomsService],
+  exports: [SymptomsService],
 })
 export class SymptomsModule {}
