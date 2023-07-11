@@ -16,7 +16,7 @@ export function App() {
     const controller = new AbortController();
     (async () => {
       try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${apiUrl}/issues`, {
           // connect the controller with the fetch request
           signal: controller.signal,
         });
