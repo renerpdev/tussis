@@ -1,61 +1,112 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { SymptomsService } from './../symptoms/symptoms.service';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Scope,
+} from '@nestjs/common';
+import { CollectionReference, Timestamp } from '@google-cloud/firestore';
+import dayjs from 'dayjs';
+import { randomUUID } from 'crypto';
+
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
-import { randomUUID } from 'crypto';
+import { IssueDocument } from './documents/issues.document';
 import { Issue } from './entities/issue.entity';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class IssuesService {
-  private readonly issues: Issue[] = [];
+  constructor(
+    @Inject(IssueDocument.collectionName)
+    private issuesCollection: CollectionReference<IssueDocument>,
+    private symptomsService: SymptomsService
+  ) {}
 
-  create(createIssueDto: CreateIssueDto): Issue {
-    const newIssue: Issue = {
-      id: randomUUID(),
-      symptomId: createIssueDto.symptomId,
-      date: new Date(createIssueDto.date),
+  async create(createIssueDto: CreateIssueDto): Promise<Issue> {
+    const docRef = this.issuesCollection.doc(randomUUID());
+    const dateMillis = dayjs(createIssueDto.date).valueOf();
+
+    const symptom = await this.symptomsService.findOne(
+      createIssueDto.symptomId
+    );
+
+    await docRef.set({
+      symptomId: symptom.id,
       notes: createIssueDto.notes,
-    };
-    this.issues.push(newIssue);
+      date: Timestamp.fromMillis(dateMillis),
+    });
 
-    return newIssue;
+    const issueDoc = await docRef.get();
+
+    return { ...issueDoc.data(), id: issueDoc.id };
   }
 
-  findAll() {
-    return this.issues;
+  async findAll(): Promise<Issue[]> {
+    const snapshot = await this.issuesCollection.get();
+    const issues: Issue[] = [];
+    snapshot.forEach((doc) => issues.push({ ...doc.data(), id: doc.id }));
+
+    return issues;
   }
 
-  findOne(id: string): Issue {
-    const existingIssue = this.issues.find((s) => s.id === id);
-    if (!existingIssue) {
-      throw new Error();
+  async findOne(id: string): Promise<Issue> {
+    const docRef = this.issuesCollection.doc(id);
+    const issueDoc = await docRef.get();
+
+    if (!issueDoc.createTime) {
+      throw new HttpException(
+        `Issue not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
     }
-    return existingIssue;
+
+    return { ...issueDoc.data(), id: issueDoc.id };
   }
 
-  update(id: string, updateIssueDto: UpdateIssueDto): Issue {
-    const issueIndex = this.issues.findIndex((s) => s.id === id);
-    const existingIssue = this.issues[issueIndex];
-    if (!existingIssue) {
-      throw new Error();
+  async update(id: string, updateIssueDto: UpdateIssueDto): Promise<Issue> {
+    const docRef = this.issuesCollection.doc(id);
+    const dateMillis =
+      updateIssueDto.date && dayjs(updateIssueDto.date).valueOf();
+
+    const symptom =
+      updateIssueDto.symptomId &&
+      (await this.symptomsService.findOne(updateIssueDto.symptomId));
+
+    let issueDoc = await docRef.get();
+
+    if (!issueDoc.createTime) {
+      throw new HttpException(
+        `Issue not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
     }
 
-    const updatedIssue: Issue = {
-      ...existingIssue,
-      ...updateIssueDto,
-      date: new Date(updateIssueDto.date),
-    };
+    await docRef.set({
+      symptomId: symptom?.id || issueDoc.data().symptomId,
+      notes: updateIssueDto.notes || issueDoc.data().notes,
+      date: dateMillis
+        ? Timestamp.fromMillis(dateMillis)
+        : issueDoc.data().date,
+    });
+    issueDoc = await docRef.get();
 
-    this.issues.splice(issueIndex, 1, updatedIssue);
-
-    return updatedIssue;
+    return { ...issueDoc.data(), id: issueDoc.id };
   }
 
-  remove(id: string): Issue {
-    const issueIndex = this.issues.findIndex((s) => s.id === id);
-    const existingIssue = this.issues[issueIndex];
+  async remove(id: string): Promise<Issue> {
+    const docRef = this.issuesCollection.doc(id);
+    const issueDoc = await docRef.get();
 
-    this.issues.splice(issueIndex, 1);
+    if (!issueDoc.createTime) {
+      throw new HttpException(
+        `Issue not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
+    }
 
-    return existingIssue;
+    await docRef.delete();
+
+    return { ...issueDoc.data(), id: issueDoc.id };
   }
 }

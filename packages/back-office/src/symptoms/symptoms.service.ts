@@ -1,59 +1,96 @@
-import { Injectable, Scope } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Scope,
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
+
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
-// TODO: remove this import later
-import { randomUUID } from 'crypto';
+import { SymptomDocument } from './documents/symptom.document';
+import { CollectionReference } from 'firebase-admin/firestore';
 import { Symptom } from './entities/symptom.entity';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class SymptomsService {
-  private readonly symptoms: Symptom[] = [];
+  constructor(
+    @Inject(SymptomDocument.collectionName)
+    private symptomsCollection: CollectionReference<SymptomDocument>
+  ) {}
 
-  create(createSymptomDto: CreateSymptomDto): Symptom {
-    const newSymptom: Symptom = {
-      id: randomUUID(),
-      ...createSymptomDto,
-    };
-    this.symptoms.push(newSymptom);
+  async create(createSymptomDto: CreateSymptomDto): Promise<Symptom> {
+    const docRef = this.symptomsCollection.doc(randomUUID());
 
-    return newSymptom;
+    await docRef.set({
+      name: createSymptomDto.name,
+      desc: createSymptomDto.desc,
+    });
+
+    const symptomDoc = await docRef.get();
+
+    return { ...symptomDoc.data(), id: symptomDoc.id };
   }
 
-  findAll(): Symptom[] {
-    return this.symptoms;
+  async findAll(): Promise<Symptom[]> {
+    const snapshot = await this.symptomsCollection.get();
+    const symptoms: Symptom[] = [];
+    snapshot.forEach((doc) => symptoms.push({ ...doc.data(), id: doc.id }));
+    return symptoms;
   }
 
-  findOne(id: string): Symptom {
-    const existingSymptom = this.symptoms.find((s) => s.id === id);
-    if (!existingSymptom) {
-      throw new Error();
+  async findOne(id: string): Promise<Symptom> {
+    const docRef = this.symptomsCollection.doc(id);
+    const symptomDoc = await docRef.get();
+
+    if (!symptomDoc.createTime) {
+      throw new HttpException(
+        `Symptom not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
     }
-    return existingSymptom;
+
+    return { ...symptomDoc.data(), id: symptomDoc.id };
   }
 
-  update(id: string, updateSymptomDto: UpdateSymptomDto): Symptom {
-    const symptomIndex = this.symptoms.findIndex((s) => s.id === id);
-    const existingSymptom = this.symptoms[symptomIndex];
-    if (!existingSymptom) {
-      throw new Error();
+  async update(
+    id: string,
+    updateSymptomDto: UpdateSymptomDto
+  ): Promise<Symptom> {
+    const docRef = this.symptomsCollection.doc(id);
+
+    let symptomDoc = await docRef.get();
+
+    if (!symptomDoc.createTime) {
+      throw new HttpException(
+        `Symptom not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
     }
 
-    const updatedSymptom: Symptom = {
-      ...existingSymptom,
-      ...updateSymptomDto,
-    };
+    await docRef.set({
+      name: updateSymptomDto.name || symptomDoc.data().name,
+      desc: updateSymptomDto.desc || symptomDoc.data().desc,
+    });
+    symptomDoc = await docRef.get();
 
-    this.symptoms.splice(symptomIndex, 1, updatedSymptom);
-
-    return updatedSymptom;
+    return { ...symptomDoc.data(), id: symptomDoc.id };
   }
 
-  remove(id: string): Symptom {
-    const symptomIndex = this.symptoms.findIndex((s) => s.id === id);
-    const existingSymptom = this.symptoms[symptomIndex];
+  async remove(id: string): Promise<Symptom> {
+    const docRef = this.symptomsCollection.doc(id);
+    const symptomDoc = await docRef.get();
 
-    this.symptoms.splice(symptomIndex, 1);
+    if (!symptomDoc.createTime) {
+      throw new HttpException(
+        `Symptom not found with ID: ${id}`,
+        HttpStatus.NOT_FOUND
+      );
+    }
 
-    return existingSymptom;
+    await docRef.delete();
+
+    return { ...symptomDoc.data(), id: symptomDoc.id };
   }
 }

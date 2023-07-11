@@ -1,6 +1,8 @@
+import { Timestamp } from 'firebase-admin/firestore';
+
 export interface Issue {
   id: string;
   symptomId: string;
-  date: Date;
+  date: Timestamp;
   notes?: string;
 }
