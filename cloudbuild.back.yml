@@ -12,9 +12,9 @@ steps:
   - name: 'node:16.20'
     entrypoint: 'yarn'
 
-  # Build/Deploy all projects
+  # Build/Deploy back-office
   - name: 'node:16.20'
     entrypoint: 'yarn'
-    args: ['nx', 'run-many', '-t', 'deploy', '--token', '${_FIREBASE_TOKEN}']
+    args: ['nx', 'deploy', 'back-office', '--token', '${_FIREBASE_TOKEN}']
 
 timeout: 1200s

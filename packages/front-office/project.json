@@ -79,7 +79,8 @@
         "commands": [
           "nx run front-office:build:production",
           "firebase deploy --only hosting --config firebase.json"
-        ]
+        ],
+        "parallel": false
       }
     }
   },

@@ -57,8 +57,9 @@
       "options": {
         "commands": [
           "nx run back-office:build:production",
-          "firebase deploy --only functions,firestore --config firebase.json"
-        ]
+          "firebase deploy --only functions --config firebase.json"
+        ],
+        "parallel": false
       }
     },
     "getconfig": {

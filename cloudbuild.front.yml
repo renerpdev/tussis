@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/${_FIREBASE_PROJECT_ID}/firebase',
+        './dockerfiles/firebase',
+      ]
+
+  # Install node deps
+  - name: 'node:16.20'
+    entrypoint: 'yarn'
+
+  # Build/Deploy front-office
+  - name: 'node:16.20'
+    entrypoint: 'yarn'
+    args: ['nx', 'deploy', 'front-office', '--token', '${_FIREBASE_TOKEN}']
+
+timeout: 1200s
