@@ -1,6 +1,6 @@
-export class SymptomDocument {
-  static collectionName = 'symptoms';
+import { OmitType } from '@nestjs/mapped-types';
+import { Symptom } from '../entities/symptom.entity';
 
-  name: string;
-  desc?: string;
+export class SymptomDocument extends OmitType(Symptom, ['id'] as const) {
+  static collectionName = 'symptoms';
 }

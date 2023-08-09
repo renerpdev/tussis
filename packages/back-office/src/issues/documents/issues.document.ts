@@ -1,9 +1,6 @@
-import { Timestamp } from '@google-cloud/firestore';
+import { OmitType } from '@nestjs/mapped-types';
+import { Issue } from '../entities/issue.entity';
 
-export class IssueDocument {
+export class IssueDocument extends OmitType(Issue, ['id'] as const) {
   static collectionName = 'issues';
-
-  symptomId: string;
-  date: Timestamp;
-  notes?: string;
 }
