@@ -5,7 +5,6 @@
   "scripts": {},
   "private": true,
   "devDependencies": {
-    "@nestjs/mapped-types": "^2.0.2",
     "@nestjs/schematics": "^9.1.0",
     "@nestjs/testing": "^9.1.1",
     "@nx/cypress": "16.3.2",
@@ -61,6 +60,7 @@
     "vitest": "^0.31.0"
   },
   "dependencies": {
+    "@nestjs/mapped-types": "^2.0.2",
     "@nestjs/common": "^9.1.1",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.1.1",
