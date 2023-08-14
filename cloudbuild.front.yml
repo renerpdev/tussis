@@ -16,5 +16,7 @@ steps:
   - name: 'node:16.20'
     entrypoint: 'yarn'
     args: ['nx', 'deploy', 'front-office', '--token', '${_FIREBASE_TOKEN}']
+    env:
+      - 'VITE_API_URL=${_API_URL}'
 
 timeout: 1200s

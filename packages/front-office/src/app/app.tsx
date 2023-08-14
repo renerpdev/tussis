@@ -4,7 +4,7 @@ import { Route, Routes, Link } from 'react-router-dom';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
 
-export const apiUrl = `${import.meta.env.VITE_API_URL}`;
+export const apiURL = import.meta.env.VITE_API_URL;
 
 export function App() {
   const [data, setData] = React.useState<any>();
@@ -16,7 +16,7 @@ export function App() {
     const controller = new AbortController();
     (async () => {
       try {
-        const response = await fetch(`${apiUrl}/issues`, {
+        const response = await fetch(`${apiURL}/issues`, {
           // connect the controller with the fetch request
           signal: controller.signal,
         });
