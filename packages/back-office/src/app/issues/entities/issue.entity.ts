@@ -2,7 +2,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 
 export class Issue {
   id: string;
-  symptomId: string;
+  symptoms: string[];
   date: Timestamp;
   notes?: string;
 }

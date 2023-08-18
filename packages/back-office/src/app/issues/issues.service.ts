@@ -27,12 +27,14 @@ export class IssuesService {
     const docRef = this.issuesCollection.doc(randomUUID());
     const dateMillis = dayjs(createIssueDto.date).valueOf();
 
-    const symptom = await this.symptomsService.findOne(
-      createIssueDto.symptomId
+    await Promise.all(
+      (createIssueDto.symptoms || []).map((symptomId) =>
+        this.symptomsService.findOne(symptomId)
+      )
     );
 
     await docRef.set({
-      symptomId: symptom.id,
+      symptoms: createIssueDto.symptoms,
       notes: createIssueDto.notes,
       date: Timestamp.fromMillis(dateMillis),
     });
@@ -69,9 +71,13 @@ export class IssuesService {
     const dateMillis =
       updateIssueDto.date && dayjs(updateIssueDto.date).valueOf();
 
-    const symptom =
-      updateIssueDto.symptomId &&
-      (await this.symptomsService.findOne(updateIssueDto.symptomId));
+    const symptoms = await Promise.all(
+      (updateIssueDto.symptoms || []).map((symptomId) =>
+        this.symptomsService.findOne(symptomId)
+      )
+    );
+
+    const symptomsIds = symptoms.map(({ id }) => id);
 
     let issueDoc = await docRef.get();
 
@@ -83,7 +89,7 @@ export class IssuesService {
     }
 
     await docRef.set({
-      symptomId: symptom?.id || issueDoc.data().symptomId,
+      symptoms: symptomsIds || issueDoc.data().symptoms,
       notes: updateIssueDto.notes || issueDoc.data().notes,
       date: dateMillis
         ? Timestamp.fromMillis(dateMillis)

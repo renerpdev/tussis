@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateIssueDto {
   @ApiProperty()
-  symptomId: string;
+  symptoms: string[];
 
   @ApiProperty()
   date: string;
