@@ -10,9 +10,13 @@ import {
 import { SymptomsService } from './symptoms.service';
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('symptoms')
+@ApiTags(SymptomsController.path)
+@Controller(SymptomsController.path)
 export class SymptomsController {
+  static path = 'symptoms';
+
   constructor(private readonly symptomsService: SymptomsService) {}
 
   @Post()
