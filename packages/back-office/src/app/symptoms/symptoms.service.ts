@@ -5,13 +5,14 @@ import {
   Injectable,
   Scope,
 } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
 import { SymptomDocument } from './documents/symptom.document';
 import { CollectionReference } from 'firebase-admin/firestore';
 import { Symptom } from './entities/symptom.entity';
+import { getPaginatedList, getValidDto } from '../../shared/utils';
+import { SymptomsList, SymptomsListInput } from './dto/get-all-symptoms.dto';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class SymptomsService {
@@ -21,23 +22,25 @@ export class SymptomsService {
   ) {}
 
   async create(createSymptomDto: CreateSymptomDto): Promise<Symptom> {
-    const docRef = this.symptomsCollection.doc(randomUUID());
-
-    await docRef.set({
+    const newSymptom = {
       name: createSymptomDto.name,
       desc: createSymptomDto.desc,
-    });
+    };
+
+    const docRef = await this.symptomsCollection.add(newSymptom);
 
     const symptomDoc = await docRef.get();
 
     return { ...symptomDoc.data(), id: symptomDoc.id };
   }
 
-  async findAll(): Promise<Symptom[]> {
-    const snapshot = await this.symptomsCollection.get();
-    const symptoms: Symptom[] = [];
-    snapshot.forEach((doc) => symptoms.push({ ...doc.data(), id: doc.id }));
-    return symptoms;
+  getList(input: SymptomsListInput): Promise<SymptomsList> {
+    const validInput = getValidDto(SymptomsListInput, input);
+
+    return getPaginatedList<SymptomDocument>({
+      ...validInput,
+      collection: this.symptomsCollection,
+    });
   }
 
   async findOne(id: string): Promise<Symptom> {
@@ -69,9 +72,8 @@ export class SymptomsService {
       );
     }
 
-    await docRef.set({
-      name: updateSymptomDto.name || symptomDoc.data().name,
-      desc: updateSymptomDto.desc || symptomDoc.data().desc,
+    await docRef.update({
+      ...updateSymptomDto,
     });
     symptomDoc = await docRef.get();
 
@@ -82,7 +84,7 @@ export class SymptomsService {
     const docRef = this.symptomsCollection.doc(id);
     const symptomDoc = await docRef.get();
 
-    if (!symptomDoc.createTime) {
+    if (!symptomDoc.exists) {
       throw new HttpException(
         `Symptom not found with ID: ${id}`,
         HttpStatus.NOT_FOUND

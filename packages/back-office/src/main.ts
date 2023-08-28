@@ -3,6 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import express from 'express';
 import * as functions from 'firebase-functions';
+import 'reflect-metadata';
 
 import { AppModule } from './app/app.module';
 

@@ -1,4 +1,4 @@
-FROM node:16.20
+FROM node:18.17
 
 RUN npm i -g firebase-tools
 

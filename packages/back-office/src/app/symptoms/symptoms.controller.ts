@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SymptomsService } from './symptoms.service';
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SymptomsListInput } from './dto/get-all-symptoms.dto';
 
 @ApiTags(SymptomsController.path)
 @Controller(SymptomsController.path)
@@ -25,8 +27,8 @@ export class SymptomsController {
   }
 
   @Get()
-  findAll() {
-    return this.symptomsService.findAll();
+  getList(@Query() input: SymptomsListInput) {
+    return this.symptomsService.getList(input);
   }
 
   @Get(':id')

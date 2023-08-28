@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
 import { FirestoreModule } from './../firestore/firestore.module';
 import { IssuesModule } from './issues/issues.module';
 import { SymptomsModule } from './symptoms/symptoms.module';

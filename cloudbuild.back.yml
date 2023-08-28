@@ -9,11 +9,11 @@ steps:
       ]
 
   # Install node deps
-  - name: 'node:16.20'
+  - name: 'node:18.17'
     entrypoint: 'yarn'
 
   # Build/Deploy back-office
-  - name: 'node:16.20'
+  - name: 'node:18.17'
     entrypoint: 'yarn'
     args: ['nx', 'deploy', 'back-office', '--token', '${_FIREBASE_TOKEN}']
 

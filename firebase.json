@@ -22,7 +22,7 @@
   "functions": {
     "codebase": "back-office",
     "predeploy": ["npx nx build back-office"],
-    "runtime": "nodejs16",
+    "runtime": "nodejs18",
     "source": "dist/packages/back-office"
   },
   "emulators": {
