@@ -15,6 +15,7 @@ import { IssueDocument } from './documents/issues.document';
 import { Issue } from './entities/issue.entity';
 import { IssuesList, IssuesListInput } from './dto/get-all-issues.dto';
 import { getPaginatedList, getValidDto } from '../../shared/utils';
+import { DEFAULT_DATE_FORMAT } from '../../shared/types';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class IssuesService {
@@ -34,7 +35,7 @@ export class IssuesService {
     const newIssue = {
       symptoms: createIssueDto.symptoms,
       notes: createIssueDto.notes,
-      date: dayjs(createIssueDto.date).format('DD/MM/YYYY'),
+      date: dayjs(new Date(createIssueDto.date)).format(DEFAULT_DATE_FORMAT),
     };
     const docRef = await this.issuesCollection.add(newIssue);
 
@@ -89,7 +90,7 @@ export class IssuesService {
     await docRef.update({
       ...updateIssueDto,
       date: updateIssueDto.date
-        ? dayjs(updateIssueDto.date).format('DD/MM/YYYY')
+        ? dayjs(updateIssueDto.date).format(DEFAULT_DATE_FORMAT)
         : issueDoc.data().date,
     });
     issueDoc = await docRef.get();

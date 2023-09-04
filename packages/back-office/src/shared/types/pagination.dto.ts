@@ -3,11 +3,13 @@ import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
 
 export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
 class BasePagination {
   /*
    * Maximum number of records to be returned
    */
+  @ApiProperty()
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -17,6 +19,7 @@ class BasePagination {
   /**
    * Number of records to be skipped
    */
+  @ApiProperty()
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -50,4 +53,15 @@ export class PaginatedListInput extends BasePagination {
   @IsOptional()
   @IsString()
   sort?: string;
+
+  @ApiProperty({
+    description: `Allows for ranging by date using ${DEFAULT_DATE_FORMAT}:${DEFAULT_DATE_FORMAT}`,
+    required: false,
+  })
+  @Matches(RegExp('(\\d{4}-\\d{1,2}-\\d{1,2}):\\d{4}-\\d{1,2}-\\d{1,2}'), {
+    message: `Date Range must be in the format of ${DEFAULT_DATE_FORMAT}:${DEFAULT_DATE_FORMAT}`,
+  })
+  @IsOptional()
+  @IsString()
+  range?: string;
 }
