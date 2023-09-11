@@ -47,7 +47,7 @@ export class SymptomsService {
     const docRef = this.symptomsCollection.doc(id);
     const symptomDoc = await docRef.get();
 
-    if (!symptomDoc.createTime) {
+    if (!symptomDoc.exists) {
       throw new HttpException(
         `Symptom not found with ID: ${id}`,
         HttpStatus.NOT_FOUND
@@ -65,7 +65,8 @@ export class SymptomsService {
 
     let symptomDoc = await docRef.get();
 
-    if (!symptomDoc.createTime) {
+    // TODO: maybe not needed since docRef.update() throws an error on failure
+    if (!symptomDoc.exists) {
       throw new HttpException(
         `Symptom not found with ID: ${id}`,
         HttpStatus.NOT_FOUND

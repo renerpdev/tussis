@@ -11,7 +11,6 @@ import {
   PaginatedList,
   PaginatedListInput,
 } from '../types';
-import { Logger } from '@nestjs/common';
 
 type SortParam = Record<string, OrderByDirection>;
 type Input<T> = PaginatedListInput & {

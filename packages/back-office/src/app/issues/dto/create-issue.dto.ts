@@ -7,6 +7,10 @@ export class CreateIssueDto {
   symptoms: string[];
 
   @ApiProperty()
+  @IsArray()
+  meds: string[];
+
+  @ApiProperty()
   @IsDate()
   date: string;
 

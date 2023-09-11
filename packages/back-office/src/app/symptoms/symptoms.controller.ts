@@ -8,10 +8,11 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { SymptomsService } from './symptoms.service';
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
-import { ApiTags } from '@nestjs/swagger';
 import { SymptomsListInput } from './dto/get-all-symptoms.dto';
 
 @ApiTags(SymptomsController.path)

@@ -16,13 +16,15 @@ import { Issue } from './entities/issue.entity';
 import { IssuesList, IssuesListInput } from './dto/get-all-issues.dto';
 import { getPaginatedList, getValidDto } from '../../shared/utils';
 import { DEFAULT_DATE_FORMAT } from '../../shared/types';
+import { MedsService } from './../meds/meds.service';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class IssuesService {
   constructor(
     @Inject(IssueDocument.collectionName)
     private issuesCollection: CollectionReference<IssueDocument>,
-    private symptomsService: SymptomsService
+    private symptomsService: SymptomsService,
+    private medsService: MedsService
   ) {}
 
   async create(createIssueDto: CreateIssueDto): Promise<Issue> {
@@ -32,8 +34,15 @@ export class IssuesService {
       )
     );
 
+    await Promise.all(
+      (createIssueDto.meds || []).map((medId) =>
+        this.medsService.findOne(medId)
+      )
+    );
+
     const newIssue = {
       symptoms: createIssueDto.symptoms,
+      meds: createIssueDto.meds,
       notes: createIssueDto.notes,
       date: dayjs(new Date(createIssueDto.date)).format(DEFAULT_DATE_FORMAT),
     };
@@ -57,7 +66,7 @@ export class IssuesService {
     const docRef = this.issuesCollection.doc(id);
     const issueDoc = await docRef.get();
 
-    if (!issueDoc.createTime) {
+    if (!issueDoc.exists) {
       throw new HttpException(
         `Issue not found with ID: ${id}`,
         HttpStatus.NOT_FOUND
@@ -80,7 +89,8 @@ export class IssuesService {
 
     let issueDoc = await docRef.get();
 
-    if (!issueDoc.createTime) {
+    // TODO: maybe not needed since docRef.update() throws an error on failure
+    if (!issueDoc.exists) {
       throw new HttpException(
         `Issue not found with ID: ${id}`,
         HttpStatus.NOT_FOUND
