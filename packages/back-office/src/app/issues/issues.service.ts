@@ -17,6 +17,7 @@ import { IssuesList, IssuesListInput } from './dto/get-all-issues.dto';
 import { getPaginatedList, getValidDto } from '../../shared/utils';
 import { DEFAULT_DATE_FORMAT } from '../../shared/types';
 import { MedsService } from './../meds/meds.service';
+import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class IssuesService {
@@ -67,9 +68,9 @@ export class IssuesService {
     const issueDoc = await docRef.get();
 
     if (!issueDoc.exists) {
-      throw new HttpException(
-        `Issue not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        issueDoc.id,
+        IssueDocument.collectionName
       );
     }
 
@@ -91,9 +92,9 @@ export class IssuesService {
 
     // TODO: maybe not needed since docRef.update() throws an error on failure
     if (!issueDoc.exists) {
-      throw new HttpException(
-        `Issue not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        issueDoc.id,
+        IssueDocument.collectionName
       );
     }
 
@@ -113,9 +114,9 @@ export class IssuesService {
     const issueDoc = await docRef.get();
 
     if (!issueDoc.exists) {
-      throw new HttpException(
-        `Issue not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        issueDoc.id,
+        IssueDocument.collectionName
       );
     }
 

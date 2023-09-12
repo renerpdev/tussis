@@ -13,6 +13,7 @@ import { CollectionReference } from 'firebase-admin/firestore';
 import { Symptom } from './entities/symptom.entity';
 import { getPaginatedList, getValidDto } from '../../shared/utils';
 import { SymptomsList, SymptomsListInput } from './dto/get-all-symptoms.dto';
+import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class SymptomsService {
@@ -48,9 +49,9 @@ export class SymptomsService {
     const symptomDoc = await docRef.get();
 
     if (!symptomDoc.exists) {
-      throw new HttpException(
-        `Symptom not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        symptomDoc.id,
+        SymptomDocument.collectionName
       );
     }
 
@@ -67,9 +68,9 @@ export class SymptomsService {
 
     // TODO: maybe not needed since docRef.update() throws an error on failure
     if (!symptomDoc.exists) {
-      throw new HttpException(
-        `Symptom not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        symptomDoc.id,
+        SymptomDocument.collectionName
       );
     }
 
@@ -86,9 +87,9 @@ export class SymptomsService {
     const symptomDoc = await docRef.get();
 
     if (!symptomDoc.exists) {
-      throw new HttpException(
-        `Symptom not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
+      throw new DocumentNotFoundError(
+        symptomDoc.id,
+        SymptomDocument.collectionName
       );
     }
 

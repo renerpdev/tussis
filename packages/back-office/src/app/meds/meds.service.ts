@@ -13,6 +13,7 @@ import { MedDocument } from './documents/med.document';
 import { Med } from './entities/med.entity';
 import { getPaginatedList, getValidDto } from '../../shared/utils';
 import { MedsList, MedsListInput } from './dto/get-all-meds.dto';
+import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class MedsService {
@@ -48,10 +49,7 @@ export class MedsService {
     const medDoc = await docRef.get();
 
     if (!medDoc.exists) {
-      throw new HttpException(
-        `Med not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
-      );
+      throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName);
     }
 
     return { ...medDoc.data(), id: medDoc.id };
@@ -64,10 +62,7 @@ export class MedsService {
 
     // TODO: maybe not needed since docRef.update() throws an error on failure
     if (!medDoc.exists) {
-      throw new HttpException(
-        `Med not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
-      );
+      throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName);
     }
 
     await docRef.update({
@@ -83,10 +78,7 @@ export class MedsService {
     const medDoc = await docRef.get();
 
     if (!medDoc.exists) {
-      throw new HttpException(
-        `Med not found with ID: ${id}`,
-        HttpStatus.NOT_FOUND
-      );
+      throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName);
     }
 
     await docRef.delete();
