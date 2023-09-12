@@ -1,77 +1,42 @@
-import React from 'react';
-import { Route, Routes, Link } from 'react-router-dom';
+import React, { useState } from 'react'
+import streamSaver from 'streamsaver'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.scss';
-
-export const apiURL = import.meta.env.VITE_API_URL;
+export const apiURL = import.meta.env.VITE_API_URL
 
 export function App() {
-  const [data, setData] = React.useState<any>();
+  const [loading, setLoading] = useState(false)
 
-  React.useEffect(() => {
-    console.log('Last deploy date:', LAST_DEPLOY_DATE);
-
-    //create a controller
-    const controller = new AbortController();
-    (async () => {
+  const handleClick = React.useCallback(() => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${apiURL}/issues`, {
-          // connect the controller with the fetch request
-          signal: controller.signal,
-        });
-        // handle success
-        setData(await response.json());
-      } catch (e) {
-        // Handle the error
+        setLoading(true)
+
+        const response = await fetch(`${apiURL}/issues/report`)
+        if (!response.ok || !response.body) {
+          throw response.statusText
+        }
+
+        const fileStream = streamSaver.createWriteStream(`tussis-report.pdf`)
+        await response.body.pipeTo(fileStream)
+
+        setLoading(false)
+      } catch (error) {
+        setLoading(false)
+        console.log(error)
       }
-    })();
-    //aborts the request when the component umounts
-    return () => controller?.abort();
-  }, []);
+    }
+
+    fetchData()
+  }, [])
 
   return (
     <div>
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
+      <button onClick={handleClick}>test download</button>
+      <div>
+        <b>Request Response: {loading && <i>Fetching data...</i>}</b>
       </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-
-      <p>{JSON.stringify(data) || 'loading data...'}</p>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

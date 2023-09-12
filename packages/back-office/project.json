@@ -25,10 +25,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "nx run back-office:build --watch",
-          "nx run back-office:emulate"
-        ]
+        "commands": ["nx run back-office:build --watch", "nx run back-office:emulate"]
       }
     },
     "lint": {
