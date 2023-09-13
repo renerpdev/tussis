@@ -14,15 +14,17 @@ export const createNestServer = async expressInstance => {
     cors: true,
   })
 
-  app.enableCors({
-    origin: function (origin, callback) {
-      if (!origin || origin === 'null' || process.env['_ALLOWED_ORIGINS']?.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    },
-  })
+  if (process.env.ENV === 'development') {
+    app.enableCors({
+      origin: function (origin, callback) {
+        if (!origin || origin === 'null' || process.env.ALLOWED_ORIGINS?.includes(origin)) {
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      },
+    })
+  }
 
   const config = new DocumentBuilder()
     .setTitle('Tussis')
