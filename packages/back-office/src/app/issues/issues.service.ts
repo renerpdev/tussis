@@ -106,11 +106,6 @@ export class IssuesService {
 
   async exportPdf(input: IssuesListInput): Promise<Buffer> {
     const paginatedIssuesList = await this.getList(input)
-
-    if (paginatedIssuesList?.data?.length === 0) {
-      return Buffer.concat([])
-    }
-
     const medsArray = (await this.medsService.getList({})).data as Med[]
     const symptomsArray = (await this.symptomsService.getList({})).data as Symptom[]
 
@@ -126,7 +121,7 @@ export class IssuesService {
 
     const table = {
       title: 'TUSSIS',
-      subtitle: 'Reporte de affecciones para el periodo',
+      subtitle: 'Reporte de afecciones para el periodo',
       headers,
       rows,
     }

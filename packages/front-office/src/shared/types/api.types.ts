@@ -19,8 +19,8 @@ export interface BaseQueryParams {
   range?: string
 }
 
-export interface BaseQueryResponse<T> {
-  data: T
+export interface PaginatedQueryResponse<T> {
+  data: T[]
   total?: number
   hasMore?: boolean
   limit?: number

@@ -1,32 +1,29 @@
+import { TussisApi } from 'api'
+import { format } from 'date-fns'
 import React, { useState } from 'react'
-import streamSaver from 'streamsaver'
-
-export const apiURL = import.meta.env.VITE_API_URL
+import { downloadBlobFile } from 'shared/utils'
 
 export function App() {
   const [loading, setLoading] = useState(false)
 
-  const handleClick = React.useCallback(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
+  const handleClick = React.useCallback(async () => {
+    try {
+      setLoading(true)
 
-        const response = await fetch(`${apiURL}/issues/report`)
-        if (!response.ok || !response.body) {
-          throw response.statusText
-        }
+      const blob = await TussisApi.getPDF(
+        'issues/report',
+        {
+          range: `${format(new Date(), 'yyyy-mm-dd')}:${format(new Date(), 'yyyy-mm-dd')}`,
+        },
+        undefined,
+      )
+      downloadBlobFile(blob)
 
-        const fileStream = streamSaver.createWriteStream(`tussis-report.pdf`)
-        await response.body.pipeTo(fileStream)
-
-        setLoading(false)
-      } catch (error) {
-        setLoading(false)
-        console.log(error)
-      }
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
     }
-
-    fetchData()
   }, [])
 
   return (

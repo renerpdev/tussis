@@ -11,11 +11,11 @@ class AxiosWrapper {
     }
   }
 
-  private async makeRequest<P, T>(
+  private async makeRequest<P, T, D>(
     method: Method,
     path: string,
     params?: P,
-    data?: P,
+    data?: D,
     accessToken?: string,
   ): Promise<T> {
     try {
@@ -38,7 +38,11 @@ class AxiosWrapper {
     }
   }
 
-  async getPdf<P>(path: string, params?: P, accessToken?: string) {
+  async getPdf<P, T = Blob>(
+    path: string,
+    params?: P,
+    accessToken?: string,
+  ): Promise<AxiosResponse<T>> {
     return axios.get(`${this.apiUrl}${path}`, {
       params: {
         cacheBustTimestamp: Date.now(), // prevents IE cache problems on re-download
@@ -54,19 +58,25 @@ class AxiosWrapper {
   }
 
   async get<P, T>(path: string, params?: P, accessToken?: string): Promise<T> {
-    return this.makeRequest<P, T>('GET', path, params, undefined, accessToken)
+    return this.makeRequest<P, T, undefined>('GET', path, params, undefined, accessToken)
   }
 
-  async post<P, T>(path: string, data?: P, accessToken?: string): Promise<T> {
-    return this.makeRequest<P, T>('POST', path, undefined, data, accessToken)
+  async post<T, D>(path: string, data?: D, accessToken?: string): Promise<T> {
+    return this.makeRequest<undefined, T, D>('POST', path, undefined, data, accessToken)
   }
 
-  async put<P, T>(path: string, data?: P, accessToken?: string): Promise<T> {
-    return this.makeRequest<P, T>('PUT', path, undefined, data, accessToken)
+  async patch<T, D>(path: string, data?: D, accessToken?: string): Promise<T> {
+    return this.makeRequest<undefined, T, D>('PATCH', path, undefined, data, accessToken)
   }
 
-  async delete<P, T>(path: string, accessToken?: string): Promise<T> {
-    return this.makeRequest<P, T>('DELETE', path, undefined, undefined, accessToken)
+  async delete<T>(path: string, accessToken?: string): Promise<T> {
+    return this.makeRequest<undefined, T, undefined>(
+      'DELETE',
+      path,
+      undefined,
+      undefined,
+      accessToken,
+    )
   }
 }
 
