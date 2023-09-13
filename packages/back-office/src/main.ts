@@ -16,7 +16,7 @@ export const createNestServer = async expressInstance => {
 
   app.enableCors({
     origin: function (origin, callback) {
-      if (!origin || origin === 'null' || process.env.ALLOWED_ORIGINS?.includes(origin)) {
+      if (!origin || origin === 'null' || process.env['_ALLOWED_ORIGINS']?.includes(origin)) {
         callback(null, true)
       } else {
         callback(new Error('Not allowed by CORS'))
@@ -26,7 +26,7 @@ export const createNestServer = async expressInstance => {
 
   const config = new DocumentBuilder()
     .setTitle('Tussis')
-    .setDescription("API for managing my dauhter's asthma condition")
+    .setDescription("API for managing my daughter's asthma condition")
     .setVersion('1.0')
     .build()
   const document = SwaggerModule.createDocument(app, config)
