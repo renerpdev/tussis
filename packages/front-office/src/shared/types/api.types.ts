@@ -26,3 +26,11 @@ export interface PaginatedQueryResponse<T> {
   limit?: number
   offset?: number
 }
+
+export enum HttpCodes {
+  Unauthorized = 401,
+  NotFound = 404,
+  Success = 200,
+  Created = 201,
+  InternalError = 500,
+}

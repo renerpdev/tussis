@@ -10,13 +10,9 @@ export function App() {
     try {
       setLoading(true)
 
-      const blob = await TussisApi.getPDF(
-        'issues/report',
-        {
-          range: `${format(new Date(), 'yyyy-mm-dd')}:${format(new Date(), 'yyyy-mm-dd')}`,
-        },
-        undefined,
-      )
+      const blob = await TussisApi.getPDF('issues/report', {
+        range: `${format(new Date(), 'yyyy-mm-dd')}:${format(new Date(), 'yyyy-mm-dd')}`,
+      })
       downloadBlobFile(blob)
 
       setLoading(false)

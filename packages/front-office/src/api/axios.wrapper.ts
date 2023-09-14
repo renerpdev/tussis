@@ -1,5 +1,7 @@
 import axios, { AxiosResponse, Method } from 'axios'
 
+export type Headers = unknown
+
 class AxiosWrapper {
   private apiUrl: string
 
@@ -11,12 +13,16 @@ class AxiosWrapper {
     }
   }
 
+  get core() {
+    return axios
+  }
+
   private async makeRequest<P, T, D>(
     method: Method,
     path: string,
     params?: P,
     data?: D,
-    accessToken?: string,
+    headers?: Headers,
   ): Promise<T> {
     try {
       const response: AxiosResponse<T> = await axios.request({
@@ -24,11 +30,7 @@ class AxiosWrapper {
         url: `${this.apiUrl}${path}`,
         params: method === 'GET' ? params : undefined,
         data: method !== 'GET' ? data : undefined,
-        headers: accessToken
-          ? {
-              Authorization: `Bearer ${accessToken}`,
-            }
-          : undefined,
+        headers: headers || undefined,
       })
 
       return response.data
@@ -41,7 +43,7 @@ class AxiosWrapper {
   async getPdf<P, T = Blob>(
     path: string,
     params?: P,
-    accessToken?: string,
+    headers?: Headers,
   ): Promise<AxiosResponse<T>> {
     return axios.get(`${this.apiUrl}${path}`, {
       params: {
@@ -52,31 +54,25 @@ class AxiosWrapper {
       timeout: 120,
       headers: {
         Accept: 'application/octet-stream',
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...(headers || {}),
       },
     })
   }
 
-  async get<P, T>(path: string, params?: P, accessToken?: string): Promise<T> {
-    return this.makeRequest<P, T, undefined>('GET', path, params, undefined, accessToken)
+  async get<P, T>(path: string, params?: P, headers?: Headers): Promise<T> {
+    return this.makeRequest<P, T, undefined>('GET', path, params, undefined, headers)
   }
 
-  async post<T, D>(path: string, data?: D, accessToken?: string): Promise<T> {
-    return this.makeRequest<undefined, T, D>('POST', path, undefined, data, accessToken)
+  async post<T, D>(path: string, data?: D, headers?: Headers): Promise<T> {
+    return this.makeRequest<undefined, T, D>('POST', path, undefined, data, headers)
   }
 
-  async patch<T, D>(path: string, data?: D, accessToken?: string): Promise<T> {
-    return this.makeRequest<undefined, T, D>('PATCH', path, undefined, data, accessToken)
+  async patch<T, D>(path: string, data?: D, headers?: Headers): Promise<T> {
+    return this.makeRequest<undefined, T, D>('PATCH', path, undefined, data, headers)
   }
 
-  async delete<T>(path: string, accessToken?: string): Promise<T> {
-    return this.makeRequest<undefined, T, undefined>(
-      'DELETE',
-      path,
-      undefined,
-      undefined,
-      accessToken,
-    )
+  async delete<T>(path: string, headers?: Headers): Promise<T> {
+    return this.makeRequest<undefined, T, undefined>('DELETE', path, undefined, undefined, headers)
   }
 }
 
