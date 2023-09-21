@@ -1,5 +1,5 @@
-import { PaginatedList, PaginatedListInput } from '../../../shared/types';
-import { IssueDocument } from '../documents/issues.document';
+import { PaginatedList, PaginatedListInput } from '../../../shared/types'
+import { IssueDocument } from '../documents/issues.document'
 
 export class IssuesListInput extends PaginatedListInput {}
 

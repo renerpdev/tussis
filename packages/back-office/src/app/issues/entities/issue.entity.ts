@@ -1,8 +1,10 @@
 import { BaseEntity } from '../../../shared/types/base-entity'
+import { Med } from '../../meds/entities/med.entity'
+import { Symptom } from '../../symptoms/entities/symptom.entity'
 
 export class Issue extends BaseEntity {
-  symptoms: string[]
-  meds: string[]
+  symptoms: Symptom[]
+  meds: Med[]
   date: string
   notes?: string
 }

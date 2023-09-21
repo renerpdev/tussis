@@ -8,6 +8,7 @@
       "executor": "@nx/vite:build",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
+      "dependsOn": ["run-tailwind"],
       "options": {
         "outputPath": "dist/packages/front-office"
       },
@@ -20,9 +21,16 @@
         }
       }
     },
+    "run-tailwind": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["yarn tailwindcss -i ./packages/front-office/src/styles.css -o ./packages/front-office/.tw/styles.css"]
+      }
+    },
     "serve": {
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
+      "dependsOn": ["run-tailwind"],
       "options": {
         "buildTarget": "front-office:build"
       },

@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { FirestoreModule } from './../firestore/firestore.module';
-import { IssuesModule } from './issues/issues.module';
+import { CacheModule } from '@nestjs/cache-manager'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { FirestoreModule } from './../firestore/firestore.module'
+import { IssuesModule } from './issues/issues.module'
 
 @Module({
   imports: [
@@ -16,6 +17,9 @@ import { IssuesModule } from './issues/issues.module';
       inject: [ConfigService],
     }),
     IssuesModule,
+    CacheModule.register({
+      isGlobal: true,
+    }),
   ],
   controllers: [],
   providers: [],

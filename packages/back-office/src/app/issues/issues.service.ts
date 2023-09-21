@@ -5,8 +5,6 @@ import dayjs from 'dayjs'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { DEFAULT_DATE_FORMAT } from '../../shared/types'
 import { generatePdfTable, getPaginatedList, getValidDto } from '../../shared/utils'
-import { Med } from '../meds/entities/med.entity'
-import { Symptom } from '../symptoms/entities/symptom.entity'
 import { MedsService } from './../meds/meds.service'
 import { SymptomsService } from './../symptoms/symptoms.service'
 import { IssueDocument } from './documents/issues.document'
@@ -25,15 +23,16 @@ export class IssuesService {
   ) {}
 
   async create(createIssueDto: CreateIssueDto): Promise<Issue> {
-    await Promise.all(
+    const symptoms = await Promise.all(
       (createIssueDto.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
     )
-
-    await Promise.all((createIssueDto.meds || []).map(medId => this.medsService.findOne(medId)))
+    const meds = await Promise.all(
+      (createIssueDto.meds || []).map(medId => this.medsService.findOne(medId)),
+    )
 
     const newIssue = {
-      symptoms: createIssueDto.symptoms,
-      meds: createIssueDto.meds,
+      symptoms: symptoms,
+      meds: meds,
       notes: createIssueDto.notes,
       date: dayjs(new Date(createIssueDto.date)).format(DEFAULT_DATE_FORMAT),
     }
@@ -44,7 +43,7 @@ export class IssuesService {
     return { ...issueDoc.data(), id: issueDoc.id }
   }
 
-  getList(input: IssuesListInput): Promise<IssuesList> {
+  async getList(input: IssuesListInput): Promise<IssuesList> {
     const validInput = getValidDto(IssuesListInput, input)
 
     return getPaginatedList<IssueDocument>({
@@ -79,14 +78,23 @@ export class IssuesService {
     if (!issueDoc.exists) {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
+    const symptoms = await Promise.all(
+      (updateIssueDto.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+    )
+    const meds = await Promise.all(
+      (updateIssueDto.meds || []).map(medId => this.medsService.findOne(medId)),
+    )
 
     await docRef.update({
       ...updateIssueDto,
+      symptoms: updateIssueDto.symptoms ? symptoms : issueDoc.data().symptoms,
+      meds: updateIssueDto.meds ? meds : issueDoc.data().meds,
       date: updateIssueDto.date
         ? dayjs(updateIssueDto.date).format(DEFAULT_DATE_FORMAT)
         : issueDoc.data().date,
     })
-    issueDoc = await docRef.get()
+
+    issueDoc = await docRef.get() // this is in order to return updated doc data
 
     return { ...issueDoc.data(), id: issueDoc.id }
   }
@@ -106,15 +114,11 @@ export class IssuesService {
 
   async exportPdf(input: IssuesListInput): Promise<Buffer> {
     const paginatedIssuesList = await this.getList(input)
-    const medsArray = (await this.medsService.getList({})).data as Med[]
-    const symptomsArray = (await this.symptomsService.getList({})).data as Symptom[]
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']
     const rows = paginatedIssuesList.data.map(issue => {
-      const issueSymptoms = issue.symptoms.map(
-        symptomId => symptomsArray.find(symptom => symptom.id === symptomId).name,
-      )
-      const issueMeds = issue.meds.map(medId => medsArray.find(med => med.id === medId).name)
+      const issueSymptoms = issue.symptoms.map(({ name }) => name)
+      const issueMeds = issue.meds.map(({ name }) => name)
 
       return [issue.date, issueSymptoms.join(', '), issueMeds.join(', '), issue.notes]
     })

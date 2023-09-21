@@ -24,20 +24,13 @@ class AxiosWrapper {
     data?: D,
     headers?: Headers,
   ): Promise<T> {
-    try {
-      const response: AxiosResponse<T> = await axios.request({
-        method,
-        url: `${this.apiUrl}${path}`,
-        params: method === 'GET' ? params : undefined,
-        data: method !== 'GET' ? data : undefined,
-        headers: headers || undefined,
-      })
-
-      return response.data
-    } catch (error) {
-      console.error(`Error performing ${method} request to ${path}:`, error)
-      throw error
-    }
+    return axios.request({
+      method,
+      url: `${this.apiUrl}${path}`,
+      params: method === 'GET' ? params : undefined,
+      data: method !== 'GET' ? data : undefined,
+      headers: headers || undefined,
+    })
   }
 
   async getPdf<P, T = Blob>(
