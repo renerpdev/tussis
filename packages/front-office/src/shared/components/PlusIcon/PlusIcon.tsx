@@ -1,5 +1,4 @@
-import React from "react";
-export const PlusIcon = ({size = 24, width=20, height=20, ...props}) => (
+export const PlusIcon = ({ size = 24, width = 20, height = 20, ...props }) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -21,4 +20,4 @@ export const PlusIcon = ({size = 24, width=20, height=20, ...props}) => (
       <path d="M12 18V6" />
     </g>
   </svg>
-);
+)

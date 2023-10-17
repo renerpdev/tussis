@@ -1,4 +1,5 @@
-import { BaseQueryParams, HttpCodes, PaginatedQueryResponse } from 'shared/types'
+import { AxiosResponse } from 'axios'
+import { BaseQueryParams, HttpCodes, PaginatedQueryResponse } from '../shared/types'
 import AxiosWrapper, { Headers } from './axios.wrapper'
 
 const axiosWrapper = new AxiosWrapper(import.meta.env.VITE_API_URL)
@@ -34,7 +35,7 @@ class TussisApi {
     // intercepts axios request
     this.axiosWrapper.core.interceptors.request.use(request => {
       // TODO: handle here the auth token insertion
-      request.headers.set('authorization', '<auth_token_here>')
+      // request.headers.set('authorization', '<auth_token_here>')
 
       return request
     })
@@ -45,19 +46,15 @@ class TussisApi {
     params?: BaseQueryParams,
     headers?: Headers,
   ): Promise<PaginatedQueryResponse<T>> {
-    const response = await this.axiosWrapper.get<BaseQueryParams, PaginatedQueryResponse<T>>(
+    return this.axiosWrapper.get<BaseQueryParams, PaginatedQueryResponse<T>>(
       `/${endpoint}`,
       params ? params : undefined,
       headers,
     )
-
-    return response
   }
 
   async add<T, D = Omit<T, 'id'>>(endpoint: string, data: D, headers?: Headers): Promise<T> {
-    const response = await this.axiosWrapper.post<T, D>(`/${endpoint}`, data, headers)
-
-    return response
+    return this.axiosWrapper.post<T, D>(`/${endpoint}`, data, headers)
   }
 
   async update<T, D = Partial<Omit<T, 'id'>>>(
@@ -65,29 +62,23 @@ class TussisApi {
     data: D,
     headers?: Headers,
   ): Promise<T> {
-    const response = await this.axiosWrapper.patch<T, D>(`/${endpoint}`, data, headers)
-
-    return response
+    return this.axiosWrapper.patch<T, D>(`/${endpoint}`, data, headers)
   }
 
   async delete<T>(endpoint: string, headers?: Headers): Promise<T> {
-    const response = await this.axiosWrapper.delete<T>(`/${endpoint}`, headers)
-
-    return response
+    return this.axiosWrapper.delete<T>(`/${endpoint}`, headers)
   }
 
   async getPDF<T = Blob>(
     endpoint: string,
     params?: BaseQueryParams,
     headers?: Headers,
-  ): Promise<T> {
-    const response = await this.axiosWrapper.getPdf<BaseQueryParams, T>(
+  ): Promise<AxiosResponse<T>> {
+    return this.axiosWrapper.getPdf<BaseQueryParams, T>(
       `/${endpoint}`,
       params ? params : undefined,
       headers,
     )
-
-    return response.data
   }
 }
 

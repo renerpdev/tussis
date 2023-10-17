@@ -1,5 +1,6 @@
-import React from "react";
-export const SearchIcon = (props) => (
+import { SVGProps } from 'react'
+
+export const SearchIcon = (props: SVGProps<SVGElement>) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -19,10 +20,10 @@ export const SearchIcon = (props) => (
     />
     <path
       d="M22 22L20 20"
-      stroke="currentColor"
+      stroke="currentColor "
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="2"
     />
   </svg>
-);
+)

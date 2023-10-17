@@ -1,5 +1,4 @@
-import React from "react";
-export const ChevronDownIcon = ({strokeWidth = 1.5, ...otherProps}) => (
+export const ChevronDownIcon = ({ strokeWidth = 1.5, ...otherProps }) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -19,4 +18,4 @@ export const ChevronDownIcon = ({strokeWidth = 1.5, ...otherProps}) => (
       strokeWidth={strokeWidth}
     />
   </svg>
-);
+)

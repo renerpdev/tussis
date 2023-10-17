@@ -1,5 +1,4 @@
-import React from "react";
-export const VerticalDotsIcon = ({size = 24, width=20, height=20, ...props}) => (
+export const VerticalDotsIcon = ({ size = 24, width = 20, height = 20, ...props }) => (
   <svg
     aria-hidden="true"
     fill="none"
@@ -15,4 +14,4 @@ export const VerticalDotsIcon = ({size = 24, width=20, height=20, ...props}) => 
       fill="currentColor"
     />
   </svg>
-);
+)

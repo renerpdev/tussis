@@ -1,12 +1,11 @@
 import { CollectionReference } from '@google-cloud/firestore'
 import { Inject, Injectable, Scope } from '@nestjs/common'
-import dayjs from 'dayjs'
 
+import dayjs from 'dayjs'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
-import { DEFAULT_DATE_FORMAT } from '../../shared/types'
 import { generatePdfTable, getPaginatedList, getValidDto } from '../../shared/utils'
-import { MedsService } from './../meds/meds.service'
-import { SymptomsService } from './../symptoms/symptoms.service'
+import { MedsService } from '../meds/meds.service'
+import { SymptomsService } from '../symptoms/symptoms.service'
 import { IssueDocument } from './documents/issues.document'
 import { CreateIssueDto } from './dto/create-issue.dto'
 import { IssuesList, IssuesListInput } from './dto/get-all-issues.dto'
@@ -34,7 +33,7 @@ export class IssuesService {
       symptoms: symptoms,
       meds: meds,
       notes: createIssueDto.notes,
-      date: dayjs(new Date(createIssueDto.date)).format(DEFAULT_DATE_FORMAT),
+      date: createIssueDto.date,
     }
     const docRef = await this.issuesCollection.add(newIssue)
 
@@ -89,9 +88,6 @@ export class IssuesService {
       ...updateIssueDto,
       symptoms: updateIssueDto.symptoms ? symptoms : issueDoc.data().symptoms,
       meds: updateIssueDto.meds ? meds : issueDoc.data().meds,
-      date: updateIssueDto.date
-        ? dayjs(updateIssueDto.date).format(DEFAULT_DATE_FORMAT)
-        : issueDoc.data().date,
     })
 
     issueDoc = await docRef.get() // this is in order to return updated doc data
@@ -120,7 +116,12 @@ export class IssuesService {
       const issueSymptoms = issue.symptoms.map(({ name }) => name)
       const issueMeds = issue.meds.map(({ name }) => name)
 
-      return [issue.date, issueSymptoms.join(', '), issueMeds.join(', '), issue.notes]
+      return [
+        `${dayjs(issue.date).format('MMMM D, YYYY')}`,
+        issueSymptoms.join(', '),
+        issueMeds.join(', '),
+        issue.notes,
+      ]
     })
 
     const table = {

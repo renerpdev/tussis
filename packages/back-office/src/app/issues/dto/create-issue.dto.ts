@@ -1,21 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import { IsArray, IsDate, IsOptional, IsString } from 'class-validator'
 
 export class CreateIssueDto {
   @ApiProperty()
   @IsArray()
-  symptoms: string[];
+  symptoms: string[]
 
   @ApiProperty()
   @IsArray()
-  meds: string[];
+  meds: string[]
 
   @ApiProperty()
   @IsDate()
-  date: string;
+  @Type(() => Date)
+  date: Date
 
   @IsOptional()
   @IsString()
   @ApiProperty()
-  notes?: string;
+  notes?: string
 }
