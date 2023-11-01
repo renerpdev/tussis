@@ -81,7 +81,7 @@ export default function DataTable<T>({
     [onView],
   )
   const parseDateValue = useCallback((value: string) => {
-    const date = dayjs(dayjs(value).toDate().toLocaleDateString())
+    const date = dayjs(value)
     const diff = dayjs(Date.now()).diff(date, 'day')
     if (diff < 2 && diff > 0) {
       dayjs.extend(relativeTime)
