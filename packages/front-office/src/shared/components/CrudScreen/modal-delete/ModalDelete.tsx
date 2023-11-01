@@ -44,7 +44,9 @@ export default function ModalDelete<T>({
   })
 
   const handleOnSubmit = useCallback(() => {
-    deleteMutation.mutate()
+    if (!deleteMutation.isLoading) {
+      deleteMutation.mutate()
+    }
   }, [deleteMutation])
 
   return (
@@ -82,6 +84,8 @@ export default function ModalDelete<T>({
               <Button
                 color="danger"
                 onPress={handleOnSubmit}
+                disabled={deleteMutation.isLoading}
+                className="disabled:opacity-50"
               >
                 <span>
                   <HiTrash />

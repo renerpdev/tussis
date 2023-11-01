@@ -136,40 +136,42 @@ export default function ModalCreate<T>({
     }
 
     return [EMPTY_FIELD]
-  }, [model.create.model, editData, fieldValues, editMode])
+  }, [model.create.model, editData, fieldValues])
 
   const handleOnSubmit = useCallback(() => {
-    // TODO: improve this, since it's just a workaround
-    const rawData: Record<string, unknown> = {}
-    for (const [key, value] of fieldValues.entries()) {
-      rawData[key] = typeof value === 'object' ? Array.from((value as Set<T>).values()) : value
-    }
+    if (!createMutation.isLoading && !updateMutation.isLoading) {
+      // TODO: improve this, since it's just a workaround
+      const rawData: Record<string, unknown> = {}
+      for (const [key, value] of fieldValues.entries()) {
+        rawData[key] = typeof value === 'object' ? Array.from((value as Set<T>).values()) : value
+      }
 
-    const data: Partial<Omit<T, 'id'>> = Object.entries(rawData).reduce((acc, [key, value]) => {
-      if (key === 'id') return acc
+      const data: Partial<Omit<T, 'id'>> = Object.entries(rawData).reduce((acc, [key, value]) => {
+        if (key === 'id') return acc
 
-      if (typeof value === 'object' && Array.isArray(value) && value.length > 0) {
+        if (typeof value === 'object' && Array.isArray(value) && value.length > 0) {
+          return {
+            ...acc,
+            [key]: value.map((item: keyof T) => {
+              if (typeof item === 'object') {
+                return item.id
+              }
+              return item
+            }),
+          }
+        }
+
         return {
           ...acc,
-          [key]: value.map((item: keyof T) => {
-            if (typeof item === 'object') {
-              return item.id
-            }
-            return item
-          }),
+          [key]: value,
         }
-      }
+      }, {})
 
-      return {
-        ...acc,
-        [key]: value,
+      if (editMode) {
+        updateMutation.mutate(data as T)
+      } else {
+        createMutation.mutate(data as T)
       }
-    }, {})
-
-    if (editMode) {
-      updateMutation.mutate(data as T)
-    } else {
-      createMutation.mutate(data as T)
     }
   }, [createMutation, editMode, fieldValues, updateMutation])
 
@@ -328,9 +330,11 @@ export default function ModalCreate<T>({
                   Close
                 </Button>
                 <Button
-                  className="bg-cyan-600 hover:bg-cyan-500 text-white"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50"
                   onPress={handleOnSubmit}
-                  disabled={fields.length === 0}
+                  disabled={
+                    fields.length === 0 || createMutation.isLoading || updateMutation.isLoading
+                  }
                 >
                   {editMode ? 'Edit' : 'Add'} {editMode ? <HiPencil /> : <HiPlus />}{' '}
                   {(createMutation.isLoading || updateMutation.isLoading) && (
