@@ -8,6 +8,7 @@ import {
   Spinner,
 } from '@nextui-org/react'
 import { useCallback } from 'react'
+import { HiTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../../api'
@@ -51,16 +52,23 @@ export default function ModalDelete<T>({
       backdrop={'blur'}
       isOpen={isOpen}
       onClose={onClose}
-      isDismissable={false}
+      isDismissable
     >
-      <ModalContent>
+      <ModalContent className="dark:bg-gray-800">
         {onClose => (
           <>
             <ModalHeader className="flex flex-col gap-1">Delete</ModalHeader>
             <ModalBody>
-              <h2 className="text-large text-default">Are you sure you want to this item?</h2>
+              <h2 className="text-large text-default dark:text-white">
+                Are you sure you want to this item?
+              </h2>
               <h6>
-                <code className="text-small text-primary">{JSON.stringify(deleteData)}</code>
+                <code
+                  className="text-small text-primary"
+                  style={{ overflowWrap: 'anywhere' }}
+                >
+                  {JSON.stringify(deleteData)}
+                </code>
               </h6>
             </ModalBody>
             <ModalFooter>
@@ -72,9 +80,12 @@ export default function ModalDelete<T>({
                 Close
               </Button>
               <Button
-                color="primary"
+                color="danger"
                 onPress={handleOnSubmit}
               >
+                <span>
+                  <HiTrash />
+                </span>
                 Delete{' '}
                 {deleteMutation.isLoading && (
                   <Spinner

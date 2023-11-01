@@ -1,9 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsOptional, IsString } from 'class-validator'
 
 export class CreateSymptomDto {
   @ApiProperty()
-  name: string;
+  @IsString()
+  name: string
 
   @ApiProperty()
-  desc?: string;
+  @IsOptional()
+  desc?: string
 }

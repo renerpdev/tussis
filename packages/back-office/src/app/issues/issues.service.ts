@@ -22,18 +22,20 @@ export class IssuesService {
   ) {}
 
   async create(createIssueDto: CreateIssueDto): Promise<Issue> {
+    const validInput = getValidDto(CreateIssueDto, createIssueDto)
+
     const symptoms = await Promise.all(
-      (createIssueDto.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
     )
     const meds = await Promise.all(
-      (createIssueDto.meds || []).map(medId => this.medsService.findOne(medId)),
+      (validInput.meds || []).map(medId => this.medsService.findOne(medId)),
     )
 
     const newIssue = {
       symptoms: symptoms,
       meds: meds,
-      notes: createIssueDto.notes,
-      date: createIssueDto.date,
+      notes: validInput.notes,
+      date: dayjs(validInput.date).format('YYYY-MM-DD'),
     }
     const docRef = await this.issuesCollection.add(newIssue)
 
@@ -63,11 +65,13 @@ export class IssuesService {
   }
 
   async update(id: string, updateIssueDto: UpdateIssueDto): Promise<Issue> {
+    const validInput = getValidDto(UpdateIssueDto, updateIssueDto)
+
     const docRef = this.issuesCollection.doc(id)
 
-    if (updateIssueDto.symptoms) {
+    if (validInput.symptoms) {
       await Promise.all(
-        (updateIssueDto.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+        (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
       )
     }
 
@@ -78,16 +82,17 @@ export class IssuesService {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
     const symptoms = await Promise.all(
-      (updateIssueDto.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
     )
     const meds = await Promise.all(
-      (updateIssueDto.meds || []).map(medId => this.medsService.findOne(medId)),
+      (validInput.meds || []).map(medId => this.medsService.findOne(medId)),
     )
 
     await docRef.update({
-      ...updateIssueDto,
-      symptoms: updateIssueDto.symptoms ? symptoms : issueDoc.data().symptoms,
-      meds: updateIssueDto.meds ? meds : issueDoc.data().meds,
+      ...validInput,
+      date: validInput.date ? dayjs(validInput.date).format('YYYY-MM-DD') : issueDoc.data().date,
+      symptoms: validInput.symptoms ? symptoms : issueDoc.data().symptoms,
+      meds: validInput.meds ? meds : issueDoc.data().meds,
     })
 
     issueDoc = await docRef.get() // this is in order to return updated doc data

@@ -37,7 +37,7 @@ export default function CrudScreen<DataType>({
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
-  const [timestamp, setTimestamp] = React.useState(0)
+  const [timestamp, setTimestamp] = React.useState(Date.now())
 
   const {
     isOpen: isModalCreateOpen,
@@ -71,7 +71,7 @@ export default function CrudScreen<DataType>({
           sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'
         }`,
         offset: rowsPerPage * (page - 1),
-      }).then(res => res.data),
+      }),
   )
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function CrudScreen<DataType>({
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setRowsPerPage(Number(e.target.value))
+      setRowsPerPage(Number((e.target as any).value))
       setPage(1)
     },
     [setPage, setRowsPerPage],
@@ -184,6 +184,7 @@ export default function CrudScreen<DataType>({
         toast.success('Request Successful!')
       }
       onModalCreateClose()
+      setSelectedItem(undefined)
     },
     [onModalCreateClose],
   )
@@ -236,14 +237,14 @@ export default function CrudScreen<DataType>({
 
       <ModalDelete<DataType>
         isOpen={isModalDeleteOpen}
-        deleteData={selectedItem || {}}
+        deleteData={selectedItem || ({} as Record<keyof DataType, unknown>)}
         model={model}
         onClose={handleOnModalDeleteClose}
       />
 
       <ModalView<DataType>
         isOpen={isModalViewOpen}
-        viewData={selectedItem || {}}
+        viewData={selectedItem || ({} as Record<keyof DataType, unknown>)}
         onClose={onModalViewClose}
       />
     </>

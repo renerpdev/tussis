@@ -1,6 +1,1 @@
-export * from './ChevronDownIcon/ChevronDownIcon'
 export * from './CrudScreen/CrudScreen'
-export * from './ExportIcon/ExportIcon'
-export * from './PlusIcon/PlusIcon'
-export * from './SearchIcon/SearchIcon'
-export * from './VerticalDotsIcon/VerticalDotsIcon'

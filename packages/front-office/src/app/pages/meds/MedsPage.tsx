@@ -27,7 +27,7 @@ export default function MedsPage() {
       endpoint: 'meds',
       model: {
         name: '',
-        desc: '',
+        desc: 'here goes a long string',
       },
     },
     update: {

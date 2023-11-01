@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+textarea, input, select {
+  border-width: 0 !important;
+}

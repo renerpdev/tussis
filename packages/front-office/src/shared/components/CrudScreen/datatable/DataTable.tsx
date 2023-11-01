@@ -17,7 +17,7 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import React, { Dispatch, ReactElement, useCallback, useMemo } from 'react'
-import { VerticalDotsIcon } from '../../index'
+import { HiDotsVertical } from 'react-icons/hi'
 import BottomContent, { BottomContentProps } from '../bottom-content/BottomContent'
 import TopContent, { TopContentProps } from '../top-content/TopContent'
 
@@ -81,8 +81,9 @@ export default function DataTable<T>({
     [onView],
   )
   const parseDateValue = useCallback((value: string) => {
-    const date = dayjs(value)
-    if (dayjs(Date.now()).diff(date, 'day') < 2) {
+    const date = dayjs(dayjs(value).toDate().toLocaleDateString())
+    const diff = dayjs(Date.now()).diff(date, 'day')
+    if (diff < 2 && diff > 0) {
       dayjs.extend(relativeTime)
       return date.fromNow()
     }
@@ -98,9 +99,8 @@ export default function DataTable<T>({
         case 'array':
           return (cellValue as T[keyof T][]).map((subItem: T[keyof T]) => (
             <Chip
-              className="mx-1 my-1"
+              className="mx-1 my-1 border-cyan-600 border-1 bg-transparent text-cyan-600 dark:text-white dark:bg-cyan-600"
               key={subItem.id}
-              color="default"
             >
               {subItem.name}
             </Chip>
@@ -110,20 +110,39 @@ export default function DataTable<T>({
         case 'action':
           return (
             <div className="relative flex justify-end items-center gap-2">
-              <Dropdown>
+              <Dropdown
+                classNames={{
+                  base: 'dark:bg-gray-800 dark:text-white',
+                }}
+              >
                 <DropdownTrigger>
                   <Button
                     isIconOnly
                     size="sm"
                     variant="light"
                   >
-                    <VerticalDotsIcon className="text-default-300" />
+                    <HiDotsVertical className="text-default-300 dark:text-white" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="ACTIONS dropdown menu">
-                  <DropdownItem onPress={handleOnView(item)}>View</DropdownItem>
-                  <DropdownItem onPress={handleOnEdit(item)}>Edit</DropdownItem>
-                  <DropdownItem onPress={handleOnDelete(item)}>Delete</DropdownItem>
+                  <DropdownItem
+                    onPress={handleOnView(item)}
+                    className="dark:hover:bg-cyan-600"
+                  >
+                    View
+                  </DropdownItem>
+                  <DropdownItem
+                    onPress={handleOnEdit(item)}
+                    className="dark:hover:bg-cyan-600"
+                  >
+                    Edit
+                  </DropdownItem>
+                  <DropdownItem
+                    onPress={handleOnDelete(item)}
+                    className="dark:hover:bg-cyan-600"
+                  >
+                    Delete
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -132,7 +151,7 @@ export default function DataTable<T>({
           return cellValue
       }
     },
-    [columns, handleOnDelete, handleOnEdit, handleOnView],
+    [columns, handleOnDelete, handleOnEdit, handleOnView, parseDateValue],
   )
 
   return (
@@ -150,7 +169,8 @@ export default function DataTable<T>({
       }
       bottomContentPlacement="outside"
       classNames={{
-        wrapper: 'max-h-[64]',
+        wrapper: 'max-h-[64] dark:bg-gray-700',
+        th: 'bg-gray-100 dark:bg-gray-600 dark:text-white',
       }}
       sortDescriptor={sortDescriptor}
       topContent={
@@ -175,7 +195,7 @@ export default function DataTable<T>({
         {column => (
           <TableColumn
             key={column.uid}
-            align={column.uid === 'actions' ? 'center' : 'start'}
+            align={column.uid === 'actions' ? 'end' : 'start'}
             allowsSorting={column.sortable}
           >
             {column.name}

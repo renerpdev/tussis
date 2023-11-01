@@ -1,7 +1,7 @@
 import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { FirestoreModule } from './../firestore/firestore.module'
+import { FirestoreModule } from '../firestore/firestore.module'
 import { IssuesModule } from './issues/issues.module'
 
 @Module({
@@ -13,6 +13,7 @@ import { IssuesModule } from './issues/issues.module'
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         keyFilename: configService.get<string>('SA_KEY'),
+        ignoreUndefinedProperties: true,
       }),
       inject: [ConfigService],
     }),

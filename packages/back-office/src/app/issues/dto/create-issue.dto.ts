@@ -7,14 +7,15 @@ export class CreateIssueDto {
   @IsArray()
   symptoms: string[]
 
+  @IsOptional()
   @ApiProperty()
   @IsArray()
-  meds: string[]
+  meds?: string[]
 
   @ApiProperty()
   @IsDate()
   @Type(() => Date)
-  date: Date
+  date: string
 
   @IsOptional()
   @IsString()

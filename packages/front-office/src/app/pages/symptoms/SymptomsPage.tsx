@@ -27,7 +27,7 @@ export default function SymptomsPage() {
       endpoint: 'symptoms',
       model: {
         name: '',
-        desc: '',
+        desc: 'here goes a long string',
       },
     },
     update: {

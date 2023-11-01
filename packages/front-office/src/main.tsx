@@ -25,6 +25,7 @@ root.render(
         <ToastContainer
           position={'bottom-right'}
           draggablePercent={60}
+          autoClose={2000}
         />
       </NextUIProvider>
     </StrictMode>

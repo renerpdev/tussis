@@ -3,7 +3,7 @@ import axios, { AxiosResponse, Method } from 'axios'
 export type Headers = unknown
 
 class AxiosWrapper {
-  private apiUrl: string
+  private readonly apiUrl: string
 
   constructor(apiUrl: string) {
     this.apiUrl = apiUrl
@@ -24,13 +24,18 @@ class AxiosWrapper {
     data?: D,
     headers?: Headers,
   ): Promise<T> {
-    return axios.request({
-      method,
-      url: `${this.apiUrl}${path}`,
-      params: method === 'GET' ? params : undefined,
-      data: method !== 'GET' ? data : undefined,
-      headers: headers || undefined,
-    })
+    return new Promise<T>((resolve, reject) =>
+      axios
+        .request({
+          method,
+          url: `${this.apiUrl}${path}`,
+          params: method === 'GET' ? params : undefined,
+          data: method !== 'GET' ? data : undefined,
+          headers: headers || undefined,
+        })
+        .then(res => resolve(res.data))
+        .catch(err => reject(err.response.data)),
+    )
   }
 
   async getPdf<P, T = Blob>(

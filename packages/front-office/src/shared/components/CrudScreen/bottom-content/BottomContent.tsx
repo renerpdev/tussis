@@ -22,10 +22,12 @@ const BottomContent = ({
         isCompact
         showControls
         showShadow
-        color="primary"
         page={currentPage}
         total={totalPages}
         onChange={onPageChange}
+        classNames={{
+          cursor: 'bg-cyan-600 dark:active:bg-cyan-600',
+        }}
       />
       <div className="hidden sm:flex w-[30%] justify-end gap-2">
         <Button

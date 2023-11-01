@@ -4,7 +4,7 @@ import { useQuery } from 'react-query'
 import { TussisApi } from '../../../api'
 import CrudScreen from '../../../shared/components/CrudScreen/CrudScreen'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
-import { AsyncData, CrudModel, Issue } from '../../../shared/models'
+import { CrudModel, Issue } from '../../../shared/models'
 import { Column } from '../../../shared/types'
 
 const INITIAL_VISIBLE_COLUMNS = ['date', 'symptoms', 'meds', 'actions']
@@ -25,33 +25,30 @@ export default function IssuesPage() {
     direction: 'ascending',
   })
   const [page, setPage] = React.useState(1)
+  const [timestamp] = React.useState(Date.now())
 
   const {
     isFetching: isFetchingMeds,
     error: errMeds,
     data: responseMeds,
-  } = useQuery(['get-meds', page, rowsPerPage, sortDescriptor], () =>
+  } = useQuery(['get-meds', page, rowsPerPage, sortDescriptor, timestamp], () =>
     TussisApi.get('meds', {
       limit: 100,
       sort: 'name:asc',
       offset: 0,
-    })
-      .then(res => res.data)
-      .catch(err => err),
+    }),
   )
 
   const {
     isFetching: isFetchingSymptoms,
     error: errSymptoms,
     data: responseSymptoms,
-  } = useQuery(['get-symptoms', page, rowsPerPage, sortDescriptor], () =>
+  } = useQuery(['get-symptoms', page, rowsPerPage, sortDescriptor, timestamp], () =>
     TussisApi.get('symptoms', {
       limit: 100,
       sort: 'name:asc',
       offset: 0,
-    })
-      .then(res => res.data)
-      .catch(err => err),
+    }),
   )
 
   const model: CrudModel<Issue> = {
@@ -63,13 +60,13 @@ export default function IssuesPage() {
           isLoading: isFetchingMeds,
           data: responseMeds?.data || [],
           error: errMeds,
-        } as AsyncData<Issue | null>,
+        },
         symptoms: {
           isLoading: isFetchingSymptoms,
           data: responseSymptoms?.data || [],
           error: errSymptoms,
-        } as AsyncData<Issue | null>,
-        notes: '',
+        },
+        notes: 'here goes a long string',
       },
     },
     update: {

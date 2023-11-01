@@ -12,16 +12,23 @@ export default function ModalView<T>({ isOpen, onClose, viewData }: ModalViewPro
       backdrop={'blur'}
       isOpen={isOpen}
       onClose={onClose}
-      isDismissable={false}
+      isDismissable
     >
-      <ModalContent>
+      <ModalContent className="dark:bg-gray-800">
         {onClose => (
           <>
             <ModalHeader className="flex flex-col gap-1">View</ModalHeader>
             <ModalBody>
-              <h2 className="text-large text-default">These are the item details:</h2>
+              <h2 className="text-large text-default dark:text-white">
+                These are the item details:
+              </h2>
               <h6>
-                <code className="text-small text-primary">{JSON.stringify(viewData)}</code>
+                <code
+                  className="text-small text-primary"
+                  style={{ overflowWrap: 'anywhere' }}
+                >
+                  {JSON.stringify(viewData)}
+                </code>
               </h6>
             </ModalBody>
             <ModalFooter>

@@ -1,12 +1,12 @@
-import { CustomError } from './custom-error';
-import { FieldValidationError } from './field-validation-error';
+import { CustomError } from './custom-error'
+import { FieldValidationError } from './field-validation-error'
 
 export class ValidationAggregateError extends CustomError {
-  readonly name = 'ValidationAggregateError';
-  data: FieldValidationError[];
+  readonly name = 'ValidationAggregateError'
+  data: FieldValidationError[]
 
   constructor(message: string, errors: FieldValidationError[]) {
-    super(message);
-    this.data = errors;
+    super(`${message}: ${JSON.stringify(errors)}`)
+    this.data = errors
   }
 }
