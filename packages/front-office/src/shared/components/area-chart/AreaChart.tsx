@@ -4,15 +4,19 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Select,
   Selection,
+  SelectItem,
+  Spinner,
 } from '@nextui-org/react'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { HiChevronDown, HiChevronRight } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
+import { periods } from '../constants'
 import { capitalize } from '../crud-screen/utils'
 
-const INITIAL_VISIBLE_FITLERS = ['tos', 'fiebre', 'despertar nocturno']
+const INITIAL_VISIBLE_FILTERS = ['tos', 'fiebre', 'despertar nocturno']
 
 const filters: any[] = [
   { name: 'Tos', uid: 'tos' },
@@ -22,7 +26,7 @@ const filters: any[] = [
 ]
 
 export const AreaChart = () => {
-  const [visibleFilters, setVisibleFilters] = useState<Selection>(new Set(INITIAL_VISIBLE_FITLERS))
+  const [visibleFilters, setVisibleFilters] = useState<Selection>(new Set(INITIAL_VISIBLE_FILTERS))
 
   const options = useMemo<any>(
     () => ({
@@ -101,6 +105,10 @@ export const AreaChart = () => {
           show: false,
         },
       },
+      legend: {
+        show: true,
+        offsetY: 10,
+      },
       yaxis: {
         show: false,
       },
@@ -132,7 +140,7 @@ export const AreaChart = () => {
   }, [visibleFilters])
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-lg dark:bg-gray-700 p-4 md:p-6 border-1 dark:border-transparent flex flex-col justify-between">
+    <div className="w-full bg-white rounded-lg shadow-lg dark:bg-gray-700 p-4 md:p-6 border-1 dark:border-transparent flex flex-col justify-between gap-4">
       <div className="flex justify-between">
         <div>
           <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">
@@ -178,89 +186,42 @@ export const AreaChart = () => {
           </Dropdown>
         </div>
       </div>
-      {options && series && (
+      {(options && series && (
         <Chart
           options={options}
           series={series}
           type="area"
         />
+      )) || (
+        <Spinner
+          size="lg"
+          className="align-center flex-1"
+        />
       )}
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-600 justify-between mt-auto">
         <div className="flex justify-between items-center pt-5">
-          <button
-            id="dropdownDefaultButton"
-            data-dropdown-toggle="lastDaysdropdown"
-            data-dropdown-placement="bottom"
-            className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-            type="button"
+          <Select
+            items={periods}
+            placeholder="Select a period"
+            isLoading={false}
+            disallowEmptySelection
+            defaultSelectedKeys={['last_7_days']}
+            classNames={{
+              base: 'max-w-[200px]',
+              trigger:
+                'bg-transparent max-h-[40px] shadow-none text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:bg-gray-600 text-center inline-flex items-center dark:hover:text-white py-0',
+              popover: 'dark:bg-gray-800',
+            }}
           >
-            Last 7 days
-            <svg
-              className="w-2.5 m-2.5 ml-1.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
-          <div
-            id="lastDaysdropdown"
-            className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
-          >
-            <ul
-              className="py-2 text-sm text-gray-700 dark:text-gray-200"
-              aria-labelledby="dropdownDefaultButton"
-            >
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Yesterday
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Today
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 7 days
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 30 days
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 90 days
-                </a>
-              </li>
-            </ul>
-          </div>
+            {period => (
+              <SelectItem
+                key={period.value}
+                className="capitalize dark:hover:bg-cyan-600 dark:focus:bg-cyan-600"
+              >
+                {period.label}
+              </SelectItem>
+            )}
+          </Select>
           <NavLink
             to="/issues"
             className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
