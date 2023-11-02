@@ -27,6 +27,10 @@ const BottomContent = ({
         onChange={onPageChange}
         classNames={{
           cursor: 'bg-cyan-600 dark:active:bg-cyan-600',
+          item: 'dark:bg-gray-700 dark:hover:bg-gray-600',
+          prev: 'dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white data-[disabled=true]:opacity-50',
+          next: 'dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white data-[disabled=true]:opacity-50',
+          wrapper: 'dark:bg-gray-700',
         }}
       />
       <div className="hidden sm:flex w-[30%] justify-end gap-2">

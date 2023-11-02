@@ -1,3 +1,6 @@
+export * from './dashboard/DashboardPage'
+export * from './error/ErrorPage'
 export * from './issues/IssuesPage'
 export * from './meds/MedsPage'
+export * from './root/RootPage'
 export * from './symptoms/SymptomsPage'

@@ -1,6 +1,6 @@
 import { SortDescriptor } from '@nextui-org/react'
 import React from 'react'
-import CrudScreen from '../../../shared/components/CrudScreen/CrudScreen'
+import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Med } from '../../../shared/models'
 import { Column } from '../../../shared/types'

@@ -1,7 +1,7 @@
 import { HiEmojiSad } from 'react-icons/hi'
 import { NavLink, useRouteError } from 'react-router-dom'
 
-export default function ErrorPage() {
+export function ErrorPage() {
   const error = useRouteError()
 
   return (

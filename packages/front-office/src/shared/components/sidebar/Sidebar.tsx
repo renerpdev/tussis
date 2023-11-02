@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType }[] = [
   {
-    route: 'dashboard',
+    route: '',
     value: 'Dashboard',
     icon: HiChartPie,
   },
@@ -25,7 +25,7 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType }[] = [
   },
 ]
 
-export default function Sidebar() {
+export function Sidebar() {
   return (
     <aside
       id="logo-sidebar"

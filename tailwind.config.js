@@ -12,5 +12,10 @@ module.exports = {
     extend: {},
   },
   darkMode: 'class',
-  plugins: [nextui(), require('flowbite/plugin')],
+  plugins: [
+    nextui(),
+    require('flowbite/plugin')({
+      charts: true,
+    }),
+  ],
 }

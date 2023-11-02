@@ -1,1 +1,5 @@
-export * from './CrudScreen/CrudScreen'
+export * from './area-chart/AreaChart'
+export * from './crud-screen/CrudScreen'
+export * from './line-chart/LineChart'
+export * from './navbar/Navbar'
+export * from './sidebar/Sidebar'

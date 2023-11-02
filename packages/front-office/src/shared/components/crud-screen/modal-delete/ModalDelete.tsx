@@ -1,12 +1,4 @@
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-} from '@nextui-org/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
 import { useCallback } from 'react'
 import { HiTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
@@ -84,19 +76,12 @@ export default function ModalDelete<T>({
               <Button
                 color="danger"
                 onPress={handleOnSubmit}
-                disabled={deleteMutation.isLoading}
-                className="disabled:opacity-50"
+                isLoading={deleteMutation.isLoading}
               >
                 <span>
                   <HiTrash />
                 </span>
                 Delete{' '}
-                {deleteMutation.isLoading && (
-                  <Spinner
-                    color="default"
-                    size="sm"
-                  />
-                )}
               </Button>
             </ModalFooter>
           </>

@@ -1,5 +1,5 @@
 import { NextUIProvider } from '@nextui-org/react'
-import 'flowbite'
+import 'flowbite/dist/flowbite.min.js'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from 'react-query'

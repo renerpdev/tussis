@@ -100,7 +100,7 @@ export default function TopContent({
           </Button>
           {onExportTableData && (
             <Button
-              className="bg-transparent border-cyan-600 border-2 text-cyan-600 hover:bg-cyan-500 hover:text-white"
+              className="bg-transparent border-cyan-600 dark:border-cyan-500 border-2 text-cyan-600 dark:text-cyan-500 hover:bg-cyan-500 hover:text-white dark:hover:text-white"
               endContent={
                 <HiSave
                   className="h-6 w-6"

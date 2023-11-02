@@ -10,7 +10,6 @@ import {
   Select,
   SelectItem,
   SelectedItems,
-  Spinner,
   Textarea,
 } from '@nextui-org/react'
 import dayjs from 'dayjs'
@@ -332,17 +331,10 @@ export default function ModalCreate<T>({
                 <Button
                   className="bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50"
                   onPress={handleOnSubmit}
-                  disabled={
-                    fields.length === 0 || createMutation.isLoading || updateMutation.isLoading
-                  }
+                  disabled={fields.length === 0}
+                  isLoading={createMutation.isLoading || updateMutation.isLoading}
                 >
                   {editMode ? 'Edit' : 'Add'} {editMode ? <HiPencil /> : <HiPlus />}{' '}
-                  {(createMutation.isLoading || updateMutation.isLoading) && (
-                    <Spinner
-                      color="default"
-                      size="sm"
-                    />
-                  )}
                 </Button>
               </ModalFooter>
             )}

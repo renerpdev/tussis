@@ -23,7 +23,7 @@ interface CrudScreenProps<T> {
   defaultColumns: string[]
   columns: Column[]
 }
-export default function CrudScreen<DataType>({
+export function CrudScreen<DataType>({
   model,
   page,
   setPage,

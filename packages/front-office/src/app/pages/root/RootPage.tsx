@@ -1,8 +1,7 @@
 import type { CustomFlowbiteTheme } from 'flowbite-react'
 import { Flowbite } from 'flowbite-react'
 import { Outlet } from 'react-router-dom'
-import { Navbar } from '../../../shared/components/Navbar/Navbar'
-import Sidebar from '../../../shared/components/Sidebar/Sidebar'
+import { Navbar, Sidebar } from '../../../shared/components'
 
 const customTheme: CustomFlowbiteTheme = {
   datepicker: {
@@ -27,7 +26,7 @@ export const RootPage = () => {
     <Flowbite theme={{ theme: customTheme }}>
       <Navbar />
       <Sidebar />
-      <main className="p-4 md:ml-56 pt-unit-18">
+      <main className="p-4 md:ml-56 pt-unit-18 dark:bg-gray-800">
         <div className="rounded-lg">
           <Outlet />
         </div>

@@ -1,8 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import ErrorPage from './pages/error/ErrorPage'
-import { RootPage } from './pages/root/RootPage'
-import { WelcomePage } from './pages/welcome/WelcomePage'
+import { DashboardPage, ErrorPage, RootPage } from './pages'
 
 const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
@@ -16,7 +14,8 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <WelcomePage />,
+        path: '/',
+        element: <DashboardPage />,
       },
       {
         path: '/issues',
