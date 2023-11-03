@@ -3,7 +3,14 @@ import { useMemo } from 'react'
 import Chart from 'react-apexcharts'
 import { HiArrowUp, HiChevronRight } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
-import { periods } from '../constants'
+
+export const periods = [
+  { label: 'Last Week', value: 'weekly' },
+  { label: 'Last Month', value: 'monthly' },
+  { label: 'Last Quarter', value: 'quarterly' },
+  { label: 'Last Semester', value: 'semester' },
+  { label: 'Last Year', value: 'yearly' },
+]
 
 export const LineChart = () => {
   const options = useMemo<any>(
@@ -135,7 +142,7 @@ export const LineChart = () => {
             placeholder="Select a period"
             isLoading={false}
             disallowEmptySelection
-            defaultSelectedKeys={['last_7_days']}
+            defaultSelectedKeys={['weekly']}
             classNames={{
               base: 'max-w-[200px]',
               trigger:

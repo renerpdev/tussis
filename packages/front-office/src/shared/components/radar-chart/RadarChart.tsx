@@ -170,6 +170,8 @@ export const RadarChart = () => {
           options={options}
           series={series}
           type="radar"
+          height={500}
+          className="mb-[-50px]"
         />
       )) || (
         <Spinner

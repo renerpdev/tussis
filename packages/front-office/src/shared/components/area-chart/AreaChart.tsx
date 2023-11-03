@@ -13,8 +13,15 @@ import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { HiChevronDown, HiChevronRight } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
-import { periods } from '../constants'
 import { capitalize } from '../crud-screen/utils'
+
+export const periods = [
+  { label: 'Last 7 days', value: 'last_7_days' },
+  { label: 'Last 30 days', value: 'last_30_days' },
+  { label: 'Last 90 days', value: 'last_90_days' },
+  { label: 'Last 6 months', value: 'last_6_months' },
+  { label: 'Last year', value: 'last_year' },
+]
 
 const INITIAL_VISIBLE_FILTERS = ['tos', 'fiebre', 'despertar nocturno']
 
@@ -163,7 +170,7 @@ export const AreaChart = () => {
                 className="px-3 py-2 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100  focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                 isLoading={false}
               >
-                Filtros
+                Valores
               </Button>
             </DropdownTrigger>
             <DropdownMenu

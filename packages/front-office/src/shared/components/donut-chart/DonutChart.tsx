@@ -3,7 +3,14 @@ import { useMemo } from 'react'
 import Chart from 'react-apexcharts'
 import { HiChevronRight } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
-import { periods } from '../constants'
+
+export const periods = [
+  { label: 'This week', value: 'last_7_days' },
+  { label: 'Last 30 days', value: 'last_30_days' },
+  { label: 'Last 90 days', value: 'last_90_days' },
+  { label: 'Last 6 months', value: 'last_6_months' },
+  { label: 'Last year', value: 'last_year' },
+]
 
 export const DonutChart = () => {
   const options = useMemo<any>(
