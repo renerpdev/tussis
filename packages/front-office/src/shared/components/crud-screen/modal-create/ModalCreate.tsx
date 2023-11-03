@@ -283,6 +283,8 @@ export default function ModalCreate<T>({
               showClearButton={false}
               showTodayButton={false}
               className={'w-full'}
+              maxDate={new Date(Date.now())}
+              weekStart={2} // First day of week is Sunday
             />
           )
         default:

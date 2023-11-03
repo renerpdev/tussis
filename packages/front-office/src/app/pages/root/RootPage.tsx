@@ -8,6 +8,17 @@ const customTheme: CustomFlowbiteTheme = {
     root: {
       base: 'relative',
     },
+    views: {
+      days: {
+        items: {
+          base: 'grid grid-cols-7',
+          item: {
+            selected: 'bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500',
+            disabled: 'opacity-20 cursor-not-allowed',
+          },
+        },
+      },
+    },
   },
   textInput: {
     field: {
