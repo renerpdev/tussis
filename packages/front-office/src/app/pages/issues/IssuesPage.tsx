@@ -79,7 +79,7 @@ export default function IssuesPage() {
       endpoint: 'issues',
     },
     report: {
-      endpoint: 'issues/report',
+      endpoint: 'issues/export/pdf',
     },
   }
 

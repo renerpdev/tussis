@@ -23,7 +23,7 @@ export class IssuesController {
     return this.issuesService.getList(input)
   }
 
-  @Get('report')
+  @Get('export/pdf')
   async exportPdf(@Res() res: Response, @Query() input: IssuesListInput) {
     const buffer = await this.issuesService.exportPdf(input)
     res.set({
