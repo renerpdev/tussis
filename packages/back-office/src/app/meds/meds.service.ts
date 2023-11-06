@@ -3,6 +3,7 @@ import { CollectionReference } from 'firebase-admin/firestore'
 
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
+import { IssueMedDocument } from '../issues/documents/issues_meds.document'
 import { MedDocument } from './documents/med.document'
 import { CreateMedDto } from './dto/create-med.dto'
 import { MedsList, MedsListInput } from './dto/get-all-meds.dto'
@@ -14,6 +15,8 @@ export class MedsService {
   constructor(
     @Inject(MedDocument.collectionName)
     private medsCollection: CollectionReference<MedDocument>,
+    @Inject(IssueMedDocument.collectionName)
+    private issuesMedsCollection: CollectionReference<IssueMedDocument>,
   ) {}
 
   async create(createMedDto: CreateMedDto): Promise<Med> {
@@ -34,7 +37,7 @@ export class MedsService {
   getList(input: MedsListInput): Promise<MedsList> {
     const validInput = getValidDto(MedsListInput, input)
 
-    return getPaginatedList<MedDocument>({
+    return getPaginatedList<Med, MedDocument>({
       ...validInput,
       collection: this.medsCollection,
     })
@@ -67,6 +70,17 @@ export class MedsService {
     })
     medDoc = await docRef.get()
 
+    // here we update IssuesMeds collection, so we keep track of this relationship
+    const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
+    await Promise.all(
+      issuesMedsRef.docs.map(doc => {
+        return doc.ref.update({
+          name: validInput.name,
+          desc: validInput.desc,
+        })
+      }),
+    )
+
     return { ...medDoc.data(), id: medDoc.id }
   }
 
@@ -79,6 +93,14 @@ export class MedsService {
     }
 
     await docRef.delete()
+
+    // here we delete all IssuesMeds registries related to this document
+    const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
+    await Promise.all(
+      issuesMedsRef.docs.map(doc => {
+        return doc.ref.delete()
+      }),
+    )
 
     return { ...medDoc.data(), id: medDoc.id }
   }

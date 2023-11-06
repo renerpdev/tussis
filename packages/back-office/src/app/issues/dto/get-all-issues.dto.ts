@@ -1,6 +1,6 @@
 import { PaginatedList, PaginatedListInput } from '../../../shared/types'
-import { IssueDocument } from '../documents/issues.document'
+import { Issue } from '../entities/issue.entity'
 
 export class IssuesListInput extends PaginatedListInput {}
 
-export class IssuesList extends PaginatedList<IssueDocument> {}
+export class IssuesList extends PaginatedList<Issue> {}

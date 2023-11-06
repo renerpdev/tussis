@@ -3,6 +3,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 import { CollectionReference } from 'firebase-admin/firestore'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
+import { IssueSymptomDocument } from '../issues/documents/issues_symptoms.document'
 import { SymptomDocument } from './documents/symptom.document'
 import { CreateSymptomDto } from './dto/create-symptom.dto'
 import { SymptomsList, SymptomsListInput } from './dto/get-all-symptoms.dto'
@@ -14,6 +15,8 @@ export class SymptomsService {
   constructor(
     @Inject(SymptomDocument.collectionName)
     private symptomsCollection: CollectionReference<SymptomDocument>,
+    @Inject(IssueSymptomDocument.collectionName)
+    private issuesSymptomsCollection: CollectionReference<IssueSymptomDocument>,
   ) {}
 
   async create(createSymptomDto: CreateSymptomDto): Promise<Symptom> {
@@ -33,7 +36,7 @@ export class SymptomsService {
   getList(input: SymptomsListInput): Promise<SymptomsList> {
     const validInput = getValidDto(SymptomsListInput, input)
 
-    return getPaginatedList<SymptomDocument>({
+    return getPaginatedList<Symptom, SymptomDocument>({
       ...validInput,
       collection: this.symptomsCollection,
     })
@@ -66,6 +69,17 @@ export class SymptomsService {
     })
     symptomDoc = await docRef.get()
 
+    // here we update IssuesSymptoms collection, so we keep track of this relationship
+    const issuesSymptomsRef = await this.issuesSymptomsCollection.where('symptomId', '==', id).get()
+    await Promise.all(
+      issuesSymptomsRef.docs.map(doc => {
+        return doc.ref.update({
+          name: validInput.name,
+          desc: validInput.desc,
+        })
+      }),
+    )
+
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }
 
@@ -78,6 +92,14 @@ export class SymptomsService {
     }
 
     await docRef.delete()
+
+    // here we delete all IssuesSymptoms registries related to this document
+    const issuesSymptomsRef = await this.issuesSymptomsCollection.where('symptomId', '==', id).get()
+    await Promise.all(
+      issuesSymptomsRef.docs.map(doc => {
+        return doc.ref.delete()
+      }),
+    )
 
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }

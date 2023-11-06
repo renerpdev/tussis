@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator'
+import { firestore } from 'firebase-admin'
 
-export const DEFAULT_PAGE_SIZE = 20;
-export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
+export const DEFAULT_PAGE_SIZE = 20
+export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD'
 
 class BasePagination {
   /*
@@ -13,8 +14,8 @@ class BasePagination {
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Transform((params) => Number(params.value))
-  limit?: number = DEFAULT_PAGE_SIZE;
+  @Transform(params => Number(params.value))
+  limit?: number = DEFAULT_PAGE_SIZE
 
   /**
    * Number of records to be skipped
@@ -23,22 +24,36 @@ class BasePagination {
   @IsOptional()
   @IsInt()
   @Min(0)
-  @Transform((params) => Number(params.value))
-  offset?: number = 0;
+  @Transform(params => Number(params.value))
+  offset?: number = 0
 }
 
 export abstract class PaginatedList<T> extends BasePagination {
   /*
    * Total number of records existent in the store
    */
-  total: number;
+  total: number
 
   /*
    * Whether there are more records to be fetched
    */
-  hasMore: boolean;
+  hasMore: boolean
 
-  data: T[];
+  data: T[]
+}
+
+export abstract class PaginatedSnapshot<T> extends BasePagination {
+  /*
+   * Total number of records existent in the store
+   */
+  total: number
+
+  /*
+   * Whether there are more records to be fetched
+   */
+  hasMore: boolean
+
+  snapshot: firestore.QuerySnapshot<T>
 }
 
 export class PaginatedListInput extends BasePagination {
@@ -52,7 +67,7 @@ export class PaginatedListInput extends BasePagination {
   })
   @IsOptional()
   @IsString()
-  sort?: string;
+  sort?: string
 
   @ApiProperty({
     description: `Allows for ranging by date using ${DEFAULT_DATE_FORMAT}:${DEFAULT_DATE_FORMAT}`,
@@ -63,5 +78,5 @@ export class PaginatedListInput extends BasePagination {
   })
   @IsOptional()
   @IsString()
-  range?: string;
+  range?: string
 }
