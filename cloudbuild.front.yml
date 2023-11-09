@@ -18,5 +18,8 @@ steps:
     args: ['nx', 'deploy', 'front-office', '--token', '${_FIREBASE_TOKEN}']
     env:
       - 'VITE_API_URL=${_API_URL}'
+      - 'VITE_FIREBASE_API_KEY=${_FIREBASE_API_KEY}'
+      - 'VITE_FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN}'
+
 
 timeout: 1200s
