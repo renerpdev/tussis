@@ -1,5 +1,5 @@
 import { CollectionReference } from '@google-cloud/firestore'
-import { Inject, Injectable, Logger, Scope } from '@nestjs/common'
+import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
@@ -73,7 +73,6 @@ export class IssuesService {
 
   async getList(input: IssuesListInput, authUser?: any): Promise<IssuesList> {
     const validInput = getValidDto(IssuesListInput, input)
-    Logger.log(authUser) // TODO: remove this later
 
     return getPaginatedIssuesList<Issue, IssueDocument, IssueMedDocument, IssueSymptomDocument>({
       ...validInput,

@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import auth from '../app/auth/auth'
-import { BaseQueryParams, HttpCodes, PaginatedQueryResponse } from '../shared/types'
+import { BaseQueryParams, PaginatedQueryResponse } from '../shared/types'
 import AxiosWrapper, { Headers } from './axios.wrapper'
 
 const axiosWrapper = new AxiosWrapper(import.meta.env.VITE_API_URL)
@@ -12,15 +12,12 @@ class TussisApi {
     this.axiosWrapper = axiosWrapper
 
     // intercepts axios response
-    this.axiosWrapper.core.interceptors.response.use(
-      response => response,
-      async error => {
-        if (error?.response?.status === HttpCodes.Unauthorized) {
-          // document.location.href = '/login'
-        }
-        return Promise.reject(error)
-      },
-    )
+    // this.axiosWrapper.core.interceptors.response.use(
+    //   response => response,
+    //   async error => {
+    //     return Promise.reject(error)
+    //   },
+    // )
 
     // intercepts axios request
     this.axiosWrapper.core.interceptors.request.use(async request => {

@@ -79,14 +79,6 @@ export const Navbar = () => {
             {/*</Dropdown.Item>*/}
             {/*<Dropdown.Divider />*/}
             <Dropdown.Item
-              onClick={() => {
-                const uid = currentUser?.uid
-                getAuth()
-              }}
-            >
-              TEST
-            </Dropdown.Item>
-            <Dropdown.Item
               icon={HiLogout}
               onClick={handleSignOut}
             >
