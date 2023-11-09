@@ -1,11 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Request } from 'express'
 import { Response } from 'firebase-functions/v1'
+import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { CreateIssueDto } from './dto/create-issue.dto'
 import { IssuesListInput } from './dto/get-all-issues.dto'
 import { UpdateIssueDto } from './dto/update-issue.dto'
 import { IssuesService } from './issues.service'
 
+@UseGuards(FirebaseAuthGuard)
 @ApiTags(IssuesController.path)
 @Controller(IssuesController.path)
 export class IssuesController {
@@ -19,8 +34,8 @@ export class IssuesController {
   }
 
   @Get()
-  getList(@Query() input: IssuesListInput) {
-    return this.issuesService.getList(input)
+  getList(@Query() input: IssuesListInput, @Req() req: Request) {
+    return this.issuesService.getList(input, req.user!)
   }
 
   @Get('export/pdf')

@@ -1,38 +1,98 @@
-import { lazy, Suspense } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { DashboardPage, ErrorPage, RootPage } from './pages'
+import { getAuth } from '@firebase/auth'
+import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { DashboardPage, RootPage } from './pages'
+import LoginPage from './pages/login/LoginPage'
+import useStore from './useStore'
 
 const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
 const LazySymptomsPage = lazy(() => import('./pages/symptoms/SymptomsPage'))
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <RootPage />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        path: '/',
-        element: <DashboardPage />,
-      },
-      {
-        path: '/issues',
-        element: <Suspense children={<LazyIssuesPage />} />,
-      },
-      {
-        path: '/meds',
-        element: <Suspense children={<LazyMedsPage />} />,
-      },
-      {
-        path: '/symptoms',
-        element: <Suspense children={<LazySymptomsPage />} />,
-      },
-    ],
-  },
-])
+const ProtectedRoute = ({ children }: PropsWithChildren) => {
+  const { currentUser } = useStore()
 
-const App = () => <RouterProvider router={router} />
+  if (!currentUser) {
+    return (
+      <Navigate
+        to={'/login'}
+        replace
+      />
+    )
+  }
+
+  return children as ReactElement
+}
+const UnProtectedRoute = ({ children }: PropsWithChildren) => {
+  const { currentUser } = useStore()
+
+  if (currentUser) {
+    return (
+      <Navigate
+        to={'/'}
+        replace
+      />
+    )
+  }
+
+  return children as ReactElement
+}
+
+const App = () => {
+  const { setCurrentUser } = useStore()
+
+  useEffect(() => {
+    getAuth().useDeviceLanguage()
+
+    const unsubscribe = getAuth().onAuthStateChanged(user => {
+      setCurrentUser(user)
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [setCurrentUser])
+
+  return (
+    <BrowserRouter basename="/">
+      <Routes>
+        <Route
+          element={
+            <ProtectedRoute>
+              <RootPage />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            path={'/'}
+            element={<DashboardPage />}
+          />
+          <Route
+            path={'/issues'}
+            element={<Suspense children={<LazyIssuesPage />} />}
+          />
+          <Route
+            path={'/meds'}
+            element={<Suspense children={<LazyMedsPage />} />}
+          />
+          <Route
+            path={'/symptoms'}
+            element={<Suspense children={<LazySymptomsPage />} />}
+          />
+        </Route>
+        <Route
+          index
+          path={'/login'}
+          element={
+            <UnProtectedRoute>
+              <LoginPage />
+            </UnProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  )
+}
 
 export default App

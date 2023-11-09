@@ -1,20 +1,41 @@
+import { getAuth } from '@firebase/auth'
 import { Avatar, DarkThemeToggle, Dropdown, Navbar as FNavbar } from 'flowbite-react'
-import { HiLogout, HiMenu, HiUser } from 'react-icons/hi'
-import { NavLink } from 'react-router-dom'
+import { useCallback } from 'react'
+import { HiLogout, HiMenu } from 'react-icons/hi'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import useStore from '../../../app/useStore'
 
 export const Navbar = () => {
+  const navigate = useNavigate()
+  const { currentUser } = useStore()
+
+  const handleSignOut = useCallback(() => {
+    getAuth()
+      .signOut()
+      .then(() => {
+        toast.success('Sign-out successful!')
+        navigate('/login')
+      })
+      .catch(error => {
+        toast.error(error.message)
+      })
+  }, [navigate])
+
   return (
     <FNavbar
       fluid
       rounded
       className="fixed top-0 left-0 z-50 w-full h-14 bg-white dark:bg-gray-800 border-b border-gray-200"
     >
-      <FNavbar.Toggle
-        barIcon={HiMenu}
-        data-drawer-target="logo-sidebar"
-        data-drawer-toggle="logo-sidebar"
-        aria-controls="logo-sidebar"
-      />
+      {currentUser && (
+        <FNavbar.Toggle
+          barIcon={HiMenu}
+          data-drawer-target="logo-sidebar"
+          data-drawer-toggle="logo-sidebar"
+          aria-controls="logo-sidebar"
+        />
+      )}
       <FNavbar.Brand
         as={NavLink}
         to="/"
@@ -25,26 +46,54 @@ export const Navbar = () => {
       </FNavbar.Brand>
       <div className="flex md:order-2">
         <DarkThemeToggle />
-        <Dropdown
-          arrowIcon={false}
-          inline
-          label={
-            <Avatar
-              alt="User settings"
-              img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-              rounded
-              size="sm"
-            />
-          }
-        >
-          <Dropdown.Header className="sdsd">
-            <span className="block text-sm">Bonnie Green</span>
-            <span className="block truncate text-sm font-medium">name@flowbite.com</span>
-          </Dropdown.Header>
-          <Dropdown.Item icon={HiUser}>Profile</Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item icon={HiLogout}>Sign out</Dropdown.Item>
-        </Dropdown>
+        {currentUser && (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar
+                alt="User settings"
+                img={currentUser?.photoURL || ''}
+                rounded
+                size="sm"
+              />
+            }
+          >
+            <Dropdown.Header>
+              {currentUser?.displayName && (
+                <span className="block text-sm capitalize">{currentUser?.displayName}</span>
+              )}
+              {currentUser?.isAnonymous && (
+                <span className="block text-sm capitalize">Anonymous</span>
+              )}
+              {currentUser?.email && (
+                <span className="block truncate text-sm font-medium">{currentUser?.email}</span>
+              )}
+            </Dropdown.Header>
+            {/*<Dropdown.Item*/}
+            {/*  icon={HiUser}*/}
+            {/*  as={NavLink}*/}
+            {/*  to="/profile"*/}
+            {/*>*/}
+            {/*  Profile*/}
+            {/*</Dropdown.Item>*/}
+            {/*<Dropdown.Divider />*/}
+            <Dropdown.Item
+              onClick={() => {
+                const uid = currentUser?.uid
+                getAuth()
+              }}
+            >
+              TEST
+            </Dropdown.Item>
+            <Dropdown.Item
+              icon={HiLogout}
+              onClick={handleSignOut}
+            >
+              Sign out
+            </Dropdown.Item>
+          </Dropdown>
+        )}
       </div>
     </FNavbar>
   )

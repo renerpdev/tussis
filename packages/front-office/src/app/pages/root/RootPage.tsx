@@ -37,7 +37,7 @@ export const RootPage = () => {
     <Flowbite theme={{ theme: customTheme }}>
       <Navbar />
       <Sidebar />
-      <main className="p-4 md:ml-56 pt-unit-18 dark:bg-gray-800">
+      <main className={`md:ml-56 pt-unit-18 p-4 dark:bg-gray-800`}>
         <div className="rounded-lg">
           <Outlet />
         </div>
