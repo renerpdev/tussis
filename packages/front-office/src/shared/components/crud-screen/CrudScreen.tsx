@@ -22,6 +22,8 @@ interface CrudScreenProps<T> {
   setSortDescriptor: Dispatch<SetStateAction<SortDescriptor>>
   defaultColumns: string[]
   columns: Column[]
+  timestamp: number
+  setTimestamp: (timestamp: number) => void
 }
 export function CrudScreen<DataType>({
   model,
@@ -33,11 +35,12 @@ export function CrudScreen<DataType>({
   setSortDescriptor,
   defaultColumns,
   columns,
+  timestamp,
+  setTimestamp,
 }: CrudScreenProps<DataType>) {
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
-  const [timestamp, setTimestamp] = React.useState(Date.now())
 
   const {
     isOpen: isModalCreateOpen,
@@ -186,7 +189,7 @@ export function CrudScreen<DataType>({
       onModalCreateClose()
       setSelectedItem(undefined)
     },
-    [onModalCreateClose],
+    [onModalCreateClose, setTimestamp],
   )
 
   const handleOnModalDeleteClose = React.useCallback(
@@ -197,7 +200,7 @@ export function CrudScreen<DataType>({
       }
       onModalDeleteClose()
     },
-    [onModalDeleteClose],
+    [onModalDeleteClose, setTimestamp],
   )
 
   return (

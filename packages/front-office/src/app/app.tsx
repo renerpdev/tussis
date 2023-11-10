@@ -3,14 +3,14 @@ import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect } from 'reac
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { DashboardPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
-import useStore from './useStore'
+import { usePersistedStore } from './useStore'
 
 const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
 const LazySymptomsPage = lazy(() => import('./pages/symptoms/SymptomsPage'))
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
-  const { currentUser } = useStore()
+  const { currentUser } = usePersistedStore()
 
   if (!currentUser) {
     return (
@@ -24,7 +24,7 @@ const ProtectedRoute = ({ children }: PropsWithChildren) => {
   return children as ReactElement
 }
 const UnProtectedRoute = ({ children }: PropsWithChildren) => {
-  const { currentUser } = useStore()
+  const { currentUser } = usePersistedStore()
 
   if (currentUser) {
     return (
@@ -39,7 +39,7 @@ const UnProtectedRoute = ({ children }: PropsWithChildren) => {
 }
 
 const App = () => {
-  const { setCurrentUser } = useStore()
+  const { setCurrentUser } = usePersistedStore()
 
   useEffect(() => {
     getAuth().useDeviceLanguage()

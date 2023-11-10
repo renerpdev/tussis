@@ -4,11 +4,11 @@ import { useCallback } from 'react'
 import { HiLogout, HiMenu } from 'react-icons/hi'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import useStore from '../../../app/useStore'
+import { usePersistedStore } from '../../../app/useStore'
 
 export const Navbar = () => {
   const navigate = useNavigate()
-  const { currentUser } = useStore()
+  const { currentUser } = usePersistedStore()
 
   const handleSignOut = useCallback(() => {
     getAuth()

@@ -6,6 +6,7 @@ import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Issue } from '../../../shared/models'
 import { Column } from '../../../shared/types'
+import { useStore } from '../../useStore'
 
 const INITIAL_VISIBLE_COLUMNS = ['date', 'symptoms', 'meds', 'actions']
 
@@ -25,13 +26,13 @@ export default function IssuesPage() {
     direction: 'ascending',
   })
   const [page, setPage] = React.useState(1)
-  const [timestamp] = React.useState(Date.now())
+  const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt, setIssuesUpdatedAt } = useStore()
 
   const {
     isFetching: isFetchingMeds,
     error: errMeds,
     data: responseMeds,
-  } = useQuery(['get-meds', page, rowsPerPage, sortDescriptor, timestamp], () =>
+  } = useQuery(['get-meds', page, rowsPerPage, sortDescriptor, medsUpdatedAt], () =>
     TussisApi.get('meds', {
       limit: 100,
       sort: 'name:asc',
@@ -43,7 +44,7 @@ export default function IssuesPage() {
     isFetching: isFetchingSymptoms,
     error: errSymptoms,
     data: responseSymptoms,
-  } = useQuery(['get-symptoms', page, rowsPerPage, sortDescriptor, timestamp], () =>
+  } = useQuery(['get-symptoms', page, rowsPerPage, sortDescriptor, symptomsUpdatedAt], () =>
     TussisApi.get('symptoms', {
       limit: 100,
       sort: 'name:asc',
@@ -94,6 +95,8 @@ export default function IssuesPage() {
       sortDescriptor={sortDescriptor}
       setSortDescriptor={setSortDescriptor}
       columns={columns}
+      timestamp={issuesUpdatedAt + symptomsUpdatedAt + medsUpdatedAt}
+      setTimestamp={setIssuesUpdatedAt}
     />
   )
 }

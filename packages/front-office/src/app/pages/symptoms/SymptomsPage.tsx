@@ -4,6 +4,7 @@ import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Symptom } from '../../../shared/models'
 import { Column } from '../../../shared/types'
+import { useStore } from '../../useStore'
 
 const INITIAL_VISIBLE_COLUMNS = ['name', 'desc', 'actions']
 
@@ -21,6 +22,7 @@ export default function SymptomsPage() {
     direction: 'ascending',
   })
   const [page, setPage] = React.useState(1)
+  const { symptomsUpdatedAt, setSymptomsUpdatedAt } = useStore()
 
   const model: CrudModel<Symptom> = {
     create: {
@@ -52,6 +54,8 @@ export default function SymptomsPage() {
       sortDescriptor={sortDescriptor}
       setSortDescriptor={setSortDescriptor}
       columns={columns}
+      timestamp={symptomsUpdatedAt}
+      setTimestamp={setSymptomsUpdatedAt}
     />
   )
 }

@@ -6,12 +6,12 @@ import 'firebaseui/dist/firebaseui.css'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import auth from '../../auth/auth'
-import useStore from '../../useStore'
+import { usePersistedStore } from '../../useStore'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
-  const { setCurrentUser, currentUser } = useStore()
+  const { setCurrentUser, currentUser } = usePersistedStore()
 
   const onLoginSuccess = useCallback(
     (user: User) => {

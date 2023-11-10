@@ -1,7 +1,7 @@
 import { HiChartPie, HiInbox, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
-import useStore from '../../../app/useStore'
+import { usePersistedStore } from '../../../app/useStore'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: boolean }[] = [
   {
@@ -28,7 +28,7 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
 ]
 
 export function Sidebar() {
-  const { currentUser } = useStore()
+  const { currentUser } = usePersistedStore()
 
   return (
     <aside
