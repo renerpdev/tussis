@@ -32,24 +32,46 @@ export default function IssuesPage() {
     isFetching: isFetchingMeds,
     error: errMeds,
     data: responseMeds,
-  } = useQuery(['get-meds', page, rowsPerPage, sortDescriptor, medsUpdatedAt], () =>
-    TussisApi.get('meds', {
-      limit: 100,
-      sort: 'name:asc',
-      offset: 0,
-    }),
+  } = useQuery(
+    [
+      'meds',
+      page,
+      rowsPerPage,
+      {
+        column: 'name',
+        direction: 'ascending',
+      },
+      medsUpdatedAt,
+    ],
+    () =>
+      TussisApi.get('meds', {
+        limit: 100,
+        sort: 'name:asc',
+        offset: 0,
+      }),
   )
 
   const {
     isFetching: isFetchingSymptoms,
     error: errSymptoms,
     data: responseSymptoms,
-  } = useQuery(['get-symptoms', page, rowsPerPage, sortDescriptor, symptomsUpdatedAt], () =>
-    TussisApi.get('symptoms', {
-      limit: 100,
-      sort: 'name:asc',
-      offset: 0,
-    }),
+  } = useQuery(
+    [
+      'symptoms',
+      page,
+      rowsPerPage,
+      {
+        column: 'name',
+        direction: 'ascending',
+      },
+      symptomsUpdatedAt,
+    ],
+    () =>
+      TussisApi.get('symptoms', {
+        limit: 100,
+        sort: 'name:asc',
+        offset: 0,
+      }),
   )
 
   const model: CrudModel<Issue> = {

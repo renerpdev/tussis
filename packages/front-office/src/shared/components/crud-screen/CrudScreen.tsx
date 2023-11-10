@@ -66,7 +66,7 @@ export function CrudScreen<DataType>({
     error,
     data: response,
   } = useQuery<unknown, unknown, PaginatedQueryResponse<DataType>>(
-    [`view-${model.view.endpoint}`, page, rowsPerPage, sortDescriptor, timestamp],
+    [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp],
     () =>
       TussisApi.get(model.view.endpoint, {
         limit: rowsPerPage,
