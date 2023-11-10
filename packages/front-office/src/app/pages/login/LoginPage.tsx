@@ -23,12 +23,16 @@ export default function LoginPage() {
   )
 
   const handleAnonymousLogin = useCallback(async () => {
+    setIsLoading(true)
     signInAnonymously(auth)
       .then(userCredential => {
         onLoginSuccess(userCredential.user)
       })
       .catch(error => {
         console.log('error', error)
+      })
+      .finally(() => {
+        setIsLoading(true)
       })
   }, [onLoginSuccess])
 
