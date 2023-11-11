@@ -97,9 +97,9 @@ export default function LoginPage() {
           signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
           requireDisplayName: true,
           buttonColor: '#0991B1',
-          disableSignUp: {
-            status: true,
-          },
+          // disableSignUp: {
+          //   status: true,
+          // },
         },
       ],
       // Terms of service url.
@@ -127,23 +127,23 @@ export default function LoginPage() {
           Login Page
         </h2>
         <div id="firebaseui-auth-container"></div>
-        {MODE === 'development' && (
-          <div className="flex flex-col items-center justify-center mt-4">
-            {/*TODO: remove this anonymous login method once testing is done*/}
+        <div className="flex flex-col items-center justify-center mt-4">
+          {/*TODO: remove this anonymous login method once testing is done*/}
+          {MODE === 'development' && (
             <Button
               className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
               onClick={handleAnonymousLogin}
             >
               Ingreso Anonimo
             </Button>
-            <Button
-              className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
-              onClick={handleLoginPopup}
-            >
-              Login Popup
-            </Button>
-          </div>
-        )}
+          )}
+          <Button
+            className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
+            onClick={handleLoginPopup}
+          >
+            Login Popup
+          </Button>
+        </div>
         {isLoading && (
           <div
             id="loader"
