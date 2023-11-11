@@ -20,7 +20,7 @@ class TussisApi {
         if (error?.response?.status === HttpCodes.Unauthorized && !config?.sent) {
           config.sent = true
           toast.error(error.message, {
-            toastId: error.status,
+            toastId: error.response.status,
           })
           await getAuth().signOut()
           return this.axiosWrapper.core(config)

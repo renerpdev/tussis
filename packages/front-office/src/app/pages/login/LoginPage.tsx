@@ -3,7 +3,7 @@ import {
   User,
   getAuth,
   signInAnonymously,
-  signInWithPopup,
+  signInWithRedirect,
 } from '@firebase/auth'
 import { Button, Spinner } from '@nextui-org/react'
 import firebase from 'firebase/compat/app'
@@ -51,7 +51,7 @@ export default function LoginPage() {
 
     const provider = new GoogleAuthProvider()
 
-    signInWithPopup(auth, provider)
+    signInWithRedirect(auth, provider)
       .then(result => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         // const credential = GoogleAuthProvider.credentialFromResult(result)
@@ -75,7 +75,6 @@ export default function LoginPage() {
     const uiConfig = {
       callbacks: {
         signInSuccessWithAuthResult: function (authResult: any) {
-          console.log('authResult', authResult)
           onLoginSuccess(authResult?.user)
           return false
         },
@@ -85,21 +84,25 @@ export default function LoginPage() {
         signInFailure: function (error: any) {
           window.location.assign('/error')
         },
+        onLoginSuccess: function (user: any) {
+          console.log('onLoginSuccess', user)
+        },
       },
       signInOptions: [
         {
           provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
           // Required to enable ID token credentials for this provider.
           clientId: CLIENT_ID,
+          signInMethod: firebase.auth.GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD,
         },
         {
           provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-          signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
+          signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
           requireDisplayName: true,
           buttonColor: '#0991B1',
-          // disableSignUp: {
-          //   status: true,
-          // },
+          disableSignUp: {
+            status: true,
+          },
         },
       ],
       // Terms of service url.
@@ -116,40 +119,44 @@ export default function LoginPage() {
 
   return (
     <div
-      className="flex flex-col items-center gap-2 bg-cyan-50 pt-[10vh]"
+      className="flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh]"
       style={{ minHeight: '100vh' }}
     >
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
         Welcome to <span className="text-cyan-800">TUSSIS</span>
       </h1>
-      <div className="py-10 px-6 border-cyan-600 border-1 shadow-lg shadow-cyan-200 bg-white">
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
+      <div className="py-10 px-6 border-cyan-600 border-1 shadow-lg shadow-cyan-200 bg-white dark:bg-gray-100">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-cyan-800 pb-2 text-center">
           Login Page
         </h2>
         <div id="firebaseui-auth-container"></div>
-        <div className="flex flex-col items-center justify-center mt-4">
-          {/*TODO: remove this anonymous login method once testing is done*/}
-          {MODE === 'development' && (
+        {MODE === 'development' && (
+          <div className="flex flex-col items-center justify-center mt-4">
+            {/*TODO: remove this anonymous login method once testing is done*/}
             <Button
               className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
               onClick={handleAnonymousLogin}
             >
               Ingreso Anonimo
             </Button>
-          )}
-          <Button
-            className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
-            onClick={handleLoginPopup}
-          >
-            Login Popup
-          </Button>
-        </div>
+            <Button
+              className="bg-transparent hover:bg-transparent text-cyan-800 hover:text-cyan-600 underline"
+              onClick={handleLoginPopup}
+            >
+              Login Popup
+            </Button>
+          </div>
+        )}
         {isLoading && (
-          <div
-            id="loader"
-            className="text-center my-4"
-          >
-            <Spinner />
+          <div className="text-center h-full z-50 fixed left-0 top-0 flex flex-col justify-center items-center w-full bg-white bg-opacity-50 overflow-hidden">
+            <Spinner
+              size="md"
+              classNames={{
+                wrapper: 'h-16 w-16',
+                circle1: 'border-b-cyan-600',
+                circle2: 'border-b-cyan-600',
+              }}
+            />
           </div>
         )}
       </div>
