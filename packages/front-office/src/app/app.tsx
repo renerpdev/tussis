@@ -58,6 +58,7 @@ const App = () => {
       <Routes>
         <Route
           errorElement={<ErrorPage />}
+          path={'/'}
           element={
             <ProtectedRoute>
               <RootPage />
@@ -65,7 +66,6 @@ const App = () => {
           }
         >
           <Route
-            index
             path={'/'}
             element={
               <Navigate
@@ -99,6 +99,15 @@ const App = () => {
             <UnProtectedRoute>
               <LoginPage />
             </UnProtectedRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
           }
         />
       </Routes>
