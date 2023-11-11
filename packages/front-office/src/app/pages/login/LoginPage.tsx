@@ -1,6 +1,5 @@
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from '@firebase/auth'
 import { Button, Input, Spinner } from '@nextui-org/react'
-import 'firebaseui/dist/firebaseui.css'
 import { useCallback, useState } from 'react'
 import { FaGoogle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
