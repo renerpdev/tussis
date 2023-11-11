@@ -14,6 +14,8 @@ type State = {
   setMedsUpdatedAt: (medsUpdatedAt: number) => void
   symptomsUpdatedAt: number
   setSymptomsUpdatedAt: (symptomsUpdatedAt: number) => void
+  sidebarOpen: boolean
+  setSidebarOpen: (sidebarOpen: boolean) => void
 }
 
 export const usePersistedStore = create(
@@ -38,4 +40,6 @@ export const useStore = create<State>(set => ({
   setMedsUpdatedAt: (medsUpdatedAt: number) => set({ medsUpdatedAt }),
   symptomsUpdatedAt: currentTimestamp,
   setSymptomsUpdatedAt: (symptomsUpdatedAt: number) => set({ symptomsUpdatedAt }),
+  sidebarOpen: false,
+  setSidebarOpen: (sidebarOpen: boolean) => set({ sidebarOpen }),
 }))

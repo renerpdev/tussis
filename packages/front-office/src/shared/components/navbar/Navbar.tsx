@@ -4,11 +4,12 @@ import { useCallback } from 'react'
 import { HiLogout, HiMenu } from 'react-icons/hi'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { usePersistedStore } from '../../../app/useStore'
+import { usePersistedStore, useStore } from '../../../app/useStore'
 
 export const Navbar = () => {
   const navigate = useNavigate()
   const { currentUser } = usePersistedStore()
+  const { sidebarOpen, setSidebarOpen } = useStore()
 
   const handleSignOut = useCallback(() => {
     getAuth()
@@ -24,6 +25,10 @@ export const Navbar = () => {
       })
   }, [navigate])
 
+  const handleSidebarVisibility = useCallback(() => {
+    setSidebarOpen(!sidebarOpen)
+  }, [sidebarOpen, setSidebarOpen])
+
   return (
     <FNavbar
       fluid
@@ -33,9 +38,8 @@ export const Navbar = () => {
       {currentUser && (
         <FNavbar.Toggle
           barIcon={HiMenu}
-          data-drawer-target="logo-sidebar"
-          data-drawer-toggle="logo-sidebar"
           aria-controls="logo-sidebar"
+          onClick={handleSidebarVisibility}
         />
       )}
       <FNavbar.Brand
