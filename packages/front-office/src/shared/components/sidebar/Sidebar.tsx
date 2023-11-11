@@ -5,7 +5,7 @@ import { usePersistedStore } from '../../../app/useStore'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: boolean }[] = [
   {
-    route: '',
+    route: 'dashboard',
     value: 'Dashboard',
     icon: HiChartPie,
     isPublic: true,

@@ -29,7 +29,7 @@ export default function ModalDelete<T>({
         return res
       } catch (e: any) {
         toast.error(e.message, {
-          toastId: 'modal-delete-error',
+          toastId: e.status.status,
         })
       }
     },

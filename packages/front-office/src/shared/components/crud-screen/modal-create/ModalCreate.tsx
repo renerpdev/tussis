@@ -64,7 +64,9 @@ export default function ModalCreate<T>({
         onClose?.(true)
         return res
       } catch (e: any) {
-        toast.error(e.message)
+        toast.error(e.message, {
+          toastId: e.status,
+        })
       }
     },
   })
@@ -79,7 +81,9 @@ export default function ModalCreate<T>({
         onClose?.(true)
         return res
       } catch (e: any) {
-        toast.error(e.message)
+        toast.error(e.message, {
+          toastId: e.status,
+        })
       }
     },
   })

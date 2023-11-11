@@ -1,7 +1,7 @@
 import { getAuth } from '@firebase/auth'
 import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { DashboardPage, RootPage } from './pages'
+import { DashboardPage, ErrorPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
 import { usePersistedStore } from './useStore'
 
@@ -57,6 +57,7 @@ const App = () => {
     <BrowserRouter basename="/">
       <Routes>
         <Route
+          errorElement={<ErrorPage />}
           element={
             <ProtectedRoute>
               <RootPage />
@@ -66,6 +67,16 @@ const App = () => {
           <Route
             index
             path={'/'}
+            element={
+              <Navigate
+                to={'/dashboard'}
+                replace
+              />
+            }
+          />
+          <Route
+            index
+            path={'/dashboard'}
             element={<DashboardPage />}
           />
           <Route

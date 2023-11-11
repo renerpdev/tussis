@@ -18,7 +18,9 @@ export const Navbar = () => {
         navigate('/login')
       })
       .catch(error => {
-        toast.error(error.message)
+        toast.error(error.message, {
+          toastId: error.status,
+        })
       })
   }, [navigate])
 

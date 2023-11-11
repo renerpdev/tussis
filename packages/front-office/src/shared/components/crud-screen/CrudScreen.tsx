@@ -80,7 +80,7 @@ export function CrudScreen<DataType>({
   useEffect(() => {
     if (error) {
       toast.error((error as any).message, {
-        toastId: 'fetch-table-data-error',
+        toastId: (error as any).status,
       })
     }
   }, [error])
@@ -146,7 +146,7 @@ export function CrudScreen<DataType>({
         downloadBlobFile(blob.data)
       } catch (e: any) {
         toast.error(e.message, {
-          toastId: 'export-report-error',
+          toastId: e.status.status,
         })
       }
     }
