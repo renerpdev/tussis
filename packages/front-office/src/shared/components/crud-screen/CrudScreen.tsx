@@ -4,6 +4,7 @@ import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import { useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
+import { usePersistedStore } from '../../../app/useStore'
 import { CrudModel } from '../../models'
 import { Column, PaginatedQueryResponse } from '../../types'
 import { downloadBlobFile } from '../../utils'
@@ -41,6 +42,7 @@ export function CrudScreen<DataType>({
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
+  const { currentUser } = usePersistedStore()
 
   const {
     isOpen: isModalCreateOpen,
@@ -66,7 +68,7 @@ export function CrudScreen<DataType>({
     error,
     data: response,
   } = useQuery<unknown, unknown, PaginatedQueryResponse<DataType>>(
-    [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp],
+    [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp, currentUser?.uid],
     () =>
       TussisApi.get(model.view.endpoint, {
         limit: rowsPerPage,
@@ -146,7 +148,7 @@ export function CrudScreen<DataType>({
         downloadBlobFile(blob.data)
       } catch (e: any) {
         toast.error(e.message, {
-          toastId: e.status.status,
+          toastId: e.status,
         })
       }
     }

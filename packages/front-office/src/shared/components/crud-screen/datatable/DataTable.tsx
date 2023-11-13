@@ -87,7 +87,7 @@ export default function DataTable<T>({
       dayjs.extend(relativeTime)
       return date.fromNow()
     }
-    return date.format('dddd, MMMM D, YYYY')
+    return date.format('D MMM, YYYY')
   }, [])
 
   const renderCell = useCallback(

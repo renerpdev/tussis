@@ -14,6 +14,7 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { Response } from 'firebase-functions/v1'
+import { AuthUser } from '../../shared/types/auth.types'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { CreateIssueDto } from './dto/create-issue.dto'
 import { IssuesListInput } from './dto/get-all-issues.dto'
@@ -29,18 +30,18 @@ export class IssuesController {
   constructor(private readonly issuesService: IssuesService) {}
 
   @Post()
-  create(@Body() createIssueDto: CreateIssueDto) {
-    return this.issuesService.create(createIssueDto)
+  create(@Body() createIssueDto: CreateIssueDto, @Req() req: Request) {
+    return this.issuesService.create(createIssueDto, req.user as AuthUser)
   }
 
   @Get()
   getList(@Query() input: IssuesListInput, @Req() req: Request) {
-    return this.issuesService.getList(input, req.user!)
+    return this.issuesService.getList(input, req.user as AuthUser)
   }
 
   @Get('export/pdf')
-  async exportPdf(@Res() res: Response, @Query() input: IssuesListInput) {
-    const buffer = await this.issuesService.exportPdf(input)
+  async exportPdf(@Res() res: Response, @Query() input: IssuesListInput, @Req() req: Request) {
+    const buffer = await this.issuesService.exportPdf(input, req.user as AuthUser)
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; tussis-report.pdf',
@@ -51,17 +52,17 @@ export class IssuesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.issuesService.findOne(id)
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.issuesService.findOne(id, req.user as AuthUser)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIssueDto: UpdateIssueDto) {
-    return this.issuesService.update(id, updateIssueDto)
+  update(@Param('id') id: string, @Body() updateIssueDto: UpdateIssueDto, @Req() req: Request) {
+    return this.issuesService.update(id, updateIssueDto, req.user as AuthUser)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.issuesService.remove(id)
+  remove(@Param('id') id: string, @Req() req: Request) {
+    return this.issuesService.remove(id, req.user as AuthUser)
   }
 }

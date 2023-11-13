@@ -6,7 +6,7 @@ import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Issue } from '../../../shared/models'
 import { Column } from '../../../shared/types'
-import { useStore } from '../../useStore'
+import { usePersistedStore, useStore } from '../../useStore'
 
 const INITIAL_VISIBLE_COLUMNS = ['date', 'symptoms', 'meds', 'actions']
 
@@ -27,6 +27,7 @@ export default function IssuesPage() {
   })
   const [page, setPage] = React.useState(1)
   const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt, setIssuesUpdatedAt } = useStore()
+  const { currentUser } = usePersistedStore()
 
   const {
     isFetching: isFetchingMeds,
@@ -42,6 +43,7 @@ export default function IssuesPage() {
         direction: 'ascending',
       },
       medsUpdatedAt,
+      currentUser?.uid,
     ],
     () =>
       TussisApi.get('meds', {
@@ -65,6 +67,7 @@ export default function IssuesPage() {
         direction: 'ascending',
       },
       symptomsUpdatedAt,
+      currentUser?.uid,
     ],
     () =>
       TussisApi.get('symptoms', {

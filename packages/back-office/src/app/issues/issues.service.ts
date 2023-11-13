@@ -3,6 +3,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { AuthUser } from '../../shared/types/auth.types'
 import { generatePdfTable, getPaginatedIssuesList, getValidDto } from '../../shared/utils'
 import { Med } from '../meds/entities/med.entity'
 import { MedsService } from '../meds/meds.service'
@@ -29,41 +30,44 @@ export class IssuesService {
     private medsService: MedsService,
   ) {}
 
-  async create(createIssueDto: CreateIssueDto): Promise<Issue> {
+  async create(createIssueDto: CreateIssueDto, user: AuthUser): Promise<Issue> {
     const validInput = getValidDto(CreateIssueDto, createIssueDto)
 
     const symptoms = await Promise.all(
-      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId, user)),
     )
     const meds = await Promise.all(
-      (validInput.meds || []).map(medId => this.medsService.findOne(medId)),
+      (validInput.meds || []).map(medId => this.medsService.findOne(medId, user)),
     )
 
     const newIssue = {
       notes: validInput.notes,
       date: dayjs(validInput.date).format('YYYY-MM-DD'),
+      uid: user.uid,
     }
     const issuesRef = await this.issuesCollection.add(newIssue)
     const issueDoc = await issuesRef.get()
 
     await Promise.all(
-      symptoms.map(({ id, name, desc }) =>
+      symptoms.map(({ id, name, desc, uid }) =>
         this.issuesSymptomsCollection.add({
           issueId: issueDoc.id,
           symptomId: id,
           name,
           desc,
+          uid,
         }),
       ),
     )
 
     await Promise.all(
-      meds.map(({ id, name, desc }) =>
+      meds.map(({ id, name, desc, uid }) =>
         this.issuesMedsCollection.add({
           issueId: issueDoc.id,
           medId: id,
           name,
           desc,
+          uid,
         }),
       ),
     )
@@ -71,7 +75,7 @@ export class IssuesService {
     return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
   }
 
-  async getList(input: IssuesListInput, authUser?: any): Promise<IssuesList> {
+  async getList(input: IssuesListInput, user: AuthUser): Promise<IssuesList> {
     const validInput = getValidDto(IssuesListInput, input)
 
     return getPaginatedIssuesList<Issue, IssueDocument, IssueMedDocument, IssueSymptomDocument>({
@@ -79,15 +83,20 @@ export class IssuesService {
       collection: this.issuesCollection,
       symptomsCollection: this.issuesSymptomsCollection,
       medsCollection: this.issuesMedsCollection,
+      uid: user.uid,
     })
   }
 
-  async findOne(id: string): Promise<Issue> {
+  async findOne(id: string, user: AuthUser): Promise<Issue> {
     const docRef = this.issuesCollection.doc(id)
     const issueDoc = await docRef.get()
 
     if (!issueDoc.exists) {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
+    }
+
+    if (issueDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     const symptoms = (
@@ -107,7 +116,7 @@ export class IssuesService {
     return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
   }
 
-  async update(id: string, updateIssueDto: UpdateIssueDto): Promise<Issue> {
+  async update(id: string, updateIssueDto: UpdateIssueDto, user: AuthUser): Promise<Issue> {
     const validInput = getValidDto(UpdateIssueDto, updateIssueDto)
 
     const docRef = this.issuesCollection.doc(id)
@@ -119,16 +128,21 @@ export class IssuesService {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
 
+    if (issueDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
+    }
+
     await docRef.update({
       ...validInput,
       date: validInput.date ? dayjs(validInput.date).format('YYYY-MM-DD') : undefined,
+      uid: user.uid,
     })
 
     const symptoms = await Promise.all(
-      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId)),
+      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId, user)),
     )
     const meds = await Promise.all(
-      (validInput.meds || []).map(medId => this.medsService.findOne(medId)),
+      (validInput.meds || []).map(medId => this.medsService.findOne(medId, user)),
     )
 
     if (validInput.meds) {
@@ -138,12 +152,13 @@ export class IssuesService {
       await Promise.all(issuesMedsRef.docs.map(doc => doc.ref.delete()))
       // Then: add new ones to IssuesMeds collection
       await Promise.all(
-        meds.map(({ id, name, desc }) =>
+        meds.map(({ id, name, desc, uid }) =>
           this.issuesMedsCollection.add({
             issueId: issueDoc.id,
             medId: id,
             name,
             desc,
+            uid,
           }),
         ),
       )
@@ -156,12 +171,13 @@ export class IssuesService {
       await Promise.all(issuesSymptomsRef.docs.map(doc => doc.ref.delete()))
       // Then: add new ones to IssuesSymptoms collection
       await Promise.all(
-        symptoms.map(({ id, name, desc }) =>
+        symptoms.map(({ id, name, desc, uid }) =>
           this.issuesSymptomsCollection.add({
             issueId: issueDoc.id,
             symptomId: id,
             name,
             desc,
+            uid,
           }),
         ),
       )
@@ -172,12 +188,16 @@ export class IssuesService {
     return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
   }
 
-  async remove(id: string): Promise<Issue> {
+  async remove(id: string, user: AuthUser): Promise<Issue> {
     const docRef = this.issuesCollection.doc(id)
     const issueDoc = await docRef.get()
 
     if (!issueDoc.exists) {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
+    }
+
+    if (issueDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.delete()
@@ -191,8 +211,8 @@ export class IssuesService {
     return { ...issueDoc.data(), id, symptoms: [], meds: [] }
   }
 
-  async exportPdf(input: IssuesListInput): Promise<Buffer> {
-    const paginatedIssuesList = await this.getList(input)
+  async exportPdf(input: IssuesListInput, user: AuthUser): Promise<Buffer> {
+    const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']
     const meds = (

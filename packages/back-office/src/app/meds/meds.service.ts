@@ -2,6 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 import { CollectionReference } from 'firebase-admin/firestore'
 
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { AuthUser } from '../../shared/types/auth.types'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
 import { IssueMedDocument } from '../issues/documents/issues_meds.document'
 import { MedDocument } from './documents/med.document'
@@ -19,12 +20,13 @@ export class MedsService {
     private issuesMedsCollection: CollectionReference<IssueMedDocument>,
   ) {}
 
-  async create(createMedDto: CreateMedDto): Promise<Med> {
+  async create(createMedDto: CreateMedDto, user: AuthUser): Promise<Med> {
     const validInput = getValidDto(CreateMedDto, createMedDto)
 
     const newMed = {
       name: validInput.name,
       desc: validInput.desc,
+      uid: user.uid,
     }
 
     const docRef = await this.medsCollection.add(newMed)
@@ -34,16 +36,17 @@ export class MedsService {
     return { ...medDoc.data(), id: medDoc.id }
   }
 
-  getList(input: MedsListInput): Promise<MedsList> {
+  getList(input: MedsListInput, user: AuthUser): Promise<MedsList> {
     const validInput = getValidDto(MedsListInput, input)
 
     return getPaginatedList<Med, MedDocument>({
       ...validInput,
       collection: this.medsCollection,
+      uid: user.uid,
     })
   }
 
-  async findOne(id: string): Promise<Med> {
+  async findOne(id: string, user: AuthUser): Promise<Med> {
     const docRef = this.medsCollection.doc(id)
     const medDoc = await docRef.get()
 
@@ -51,10 +54,14 @@ export class MedsService {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
     }
 
+    if (medDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
+    }
+
     return { ...medDoc.data(), id: medDoc.id }
   }
 
-  async update(id: string, updateMedDto: UpdateMedDto): Promise<Med> {
+  async update(id: string, updateMedDto: UpdateMedDto, user: AuthUser): Promise<Med> {
     const validInput = getValidDto(UpdateMedDto, updateMedDto)
     const docRef = this.medsCollection.doc(id)
 
@@ -63,6 +70,10 @@ export class MedsService {
     // TODO: maybe not needed since docRef.update() throws an error on failure
     if (!medDoc.exists) {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
+    }
+
+    if (medDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.update({
@@ -84,12 +95,16 @@ export class MedsService {
     return { ...medDoc.data(), id: medDoc.id }
   }
 
-  async remove(id: string): Promise<Med> {
+  async remove(id: string, user: AuthUser): Promise<Med> {
     const docRef = this.medsCollection.doc(id)
     const medDoc = await docRef.get()
 
     if (!medDoc.exists) {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
+    }
+
+    if (medDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.delete()

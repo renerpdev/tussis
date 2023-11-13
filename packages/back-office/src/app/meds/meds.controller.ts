@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
   Patch,
   Post,
@@ -14,6 +13,7 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 
 import { Request } from 'express'
+import { AuthUser } from '../../shared/types/auth.types'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { CreateMedDto } from './dto/create-med.dto'
 import { MedsListInput } from './dto/get-all-meds.dto'
@@ -29,28 +29,27 @@ export class MedsController {
   constructor(private readonly medsService: MedsService) {}
 
   @Post()
-  create(@Body() createMedDto: CreateMedDto) {
-    return this.medsService.create(createMedDto)
+  create(@Body() createMedDto: CreateMedDto, @Req() req: Request) {
+    return this.medsService.create(createMedDto, req.user as AuthUser)
   }
 
   @Get()
   getList(@Query() input: MedsListInput, @Req() req: Request) {
-    Logger.log(req.authInfo)
-    return this.medsService.getList(input)
+    return this.medsService.getList(input, req.user as AuthUser)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medsService.findOne(id)
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.medsService.findOne(id, req.user as AuthUser)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMedDto: UpdateMedDto) {
-    return this.medsService.update(id, updateMedDto)
+  update(@Param('id') id: string, @Body() updateMedDto: UpdateMedDto, @Req() req: Request) {
+    return this.medsService.update(id, updateMedDto, req.user as AuthUser)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.medsService.remove(id)
+  remove(@Param('id') id: string, @Req() req: Request) {
+    return this.medsService.remove(id, req.user as AuthUser)
   }
 }

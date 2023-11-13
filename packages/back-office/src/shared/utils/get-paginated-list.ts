@@ -14,6 +14,7 @@ import {
 type SortParam = Record<string, OrderByDirection>
 type Input<C> = PaginatedListInput & {
   collection: CollectionReference<C>
+  uid: string
 }
 type InputIssues<C, M, S> = Input<C> & {
   medsCollection: CollectionReference<M>
@@ -22,7 +23,7 @@ type InputIssues<C, M, S> = Input<C> & {
 
 export const getPaginatedSnapshot = async <C>(input: Input<C>): Promise<PaginatedSnapshot<C>> => {
   const { limit = DEFAULT_PAGE_SIZE, sort, collection, range, offset = 0 } = input
-  let query: Query<C> = collection.offset(0)
+  let query: Query<C> = collection.where('uid', '==', input.uid)
 
   const sortParams: SortParam[] = sort
     ? sort.split('&').map(param => {
@@ -40,8 +41,7 @@ export const getPaginatedSnapshot = async <C>(input: Input<C>): Promise<Paginate
       throw new Error('Invalid date range values!')
     }
 
-    query = query.where('date', '>=', fromDate)
-    query = query.where('date', '<=', toDate)
+    query = query.where('date', '>=', fromDate).where('date', '<=', toDate)
   }
 
   if (sortParams.length > 0) {
@@ -93,8 +93,8 @@ export const getPaginatedIssuesList = async <T, C, M, S>(
     )
   ).map(({ docs }) =>
     docs.map(doc => {
-      const { medId, desc, name }: any = doc.data()
-      return { name, desc, id: medId } as Med
+      const { _medId, ...data }: any = doc.data()
+      return { ...data, id: _medId } as Med
     }),
   )
 
@@ -105,8 +105,8 @@ export const getPaginatedIssuesList = async <T, C, M, S>(
     )
   ).map(({ docs }) =>
     docs.map(doc => {
-      const { symptomId, desc, name }: any = doc.data()
-      return { name, desc, id: symptomId } as Symptom
+      const { _symptomId, ...data }: any = doc.data()
+      return { ...data, id: _symptomId } as Symptom
     }),
   )
 

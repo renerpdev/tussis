@@ -6,5 +6,6 @@ export class Issue extends BaseEntity {
   symptoms: Symptom[]
   meds: Med[]
   date: string
+  uid: string
   notes?: string
 }

@@ -2,6 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import { CollectionReference } from 'firebase-admin/firestore'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { AuthUser } from '../../shared/types/auth.types'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
 import { IssueSymptomDocument } from '../issues/documents/issues_symptoms.document'
 import { SymptomDocument } from './documents/symptom.document'
@@ -19,11 +20,12 @@ export class SymptomsService {
     private issuesSymptomsCollection: CollectionReference<IssueSymptomDocument>,
   ) {}
 
-  async create(createSymptomDto: CreateSymptomDto): Promise<Symptom> {
+  async create(createSymptomDto: CreateSymptomDto, user: AuthUser): Promise<Symptom> {
     const validInput = getValidDto(CreateSymptomDto, createSymptomDto)
 
     const newSymptom = {
       ...validInput,
+      uid: user.uid,
     }
 
     const docRef = await this.symptomsCollection.add(newSymptom)
@@ -33,16 +35,17 @@ export class SymptomsService {
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }
 
-  getList(input: SymptomsListInput): Promise<SymptomsList> {
+  getList(input: SymptomsListInput, user: AuthUser): Promise<SymptomsList> {
     const validInput = getValidDto(SymptomsListInput, input)
 
     return getPaginatedList<Symptom, SymptomDocument>({
       ...validInput,
       collection: this.symptomsCollection,
+      uid: user.uid,
     })
   }
 
-  async findOne(id: string): Promise<Symptom> {
+  async findOne(id: string, user: AuthUser): Promise<Symptom> {
     const docRef = this.symptomsCollection.doc(id)
     const symptomDoc = await docRef.get()
 
@@ -50,10 +53,14 @@ export class SymptomsService {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
     }
 
+    if (symptomDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
+    }
+
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }
 
-  async update(id: string, updateSymptomDto: UpdateSymptomDto): Promise<Symptom> {
+  async update(id: string, updateSymptomDto: UpdateSymptomDto, user: AuthUser): Promise<Symptom> {
     const validInput = getValidDto(UpdateSymptomDto, updateSymptomDto)
     const docRef = this.symptomsCollection.doc(id)
 
@@ -62,6 +69,10 @@ export class SymptomsService {
     // TODO: maybe not needed since docRef.update() throws an error on failure
     if (!symptomDoc.exists) {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
+    }
+
+    if (symptomDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.update({
@@ -83,12 +94,16 @@ export class SymptomsService {
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }
 
-  async remove(id: string): Promise<Symptom> {
+  async remove(id: string, user: AuthUser): Promise<Symptom> {
     const docRef = this.symptomsCollection.doc(id)
     const symptomDoc = await docRef.get()
 
     if (!symptomDoc.exists) {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
+    }
+
+    if (symptomDoc.data().uid !== user.uid) {
+      throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.delete()
