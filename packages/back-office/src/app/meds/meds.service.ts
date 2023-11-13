@@ -2,6 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 import { CollectionReference } from 'firebase-admin/firestore'
 
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
 import { AuthUser } from '../../shared/types/auth.types'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
 import { IssueMedDocument } from '../issues/documents/issues_meds.document'
@@ -55,7 +56,7 @@ export class MedsService {
     }
 
     if (medDoc.data().uid !== user.sub) {
-      throw new Error('Unauthorized! The id your are trying to access is not yours')
+      throw new UnauthorizedResourceError(user.sub)
     }
 
     return { ...medDoc.data(), id: medDoc.id }
@@ -73,7 +74,7 @@ export class MedsService {
     }
 
     if (medDoc.data().uid !== user.sub) {
-      throw new Error('Unauthorized! The id your are trying to access is not yours')
+      throw new UnauthorizedResourceError(user.sub)
     }
 
     await docRef.update({
@@ -104,7 +105,7 @@ export class MedsService {
     }
 
     if (medDoc.data().uid !== user.sub) {
-      throw new Error('Unauthorized! The id your are trying to access is not yours')
+      throw new UnauthorizedResourceError(user.sub)
     }
 
     await docRef.delete()

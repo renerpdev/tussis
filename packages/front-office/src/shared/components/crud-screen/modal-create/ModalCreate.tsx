@@ -17,7 +17,6 @@ import { Datepicker } from 'flowbite-react'
 import { useCallback, useMemo, useState } from 'react'
 import { HiPencil, HiPlus } from 'react-icons/hi'
 import { useMutation } from 'react-query'
-import { toast } from 'react-toastify'
 import { v4 as uuid } from 'uuid'
 import { TussisApi } from '../../../../api'
 import { AsyncData, BaseModel, CrudModel } from '../../../models'
@@ -58,33 +57,21 @@ export default function ModalCreate<T>({
 
   const createMutation = useMutation({
     mutationFn: async (data: T) => {
-      try {
-        const res = await TussisApi.add<T>(model.create.endpoint, data)
-        setFieldValues(new Map(Object.entries({})))
-        onClose?.(true)
-        return res
-      } catch (e: any) {
-        toast.error(e.message, {
-          toastId: e.status,
-        })
-      }
+      const res = await TussisApi.add<T>(model.create.endpoint, data)
+      setFieldValues(new Map(Object.entries({})))
+      onClose?.(true)
+      return res
     },
   })
   const updateMutation = useMutation({
     mutationFn: async (data: T) => {
-      try {
-        const res = await TussisApi.update<T>(
-          `${model.update.endpoint}/${(editData as BaseModel)?.id}`,
-          data,
-        )
-        setFieldValues(new Map(Object.entries({})))
-        onClose?.(true)
-        return res
-      } catch (e: any) {
-        toast.error(e.message, {
-          toastId: e.status,
-        })
-      }
+      const res = await TussisApi.update<T>(
+        `${model.update.endpoint}/${(editData as BaseModel)?.id}`,
+        data,
+      )
+      setFieldValues(new Map(Object.entries({})))
+      onClose?.(true)
+      return res
     },
   })
 

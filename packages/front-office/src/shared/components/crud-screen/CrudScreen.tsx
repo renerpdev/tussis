@@ -136,21 +136,15 @@ export function CrudScreen<DataType>({
 
   const onExportTableData = React.useCallback(async () => {
     if (model.report) {
-      try {
-        const blob = await TussisApi.getPDF(model.report.endpoint, {
-          limit: response?.total,
-          sort: `${sortDescriptor.column}:${
-            sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'
-          }`,
-          offset: 0,
-        })
+      const blob = await TussisApi.getPDF(model.report.endpoint, {
+        limit: response?.total,
+        sort: `${sortDescriptor.column}:${
+          sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'
+        }`,
+        offset: 0,
+      })
 
-        downloadBlobFile(blob.data)
-      } catch (e: any) {
-        toast.error(e.message, {
-          toastId: e.status,
-        })
-      }
+      downloadBlobFile(blob.data)
     }
   }, [model.report, response?.total, sortDescriptor.column, sortDescriptor.direction])
 

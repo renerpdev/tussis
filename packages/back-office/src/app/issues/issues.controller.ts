@@ -16,12 +16,14 @@ import { Request } from 'express'
 import { Response } from 'firebase-functions/v1'
 import { AuthUser } from '../../shared/types/auth.types'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
+import { Roles } from '../auth/roles.decorator'
+import { RolesGuard } from '../auth/roles.guard'
 import { CreateIssueDto } from './dto/create-issue.dto'
 import { IssuesListInput } from './dto/get-all-issues.dto'
 import { UpdateIssueDto } from './dto/update-issue.dto'
 import { IssuesService } from './issues.service'
 
-@UseGuards(FirebaseAuthGuard)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
 @ApiTags(IssuesController.path)
 @Controller(IssuesController.path)
 export class IssuesController {
@@ -29,6 +31,7 @@ export class IssuesController {
 
   constructor(private readonly issuesService: IssuesService) {}
 
+  @Roles('admin')
   @Post()
   create(@Body() createIssueDto: CreateIssueDto, @Req() req: Request) {
     return this.issuesService.create(createIssueDto, req.user as AuthUser)
@@ -39,6 +42,7 @@ export class IssuesController {
     return this.issuesService.getList(input, req.user as AuthUser)
   }
 
+  @Roles('admin')
   @Get('export/pdf')
   async exportPdf(@Res() res: Response, @Query() input: IssuesListInput, @Req() req: Request) {
     const buffer = await this.issuesService.exportPdf(input, req.user as AuthUser)
@@ -56,11 +60,13 @@ export class IssuesController {
     return this.issuesService.findOne(id, req.user as AuthUser)
   }
 
+  @Roles('admin')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateIssueDto: UpdateIssueDto, @Req() req: Request) {
     return this.issuesService.update(id, updateIssueDto, req.user as AuthUser)
   }
 
+  @Roles('admin')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.issuesService.remove(id, req.user as AuthUser)

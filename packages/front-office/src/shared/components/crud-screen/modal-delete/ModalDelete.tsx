@@ -2,7 +2,6 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from
 import { useCallback } from 'react'
 import { HiTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
-import { toast } from 'react-toastify'
 import { TussisApi } from '../../../../api'
 import { BaseModel, CrudModel } from '../../../models'
 
@@ -21,17 +20,11 @@ export default function ModalDelete<T>({
 }: ModalDeleteProps<T>) {
   const deleteMutation = useMutation({
     mutationFn: async T => {
-      try {
-        const res = await TussisApi.delete<T>(
-          `${model.update.endpoint}/${(deleteData as BaseModel).id}`,
-        )
-        onClose?.(true)
-        return res
-      } catch (e: any) {
-        toast.error(e.message, {
-          toastId: e.status,
-        })
-      }
+      const res = await TussisApi.delete<T>(
+        `${model.update.endpoint}/${(deleteData as BaseModel).id}`,
+      )
+      onClose?.(true)
+      return res
     },
   })
 

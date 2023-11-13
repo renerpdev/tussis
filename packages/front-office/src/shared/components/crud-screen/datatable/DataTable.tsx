@@ -211,7 +211,9 @@ export default function DataTable<T>({
         {item => (
           <TableRow key={item?.id}>
             {columnKey => (
-              <TableCell>{renderCell(item, columnKey as keyof T) as ReactElement}</TableCell>
+              <TableCell key={columnKey}>
+                {renderCell(item, columnKey as keyof T) as ReactElement}
+              </TableCell>
             )}
           </TableRow>
         )}

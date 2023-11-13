@@ -2,15 +2,11 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import { FaGoogle } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import auth from '../../auth/auth'
-import { usePersistedStore } from '../../useStore'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const { setCurrentUser } = usePersistedStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -18,11 +14,6 @@ export default function LoginPage() {
     setIsLoading(true)
 
     signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
-        const user = userCredential.user
-        setCurrentUser(user)
-        navigate('/')
-      })
       .catch(error => {
         const errorMessage = error.message
         toast.error(errorMessage, {
@@ -32,7 +23,7 @@ export default function LoginPage() {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [email, navigate, password, setCurrentUser])
+  }, [email, password])
 
   const handleGoogleLogin = useCallback(async () => {
     setIsLoading(true)

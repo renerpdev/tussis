@@ -1,4 +1,7 @@
+import { getAuth } from '@firebase/auth'
 import axios, { AxiosResponse, Method } from 'axios'
+import { toast } from 'react-toastify'
+import { HttpCodes } from '../shared/types'
 
 export type Headers = unknown
 
@@ -11,10 +14,45 @@ class AxiosWrapper {
     if (!this.apiUrl) {
       console.error('Warning: VITE_API_URL is not set! Requests might fail.')
     }
-  }
 
-  get core() {
-    return axios
+    // intercepts axios response
+    axios.interceptors.response.use(
+      response => response,
+      async error => {
+        const config = error?.config
+        const message = error?.response?.data.message
+        if (error?.response?.status === HttpCodes.Unauthorized && !config?.sent) {
+          config.sent = true
+          toast.error(message, {
+            toastId: error.response.status,
+          })
+          await getAuth().signOut()
+          return axios(config)
+        }
+        toast.error(message, {
+          toastId: error.response.status,
+        })
+        return Promise.reject(error)
+      },
+    )
+
+    // intercepts axios request
+    axios.interceptors.request.use(
+      async request => {
+        // TODO: handle here the auth token insertion
+        const token = JSON.parse(localStorage.getItem('tussis-store') || '{}').state?.currentUser
+          ?.stsTokenManager?.accessToken
+        if (token) {
+          request.headers.set('Authorization', `Bearer ${token}`)
+        }
+
+        return request
+      },
+      onRejected => {
+        console.log('onRejected', onRejected)
+        return Promise.reject(onRejected)
+      },
+    )
   }
 
   private async makeRequest<P, T, D>(
@@ -34,7 +72,7 @@ class AxiosWrapper {
           headers: headers || undefined,
         })
         .then(res => resolve(res.data))
-        .catch(err => reject(err.response.data)),
+        .catch(err => reject(err.response?.data)),
     )
   }
 

@@ -10,7 +10,7 @@ import App from './app/app'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 3000000, // sale time set to 5 mins,
+      staleTime: Infinity, // sale time set to `never` to avoid re-fetching data
       retry: 1,
     },
   },

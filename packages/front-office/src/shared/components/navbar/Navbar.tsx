@@ -20,7 +20,7 @@ export const Navbar = () => {
       })
       .catch(error => {
         toast.error(error.message, {
-          toastId: error.status,
+          toastId: 'sign-out',
         })
       })
   }, [navigate])

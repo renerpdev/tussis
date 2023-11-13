@@ -38,8 +38,12 @@ export const createNestServer = async expressInstance => {
 }
 
 createNestServer(server)
-  .then(v => console.log('Nest Ready'))
+  .then(() => console.log('Nest Ready'))
   .catch(err => console.error('Nest broken', err))
 
 // Connect express server to Firebase Functions
-export const api = functions.https.onRequest(server)
+export const api = functions
+  .runWith({
+    enforceAppCheck: true, // Reject requests with missing or invalid App Check tokens.
+  })
+  .https.onRequest(server)
