@@ -43,7 +43,7 @@ export class IssuesService {
     const newIssue = {
       notes: validInput.notes,
       date: dayjs(validInput.date).format('YYYY-MM-DD'),
-      uid: user.uid,
+      uid: user.sub,
     }
     const issuesRef = await this.issuesCollection.add(newIssue)
     const issueDoc = await issuesRef.get()
@@ -83,7 +83,7 @@ export class IssuesService {
       collection: this.issuesCollection,
       symptomsCollection: this.issuesSymptomsCollection,
       medsCollection: this.issuesMedsCollection,
-      uid: user.uid,
+      uid: user.sub,
     })
   }
 
@@ -95,7 +95,7 @@ export class IssuesService {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
 
-    if (issueDoc.data().uid !== user.uid) {
+    if (issueDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
@@ -128,14 +128,14 @@ export class IssuesService {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
 
-    if (issueDoc.data().uid !== user.uid) {
+    if (issueDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
     await docRef.update({
       ...validInput,
       date: validInput.date ? dayjs(validInput.date).format('YYYY-MM-DD') : undefined,
-      uid: user.uid,
+      uid: user.sub,
     })
 
     const symptoms = await Promise.all(
@@ -196,7 +196,7 @@ export class IssuesService {
       throw new DocumentNotFoundError(issueDoc.id, IssueDocument.collectionName)
     }
 
-    if (issueDoc.data().uid !== user.uid) {
+    if (issueDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 

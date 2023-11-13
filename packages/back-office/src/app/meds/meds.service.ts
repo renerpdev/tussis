@@ -26,7 +26,7 @@ export class MedsService {
     const newMed = {
       name: validInput.name,
       desc: validInput.desc,
-      uid: user.uid,
+      uid: user.sub,
     }
 
     const docRef = await this.medsCollection.add(newMed)
@@ -42,7 +42,7 @@ export class MedsService {
     return getPaginatedList<Med, MedDocument>({
       ...validInput,
       collection: this.medsCollection,
-      uid: user.uid,
+      uid: user.sub,
     })
   }
 
@@ -54,7 +54,7 @@ export class MedsService {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
     }
 
-    if (medDoc.data().uid !== user.uid) {
+    if (medDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
@@ -72,7 +72,7 @@ export class MedsService {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
     }
 
-    if (medDoc.data().uid !== user.uid) {
+    if (medDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
@@ -103,7 +103,7 @@ export class MedsService {
       throw new DocumentNotFoundError(medDoc.id, MedDocument.collectionName)
     }
 
-    if (medDoc.data().uid !== user.uid) {
+    if (medDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 

@@ -25,7 +25,7 @@ export class SymptomsService {
 
     const newSymptom = {
       ...validInput,
-      uid: user.uid,
+      uid: user.sub,
     }
 
     const docRef = await this.symptomsCollection.add(newSymptom)
@@ -41,7 +41,7 @@ export class SymptomsService {
     return getPaginatedList<Symptom, SymptomDocument>({
       ...validInput,
       collection: this.symptomsCollection,
-      uid: user.uid,
+      uid: user.sub,
     })
   }
 
@@ -53,7 +53,7 @@ export class SymptomsService {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
     }
 
-    if (symptomDoc.data().uid !== user.uid) {
+    if (symptomDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
@@ -71,7 +71,7 @@ export class SymptomsService {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
     }
 
-    if (symptomDoc.data().uid !== user.uid) {
+    if (symptomDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
@@ -102,7 +102,7 @@ export class SymptomsService {
       throw new DocumentNotFoundError(symptomDoc.id, SymptomDocument.collectionName)
     }
 
-    if (symptomDoc.data().uid !== user.uid) {
+    if (symptomDoc.data().uid !== user.sub) {
       throw new Error('Unauthorized! The id your are trying to access is not yours')
     }
 
