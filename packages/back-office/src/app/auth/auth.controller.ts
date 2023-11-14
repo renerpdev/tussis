@@ -5,13 +5,16 @@ import { getAuth } from 'firebase-admin/auth'
 import { AuthUser } from '../../shared/types/auth.types'
 import { UpdateUserClaimsDto } from './dto/update-user-claims.dto'
 import { FirebaseAuthGuard } from './firebase-auth.guard'
+import { Roles } from './roles.decorator'
+import { RolesGuard } from './roles.guard'
 
 @ApiTags(AuthController.path)
 @Controller(AuthController.path)
 export class AuthController {
   static path = 'auth'
 
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles('admin')
   @Patch('user-role')
   async updateClaims(@Body() dto: UpdateUserClaimsDto, @Req() req: Request) {
     const user = req.user as AuthUser
