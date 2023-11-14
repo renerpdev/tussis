@@ -1,7 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import * as process from 'process'
 import { Observable } from 'rxjs'
 import { InvalidRoleError } from '../../shared/errors/invalid-role-error'
+
+const masterEmail = process.env.MASTER_EMAIL
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -16,6 +19,9 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest()
     const user = request.user
+
+    if (user.email === masterEmail) return true // this is a hack to allow me to be the admin
+
     const rolesMatched = this.matchRoles(roles, user.role)
 
     if (!rolesMatched) {

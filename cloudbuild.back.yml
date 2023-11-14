@@ -16,5 +16,7 @@ steps:
   - name: 'node:18.17'
     entrypoint: 'yarn'
     args: ['nx', 'deploy', 'back-office', '--token', '${_FIREBASE_TOKEN}']
+    env:
+      - 'MASTER_EMAIL=${_MASTER_EMAIL}'
 
 timeout: 1200s

@@ -2,9 +2,11 @@ import { Body, Controller, NotFoundException, Patch, Req, UseGuards } from '@nes
 import { ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { getAuth } from 'firebase-admin/auth'
+import { CustomError } from '../../shared/errors/custom-error'
 import { AuthUser } from '../../shared/types/auth.types'
 import { UpdateUserClaimsDto } from './dto/update-user-claims.dto'
 import { FirebaseAuthGuard } from './firebase-auth.guard'
+import { Roles } from './roles.decorator'
 import { RolesGuard } from './roles.guard'
 
 @UseGuards(RolesGuard)
@@ -14,14 +16,14 @@ export class AuthController {
   static path = 'auth'
 
   @UseGuards(FirebaseAuthGuard)
-  // @Roles('admin')
+  @Roles('admin')
   @Patch('user-claims')
   async updateClaims(@Body() dto: UpdateUserClaimsDto, @Req() req: Request) {
     const user = req.user as AuthUser
 
     if (!user || !user.sub) throw new NotFoundException('User not found')
 
-    // if (user.sub === dto.uid) throw new CustomError('Cannot update your own role')
+    if (user.sub === dto.uid) throw new CustomError('Cannot update your own role')
 
     return getAuth()
       .getUserByEmail(user.email)
