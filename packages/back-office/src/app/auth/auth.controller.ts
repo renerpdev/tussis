@@ -9,13 +9,12 @@ import { FirebaseAuthGuard } from './firebase-auth.guard'
 import { Roles } from './roles.decorator'
 import { RolesGuard } from './roles.guard'
 
-@UseGuards(RolesGuard)
 @ApiTags(AuthController.path)
 @Controller(AuthController.path)
 export class AuthController {
   static path = 'auth'
 
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('admin')
   @Patch('user-claims')
   async updateClaims(@Body() dto: UpdateUserClaimsDto, @Req() req: Request) {

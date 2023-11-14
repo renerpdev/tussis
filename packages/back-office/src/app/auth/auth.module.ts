@@ -1,5 +1,6 @@
 import { DynamicModule, FactoryProvider, Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
+import { AuthController } from './auth.controller'
 import { FirebaseAuthProvider } from './auth.providers'
 import { FirebaseAuthStrategy } from './firebase-auth.strategy'
 
@@ -12,6 +13,7 @@ type AuthModuleOptions = {
 @Module({
   imports: [PassportModule],
   providers: [FirebaseAuthStrategy],
+  controllers: [AuthController],
   exports: [],
 })
 export class AuthModule {
