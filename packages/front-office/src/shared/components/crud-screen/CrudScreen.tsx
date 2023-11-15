@@ -204,7 +204,7 @@ export function CrudScreen<DataType>({
       <DataTable<DataType>
         columns={columns}
         currentPage={page}
-        data={response?.data || []}
+        data={Array.isArray(response) ? response : response?.data || []}
         filterValue={filterValue}
         loadingState={loadingState}
         onClear={onClear}

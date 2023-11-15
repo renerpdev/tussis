@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { HiChartPie, HiInbox, HiViewBoards } from 'react-icons/hi'
+import { HiChartPie, HiInbox, HiUsers, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
 import { usePersistedStore, useStore } from '../../../app/useStore'
@@ -25,6 +25,11 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
     route: 'meds',
     value: 'Meds',
     icon: HiInbox,
+  },
+  {
+    route: 'users',
+    value: 'Users',
+    icon: HiUsers,
   },
 ]
 

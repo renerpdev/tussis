@@ -31,7 +31,7 @@ export class IssuesController {
 
   constructor(private readonly issuesService: IssuesService) {}
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Post()
   create(@Body() createIssueDto: CreateIssueDto, @Req() req: Request) {
     return this.issuesService.create(createIssueDto, req.user as AuthUser)
@@ -42,7 +42,7 @@ export class IssuesController {
     return this.issuesService.getList(input, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Get('export/pdf')
   async exportPdf(@Res() res: Response, @Query() input: IssuesListInput, @Req() req: Request) {
     const buffer = await this.issuesService.exportPdf(input, req.user as AuthUser)
@@ -60,13 +60,13 @@ export class IssuesController {
     return this.issuesService.findOne(id, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateIssueDto: UpdateIssueDto, @Req() req: Request) {
     return this.issuesService.update(id, updateIssueDto, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.issuesService.remove(id, req.user as AuthUser)

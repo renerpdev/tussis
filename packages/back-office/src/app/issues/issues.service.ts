@@ -212,6 +212,11 @@ export class IssuesService {
     return { ...issueDoc.data(), id, symptoms: [], meds: [] }
   }
 
+  async deleteAllIssuesFromUser(uid: string): Promise<void> {
+    const userIssuesRef = await this.issuesCollection.where('uid', '==', uid).get()
+    await Promise.all(userIssuesRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+  }
+
   async exportPdf(input: IssuesListInput, user: AuthUser): Promise<Buffer> {
     const paginatedIssuesList = await this.getList(input, user)
 

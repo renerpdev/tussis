@@ -30,7 +30,7 @@ export class SymptomsController {
 
   constructor(private readonly symptomsService: SymptomsService) {}
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Post()
   create(@Body() createSymptomDto: CreateSymptomDto, @Req() req: Request) {
     return this.symptomsService.create(createSymptomDto, req.user as AuthUser)
@@ -46,13 +46,13 @@ export class SymptomsController {
     return this.symptomsService.findOne(id, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSymptomDto: UpdateSymptomDto, @Req() req: Request) {
     return this.symptomsService.update(id, updateSymptomDto, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.symptomsService.remove(id, req.user as AuthUser)

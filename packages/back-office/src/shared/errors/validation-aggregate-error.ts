@@ -1,7 +1,7 @@
-import { CustomError } from './custom-error'
 import { FieldValidationError } from './field-validation-error'
+import { UserError } from './user-error'
 
-export class ValidationAggregateError extends CustomError {
+export class ValidationAggregateError extends UserError {
   readonly name = 'ValidationAggregateError'
   data: FieldValidationError[]
 

@@ -3,7 +3,7 @@ interface BaseRequest {
 }
 
 interface CreateRequestModel<T> extends BaseRequest {
-  model: Record<keyof Omit<T, 'id'>, unknown>
+  model: Partial<Record<keyof Omit<T, 'id'>, unknown>>
 }
 type UpdateRequestModel<T> = BaseRequest
 type DeleteRequestModel<T> = BaseRequest

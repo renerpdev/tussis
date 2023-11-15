@@ -3,6 +3,7 @@ import { CollectionReference, OrderByDirection, Query } from 'firebase-admin/fir
 
 import { Med } from '../../app/meds/entities/med.entity'
 import { Symptom } from '../../app/symptoms/entities/symptom.entity'
+import { UserError } from '../errors/user-error'
 import {
   DEFAULT_DATE_FORMAT,
   DEFAULT_PAGE_SIZE,
@@ -38,7 +39,7 @@ export const getPaginatedSnapshot = async <C>(input: Input<C>): Promise<Paginate
 
   if (fromDate && toDate) {
     if (dayjs(fromDate).isAfter(toDate)) {
-      throw new Error('Invalid date range values!')
+      throw new UserError('Invalid date range values!')
     }
 
     query = query.where('date', '>=', fromDate).where('date', '<=', toDate)

@@ -65,10 +65,8 @@ export default function ModalCreate<T>({
   })
   const updateMutation = useMutation({
     mutationFn: async (data: T) => {
-      const res = await TussisApi.update<T>(
-        `${model.update.endpoint}/${(editData as BaseModel)?.id}`,
-        data,
-      )
+      const id = (editData as BaseModel)?.id || (editData as BaseModel).uid
+      const res = await TussisApi.update<T>(`${model.update.endpoint}/${id}`, data)
       setFieldValues(new Map(Object.entries({})))
       onClose?.(true)
       return res

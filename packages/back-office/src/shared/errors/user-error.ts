@@ -1,5 +1,5 @@
-export class CustomError extends Error {
-  name = 'CustomError'
+export class UserError extends Error {
+  name = 'UserError'
   statusCode = 400
   data: unknown
 

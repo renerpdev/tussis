@@ -119,4 +119,9 @@ export class SymptomsService {
 
     return { ...symptomDoc.data(), id: symptomDoc.id }
   }
+
+  async deleteAllSymptomsFromUser(uid: string): Promise<void> {
+    const userSymptomsRef = await this.symptomsCollection.where('uid', '==', uid).get()
+    await Promise.all(userSymptomsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+  }
 }

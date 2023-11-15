@@ -20,9 +20,8 @@ export default function ModalDelete<T>({
 }: ModalDeleteProps<T>) {
   const deleteMutation = useMutation({
     mutationFn: async T => {
-      const res = await TussisApi.delete<T>(
-        `${model.update.endpoint}/${(deleteData as BaseModel).id}`,
-      )
+      const id = (deleteData as BaseModel)?.id || (deleteData as BaseModel).uid
+      const res = await TussisApi.delete<T>(`${model.update.endpoint}/${id}`)
       onClose?.(true)
       return res
     },

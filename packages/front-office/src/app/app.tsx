@@ -10,6 +10,7 @@ const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
 const LazySymptomsPage = lazy(() => import('./pages/symptoms/SymptomsPage'))
 const LazyDashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
+const LazyUsersPage = lazy(() => import('./pages/users/UsersPage'))
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { currentUser } = usePersistedStore()
@@ -109,6 +110,16 @@ const App = () => {
             element={
               <Suspense
                 children={<LazySymptomsPage />}
+                fallback={<Spinner />}
+              />
+            }
+          />
+
+          <Route
+            path={'/users'}
+            element={
+              <Suspense
+                children={<LazyUsersPage />}
                 fallback={<Spinner />}
               />
             }

@@ -120,4 +120,9 @@ export class MedsService {
 
     return { ...medDoc.data(), id: medDoc.id }
   }
+
+  async deleteAllMedsFromUser(uid: string): Promise<void> {
+    const userMedsRef = await this.medsCollection.where('uid', '==', uid).get()
+    await Promise.all(userMedsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+  }
 }

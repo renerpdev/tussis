@@ -30,7 +30,7 @@ export class MedsController {
 
   constructor(private readonly medsService: MedsService) {}
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Post()
   create(@Body() createMedDto: CreateMedDto, @Req() req: Request) {
     return this.medsService.create(createMedDto, req.user as AuthUser)
@@ -46,13 +46,13 @@ export class MedsController {
     return this.medsService.findOne(id, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMedDto: UpdateMedDto, @Req() req: Request) {
     return this.medsService.update(id, updateMedDto, req.user as AuthUser)
   }
 
-  @Roles('admin')
+  @Roles('admin', 'editor')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.medsService.remove(id, req.user as AuthUser)

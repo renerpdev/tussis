@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { FirestoreModule } from '../firestore/firestore.module'
 import { AuthModule } from './auth/auth.module'
-import { IssuesModule } from './issues/issues.module'
+import { UsersModule } from './users/users.module'
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { IssuesModule } from './issues/issues.module'
       }),
       inject: [ConfigService],
     }),
-    IssuesModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
