@@ -1,4 +1,4 @@
-export type UIType = 'input' | 'textarea' | 'select' | 'datepicker'
+export type UIType = 'input' | 'textarea' | 'password' | 'select' | 'datepicker' | 'toggle'
 
 interface UIComponent {
   id: string
@@ -16,27 +16,36 @@ export interface UIField extends UIComponent {
 }
 
 export interface UIInputText extends UIField {
+  type: 'input' | 'textarea' | 'password'
   value: string
 }
 
 export interface UIDatePicker extends UIField {
+  type: 'datepicker'
   value: string
 }
 
 export interface UISelect extends UIField {
   value: string[]
   items: UISelectOption[]
+  type: 'select'
 }
 
 export interface UISelectOption {
   id: string
   name: string
   desc: string
+  type: 'select'
 }
 
 export interface Column {
   uid: string
   name: string
-  type: 'date' | 'string' | 'array' | 'action'
+  type: 'date' | 'string' | 'array' | 'action' | 'boolean' | 'picture'
   sortable?: boolean
+}
+
+export interface UIToggle extends UIField {
+  type: 'toggle'
+  value: boolean
 }

@@ -31,7 +31,7 @@ export class UsersService {
             email,
             emailVerified,
             disabled,
-            customClaims,
+            role: customClaims?.role,
             photoURL,
           }),
         )
@@ -50,7 +50,7 @@ export class UsersService {
         emailVerified: validDto.emailVerified,
         password: validDto.password,
         displayName: validDto.displayName,
-        photoURL: validDto.photoUrl,
+        photoURL: validDto.photoURL,
         disabled: validDto.disabled,
       })
       .then(userRecord => {
@@ -61,7 +61,8 @@ export class UsersService {
           emailVerified: userRecord.emailVerified,
           disabled: userRecord.disabled,
           customClaims: userRecord.customClaims,
-          photoUrl: userRecord.photoURL,
+          photoURL: userRecord.photoURL,
+          role: userRecord.customClaims?.role,
         } as User
       })
       .catch(error => {
@@ -78,7 +79,7 @@ export class UsersService {
         emailVerified: validDto.emailVerified,
         password: validDto.password,
         displayName: validDto.displayName,
-        photoURL: validDto.photoUrl,
+        photoURL: validDto.photoURL,
         disabled: validDto.disabled,
       })
       .then(userRecord => {
@@ -89,7 +90,8 @@ export class UsersService {
           emailVerified: userRecord.emailVerified,
           disabled: userRecord.disabled,
           customClaims: userRecord.customClaims,
-          photoUrl: userRecord.photoURL,
+          photoURL: userRecord.photoURL,
+          role: userRecord.customClaims?.role,
         } as User
       })
       .catch(error => {

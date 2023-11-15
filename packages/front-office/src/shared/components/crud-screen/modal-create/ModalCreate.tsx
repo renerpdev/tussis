@@ -7,6 +7,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Radio,
+  RadioGroup,
   Select,
   SelectItem,
   SelectedItems,
@@ -26,6 +28,7 @@ import {
   UIInputText,
   UISelect,
   UISelectOption,
+  UIToggle,
   UIType,
 } from '../../../types'
 
@@ -78,6 +81,25 @@ export default function ModalCreate<T>({
       return Object.entries(model.create.model).map(([key, value]) => {
         const editValue = editData?.[key as keyof typeof editData]
 
+        /**
+         * RETURNS A MODEL TO RENDER AN ON/OFF TOGGLE
+         */
+        if (typeof value === 'boolean') {
+          const field = {
+            id: uuid(),
+            value: (editValue || false) as boolean,
+            label: key.toUpperCase(),
+            name: key,
+            type: 'toggle',
+          } as UIToggle
+
+          setFieldValues(fieldValues.set(field.name, field.value))
+          return field
+        }
+
+        /**
+         * RETURNS A MODEL TO RENDER A DATEPICKER
+         */
         if (dayjs(value as string).isValid()) {
           const field: UIDatePicker = {
             id: uuid(),
@@ -87,11 +109,15 @@ export default function ModalCreate<T>({
             label: key.toUpperCase(),
             type: 'datepicker',
           }
+          // here we store the date, so we don't need to click on it again
           setFieldValues(fieldValues.set(field.name, field.value))
           return field
         }
 
-        if (typeof value === 'object') {
+        /**
+         * RETURNS A MODEL TO RENDER A SELECT WITH OPTIONS LOADED ASYNC
+         */
+        if (typeof value === 'object' && value?.data) {
           const field: UISelect = {
             id: uuid(),
             items: (value as AsyncData<T>).data as UISelectOption[],
@@ -106,8 +132,12 @@ export default function ModalCreate<T>({
           return field
         }
 
+        /**
+         * RETURNS A MODEL TO RENDER A TEXT INPUT
+         */
         if (typeof value === 'string') {
-          const type: UIType = (value as string).length <= 8 ? 'input' : 'textarea'
+          const type: UIType =
+            value.indexOf('*') >= 0 ? 'password' : value.length <= 8 ? 'input' : 'textarea'
           const field: UIInputText = {
             id: uuid(),
             value: (editValue || '') as string,
@@ -119,6 +149,9 @@ export default function ModalCreate<T>({
           return field
         }
 
+        /**
+         * RETURNS A MODEL TO RENDER AN EMPTY FIELD
+         */
         return EMPTY_FIELD
       })
     }
@@ -166,6 +199,23 @@ export default function ModalCreate<T>({
   const renderField = useCallback(
     (field: UIField) => {
       switch (field.type) {
+        case 'toggle':
+          return (
+            <div className="w-full">
+              <RadioGroup
+                key={field.id}
+                label={field.label}
+                orientation="horizontal"
+                defaultValue={(fieldValues.get(field.name) as boolean) ? 'yes' : 'no'}
+                onValueChange={value =>
+                  setFieldValues(fieldValues.set(field.name, value === 'yes'))
+                }
+              >
+                <Radio value="yes">SI</Radio>
+                <Radio value="no">NO</Radio>
+              </RadioGroup>
+            </div>
+          )
         case 'select':
           return (
             <Select
@@ -225,12 +275,13 @@ export default function ModalCreate<T>({
             </Select>
           )
         case 'input':
+        case 'password':
           return (
             <Input
               id={field.id}
               key={field.id}
               autoFocus={field.autofocus}
-              type="text"
+              type={field.type === 'password' ? 'password' : 'text'}
               defaultValue={field.value as string}
               onValueChange={value => setFieldValues(fieldValues.set(field.name, value))}
               placeholder={field.placeholder}

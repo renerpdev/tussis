@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Chip,
   Dropdown,
@@ -96,6 +97,13 @@ export default function DataTable<T>({
       const columnType = columns.find(column => column.uid === columnKey)?.type
 
       switch (columnType) {
+        case 'picture':
+          return (
+            <Avatar
+              src={cellValue as string}
+              size="sm"
+            />
+          )
         case 'array':
           return (cellValue as T[keyof T][]).map((subItem: T[keyof T]) => (
             <Chip
@@ -107,6 +115,8 @@ export default function DataTable<T>({
           ))
         case 'date':
           return parseDateValue(cellValue as string)
+        case 'boolean':
+          return <span>{cellValue ? 'SI' : 'NO'}</span>
         case 'action':
           return (
             <div className="relative flex justify-end items-center gap-2">
