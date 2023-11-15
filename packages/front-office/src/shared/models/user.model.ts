@@ -7,6 +7,6 @@ export interface User extends BaseModel {
   password: string
   disabled?: boolean
   emailVerified?: boolean
-  photoURL?: string
+  photoUrl?: string
   role?: 'admin' | 'editor'
 }

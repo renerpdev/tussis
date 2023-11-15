@@ -7,11 +7,11 @@ import { User } from '../../../shared/models/user.model'
 import { Column } from '../../../shared/types'
 import { useStore } from '../../useStore'
 
-const INITIAL_VISIBLE_COLUMNS = ['photoURL', 'displayName', 'email', 'role', 'actions']
+const INITIAL_VISIBLE_COLUMNS = ['photoUrl', 'displayName', 'email', 'role', 'actions']
 
 const columns: Column[] = [
   { name: 'UID', uid: 'uid', type: 'string', sortable: true },
-  { name: 'AVATAR', uid: 'photoURL', type: 'picture' },
+  { name: 'AVATAR', uid: 'photoUrl', type: 'picture' },
   { name: 'NAME', uid: 'displayName', type: 'string', sortable: true },
   { name: 'EMAIL', uid: 'email', type: 'string', sortable: true },
   { name: 'ROLE', uid: 'role', type: 'string' },
@@ -38,7 +38,7 @@ export default function UsersPage() {
         password: '***',
         emailVerified: false,
         disabled: false,
-        photoURL: '',
+        photoUrl: '',
       },
     },
     update: {

@@ -32,7 +32,7 @@ export class UsersService {
             emailVerified,
             disabled,
             role: customClaims?.role,
-            photoURL,
+            photoUrl: photoURL,
           }),
         )
       })
@@ -50,7 +50,7 @@ export class UsersService {
         emailVerified: validDto.emailVerified,
         password: validDto.password,
         displayName: validDto.displayName,
-        photoURL: validDto.photoURL,
+        photoURL: validDto.photoUrl,
         disabled: validDto.disabled,
       })
       .then(userRecord => {
@@ -61,7 +61,7 @@ export class UsersService {
           emailVerified: userRecord.emailVerified,
           disabled: userRecord.disabled,
           customClaims: userRecord.customClaims,
-          photoURL: userRecord.photoURL,
+          photoUrl: userRecord.photoURL,
           role: userRecord.customClaims?.role,
         } as User
       })
@@ -79,7 +79,7 @@ export class UsersService {
         emailVerified: validDto.emailVerified,
         password: validDto.password,
         displayName: validDto.displayName,
-        photoURL: validDto.photoURL,
+        photoURL: validDto.photoUrl,
         disabled: validDto.disabled,
       })
       .then(userRecord => {
@@ -90,7 +90,7 @@ export class UsersService {
           emailVerified: userRecord.emailVerified,
           disabled: userRecord.disabled,
           customClaims: userRecord.customClaims,
-          photoURL: userRecord.photoURL,
+          photoUrl: userRecord.photoURL,
           role: userRecord.customClaims?.role,
         } as User
       })

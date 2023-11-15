@@ -76,10 +76,16 @@ export default function ModalCreate<T>({
     },
   })
 
+  const removeCamelCase = useCallback((value: string) => {
+    return value.replace(/([a-zA-Z])(?=[A-Z])/g, '$1 ').toUpperCase()
+  }, [])
+
   const fields: UIField[] = useMemo(() => {
     if (model.create.model) {
       return Object.entries(model.create.model).map(([key, value]) => {
         const editValue = editData?.[key as keyof typeof editData]
+        const placeholder = `Enter the ${removeCamelCase(key)} here`
+        const label = removeCamelCase(key)
 
         /**
          * RETURNS A MODEL TO RENDER AN ON/OFF TOGGLE
@@ -88,7 +94,7 @@ export default function ModalCreate<T>({
           const field = {
             id: uuid(),
             value: (editValue || false) as boolean,
-            label: key.toUpperCase(),
+            label,
             name: key,
             type: 'toggle',
           } as UIToggle
@@ -105,8 +111,8 @@ export default function ModalCreate<T>({
             id: uuid(),
             value: (editValue || dayjs(Date.now()).format('YYYY-MM-DD')) as string,
             name: key,
-            placeholder: `Enter the ${key} here`,
-            label: key.toUpperCase(),
+            placeholder,
+            label,
             type: 'datepicker',
           }
           // here we store the date, so we don't need to click on it again
@@ -125,8 +131,8 @@ export default function ModalCreate<T>({
             name: key,
             loading: (value as AsyncData<T>).isLoading,
             errorMessage: (value as AsyncData<T>).error?.message,
-            placeholder: `Select the ${key} from the list`,
-            label: key.toUpperCase(),
+            placeholder: `Select the ${removeCamelCase(key)} from the list`,
+            label,
             type: 'select',
           }
           return field
@@ -142,8 +148,8 @@ export default function ModalCreate<T>({
             id: uuid(),
             value: (editValue || '') as string,
             name: key,
-            placeholder: `Enter the ${key} here`,
-            label: key.toUpperCase(),
+            placeholder,
+            label,
             type,
           }
           return field
@@ -157,7 +163,7 @@ export default function ModalCreate<T>({
     }
 
     return [EMPTY_FIELD]
-  }, [model.create.model, editData, fieldValues])
+  }, [model.create.model, editData, removeCamelCase, fieldValues])
 
   const handleOnSubmit = useCallback(() => {
     if (!createMutation.isLoading && !updateMutation.isLoading) {

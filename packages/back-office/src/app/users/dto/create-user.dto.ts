@@ -27,5 +27,5 @@ export class CreateUserDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  photoURL?: string
+  photoUrl?: string
 }
