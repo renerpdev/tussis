@@ -16,7 +16,7 @@ import {
 } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import { Datepicker } from 'flowbite-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { HiPencil, HiPlus } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { v4 as uuid } from 'uuid'
@@ -57,6 +57,9 @@ export default function ModalCreate<T>({
   editMode,
 }: ModalCreateProps<T>) {
   const [fieldValues, setFieldValues] = useState<Map<string, unknown>>(new Map(Object.entries({})))
+  const [validationErrors, setValidationErrors] = useState<Map<string, string[]>>(
+    new Map(Object.entries({})),
+  )
 
   const createMutation = useMutation({
     mutationFn: async (data: T) => {
@@ -86,6 +89,7 @@ export default function ModalCreate<T>({
         const editValue = editData?.[key as keyof typeof editData]
         const placeholder = `Enter the ${removeCamelCase(key)} here`
         const label = removeCamelCase(key)
+        const errorMessage = validationErrors.get(key)?.join(', ')
 
         /**
          * RETURNS A MODEL TO RENDER AN ON/OFF TOGGLE
@@ -95,6 +99,7 @@ export default function ModalCreate<T>({
             id: uuid(),
             value: (editValue || false) as boolean,
             label,
+            errorMessage,
             name: key,
             type: 'toggle',
           } as UIToggle
@@ -110,6 +115,7 @@ export default function ModalCreate<T>({
           const field: UIDatePicker = {
             id: uuid(),
             value: (editValue || dayjs(Date.now()).format('YYYY-MM-DD')) as string,
+            errorMessage,
             name: key,
             placeholder,
             label,
@@ -147,6 +153,7 @@ export default function ModalCreate<T>({
           const field: UIInputText = {
             id: uuid(),
             value: (editValue || '') as string,
+            errorMessage,
             name: key,
             placeholder,
             label,
@@ -163,7 +170,25 @@ export default function ModalCreate<T>({
     }
 
     return [EMPTY_FIELD]
-  }, [model.create.model, editData, removeCamelCase, fieldValues])
+  }, [model.create.model, editData, removeCamelCase, validationErrors, fieldValues])
+
+  useEffect(() => {
+    const errorMessage = editMode ? updateMutation.error?.message : createMutation.error?.message
+    if (errorMessage) {
+      try {
+        const activeErrors = JSON.parse(errorMessage.replace('Validation error: ', ''))
+        if (Array.isArray(activeErrors)) {
+          const errors = new Map<string, string[]>(Object.entries({}))
+          activeErrors.forEach(error => {
+            errors.set(error.field, error.errors)
+          })
+          setValidationErrors(errors)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }, [createMutation.error, editMode, updateMutation.error])
 
   const handleOnSubmit = useCallback(() => {
     if (!createMutation.isLoading && !updateMutation.isLoading) {
@@ -212,6 +237,7 @@ export default function ModalCreate<T>({
                 key={field.id}
                 label={field.label}
                 orientation="horizontal"
+                errorMessage={field.errorMessage}
                 defaultValue={(fieldValues.get(field.name) as boolean) ? 'yes' : 'no'}
                 onValueChange={value =>
                   setFieldValues(fieldValues.set(field.name, value === 'yes'))
@@ -288,8 +314,9 @@ export default function ModalCreate<T>({
               key={field.id}
               autoFocus={field.autofocus}
               type={field.type === 'password' ? 'password' : 'text'}
-              defaultValue={field.value as string}
+              defaultValue={fieldValues.get(field.name) as string}
               onValueChange={value => setFieldValues(fieldValues.set(field.name, value))}
+              errorMessage={field.errorMessage}
               placeholder={field.placeholder}
               variant="flat"
               label={field.label}
@@ -305,8 +332,9 @@ export default function ModalCreate<T>({
               id={field.id}
               key={field.id}
               label={field.label}
-              defaultValue={field.value as string}
+              defaultValue={fieldValues.get(field.name) as string}
               onValueChange={value => setFieldValues(fieldValues.set(field.name, value))}
+              errorMessage={field.errorMessage}
               labelPlacement="outside"
               placeholder={field.placeholder}
               classNames={{
@@ -342,6 +370,7 @@ export default function ModalCreate<T>({
 
   const onCloseModal = useCallback(() => {
     setFieldValues(new Map(Object.entries({})))
+    setValidationErrors(new Map(Object.entries({})))
     onClose?.()
   }, [onClose])
 
