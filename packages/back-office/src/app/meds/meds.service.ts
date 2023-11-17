@@ -2,6 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 import { CollectionReference } from 'firebase-admin/firestore'
 
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
 import { AuthUser } from '../../shared/types/auth.types'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
@@ -30,11 +31,15 @@ export class MedsService {
       uid: user.sub,
     }
 
-    const docRef = await this.medsCollection.add(newMed)
+    try {
+      const docRef = await this.medsCollection.add(newMed)
 
-    const medDoc = await docRef.get()
+      const medDoc = await docRef.get()
 
-    return { ...medDoc.data(), id: medDoc.id }
+      return { ...medDoc.data(), id: medDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   getList(input: MedsListInput, user: AuthUser): Promise<MedsList> {
@@ -77,23 +82,26 @@ export class MedsService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    await docRef.update({
-      ...validInput,
-    })
-    medDoc = await docRef.get()
+    try {
+      await docRef.update({
+        ...validInput,
+      })
+      medDoc = await docRef.get()
 
-    // here we update IssuesMeds collection, so we keep track of this relationship
-    const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
-    await Promise.all(
-      issuesMedsRef.docs.map(doc => {
-        return doc.ref.update({
-          name: validInput.name,
-          desc: validInput.desc,
-        })
-      }),
-    )
-
-    return { ...medDoc.data(), id: medDoc.id }
+      // here we update IssuesMeds collection, so we keep track of this relationship
+      const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
+      await Promise.all(
+        issuesMedsRef.docs.map(doc => {
+          return doc.ref.update({
+            name: validInput.name,
+            desc: validInput.desc,
+          })
+        }),
+      )
+      return { ...medDoc.data(), id: medDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async remove(id: string, user: AuthUser): Promise<Med> {
@@ -108,21 +116,29 @@ export class MedsService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    await docRef.delete()
+    try {
+      await docRef.delete()
 
-    // here we delete all IssuesMeds registries related to this document
-    const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
-    await Promise.all(
-      issuesMedsRef.docs.map(doc => {
-        return doc.ref.delete()
-      }),
-    )
+      // here we delete all IssuesMeds registries related to this document
+      const issuesMedsRef = await this.issuesMedsCollection.where('medId', '==', id).get()
+      await Promise.all(
+        issuesMedsRef.docs.map(doc => {
+          return doc.ref.delete()
+        }),
+      )
 
-    return { ...medDoc.data(), id: medDoc.id }
+      return { ...medDoc.data(), id: medDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async deleteAllMedsFromUser(uid: string): Promise<void> {
     const userMedsRef = await this.medsCollection.where('uid', '==', uid).get()
-    await Promise.all(userMedsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    try {
+      await Promise.all(userMedsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 }

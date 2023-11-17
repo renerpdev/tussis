@@ -81,18 +81,24 @@ export default function IssuesPage() {
     create: {
       endpoint: 'issues',
       model: {
-        date: new Date(),
+        date: {
+          type: 'datepicker',
+        },
         meds: {
+          type: 'multiselect',
           isLoading: isFetchingMeds,
           data: responseMeds?.data || [],
           error: errMeds,
         },
         symptoms: {
+          type: 'multiselect',
           isLoading: isFetchingSymptoms,
           data: responseSymptoms?.data || [],
           error: errSymptoms,
         },
-        notes: 'here goes a long string',
+        notes: {
+          type: 'textarea',
+        },
       },
     },
     update: {

@@ -2,6 +2,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import { FaGoogle } from 'react-icons/fa'
+import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import auth from '../../auth/auth'
 
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const handleUserPassLogin = useCallback(() => {
     setIsLoading(true)
@@ -68,13 +70,26 @@ export default function LoginPage() {
           />
           <Input
             id="pass"
-            type="password"
             onValueChange={setPassword}
             label="Password"
             classNames={{
               inputWrapper: 'dark:bg-gray-500',
               input: 'focus:ring-transparent dark:focus:ring-transparent',
             }}
+            endContent={
+              <button
+                className="focus:outline-none"
+                type="button"
+                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
+                {isPasswordVisible ? (
+                  <HiEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                ) : (
+                  <HiEye className="text-2xl text-default-400 pointer-events-none" />
+                )}
+              </button>
+            }
+            type={isPasswordVisible ? 'text' : 'password'}
           />
           <Button
             className="bg-cyan-600 border-1 hover:bg-cyan-500 text-white hover:text-white w-full"

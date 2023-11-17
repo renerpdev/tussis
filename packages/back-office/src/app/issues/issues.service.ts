@@ -3,6 +3,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
 import { AuthUser } from '../../shared/types/auth.types'
 import { generatePdfTable, getPaginatedIssuesList, getValidDto } from '../../shared/utils'
@@ -49,29 +50,33 @@ export class IssuesService {
     const issuesRef = await this.issuesCollection.add(newIssue)
     const issueDoc = await issuesRef.get()
 
-    await Promise.all(
-      symptoms.map(({ id, name, desc, uid }) =>
-        this.issuesSymptomsCollection.add({
-          issueId: issueDoc.id,
-          symptomId: id,
-          name,
-          desc,
-          uid,
-        }),
-      ),
-    )
+    try {
+      await Promise.all(
+        symptoms.map(({ id, name, desc, uid }) =>
+          this.issuesSymptomsCollection.add({
+            issueId: issueDoc.id,
+            symptomId: id,
+            name,
+            desc,
+            uid,
+          }),
+        ),
+      )
 
-    await Promise.all(
-      meds.map(({ id, name, desc, uid }) =>
-        this.issuesMedsCollection.add({
-          issueId: issueDoc.id,
-          medId: id,
-          name,
-          desc,
-          uid,
-        }),
-      ),
-    )
+      await Promise.all(
+        meds.map(({ id, name, desc, uid }) =>
+          this.issuesMedsCollection.add({
+            issueId: issueDoc.id,
+            medId: id,
+            name,
+            desc,
+            uid,
+          }),
+        ),
+      )
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
 
     return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
   }
@@ -100,21 +105,24 @@ export class IssuesService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    const symptoms = (
-      await this.issuesSymptomsCollection.where('issueId', '==', id).get()
-    ).docs.map(doc => {
-      const { symptomId, desc, name } = doc.data()
-      return { name, desc, id: symptomId } as Symptom
-    })
+    try {
+      const symptoms = (
+        await this.issuesSymptomsCollection.where('issueId', '==', id).get()
+      ).docs.map(doc => {
+        const { symptomId, desc, name } = doc.data()
+        return { name, desc, id: symptomId } as Symptom
+      })
 
-    const meds = (await this.issuesMedsCollection.where('issueId', '==', id).get()).docs.map(
-      doc => {
-        const { medId, desc, name } = doc.data()
-        return { name, desc, id: medId } as Med
-      },
-    )
-
-    return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
+      const meds = (await this.issuesMedsCollection.where('issueId', '==', id).get()).docs.map(
+        doc => {
+          const { medId, desc, name } = doc.data()
+          return { name, desc, id: medId } as Med
+        },
+      )
+      return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async update(id: string, updateIssueDto: UpdateIssueDto, user: AuthUser): Promise<Issue> {
@@ -133,60 +141,66 @@ export class IssuesService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    await docRef.update({
-      ...validInput,
-      date: validInput.date ? dayjs(validInput.date).format('YYYY-MM-DD') : undefined,
-      uid: user.sub,
-    })
+    try {
+      await docRef.update({
+        ...validInput,
+        date: validInput.date ? dayjs(validInput.date).format('YYYY-MM-DD') : undefined,
+        uid: user.sub,
+      })
 
-    const symptoms = await Promise.all(
-      (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId, user)),
-    )
-    const meds = await Promise.all(
-      (validInput.meds || []).map(medId => this.medsService.findOne(medId, user)),
-    )
-
-    if (validInput.meds) {
-      const issuesMedsRef = await this.issuesMedsCollection.where('issueId', '==', id).get()
-      // TODO: refactor this to do less reads
-      // First: delete current meds from IssuesMeds collection
-      await Promise.all(issuesMedsRef.docs.map(doc => doc.ref.delete()))
-      // Then: add new ones to IssuesMeds collection
-      await Promise.all(
-        meds.map(({ id, name, desc, uid }) =>
-          this.issuesMedsCollection.add({
-            issueId: issueDoc.id,
-            medId: id,
-            name,
-            desc,
-            uid,
-          }),
-        ),
+      const symptoms = await Promise.all(
+        (validInput.symptoms || []).map(symptomId => this.symptomsService.findOne(symptomId, user)),
       )
-    }
-
-    if (validInput.symptoms) {
-      const issuesSymptomsRef = await this.issuesSymptomsCollection.where('issueId', '==', id).get()
-      // TODO: refactor this to do less reads
-      // First: delete current symptoms from IssuesSymptoms collection
-      await Promise.all(issuesSymptomsRef.docs.map(doc => doc.ref.delete()))
-      // Then: add new ones to IssuesSymptoms collection
-      await Promise.all(
-        symptoms.map(({ id, name, desc, uid }) =>
-          this.issuesSymptomsCollection.add({
-            issueId: issueDoc.id,
-            symptomId: id,
-            name,
-            desc,
-            uid,
-          }),
-        ),
+      const meds = await Promise.all(
+        (validInput.meds || []).map(medId => this.medsService.findOne(medId, user)),
       )
+
+      if (validInput.meds) {
+        const issuesMedsRef = await this.issuesMedsCollection.where('issueId', '==', id).get()
+        // TODO: refactor this to do less reads
+        // First: delete current meds from IssuesMeds collection
+        await Promise.all(issuesMedsRef.docs.map(doc => doc.ref.delete()))
+        // Then: add new ones to IssuesMeds collection
+        await Promise.all(
+          meds.map(({ id, name, desc, uid }) =>
+            this.issuesMedsCollection.add({
+              issueId: issueDoc.id,
+              medId: id,
+              name,
+              desc,
+              uid,
+            }),
+          ),
+        )
+      }
+
+      if (validInput.symptoms) {
+        const issuesSymptomsRef = await this.issuesSymptomsCollection
+          .where('issueId', '==', id)
+          .get()
+        // TODO: refactor this to do less reads
+        // First: delete current symptoms from IssuesSymptoms collection
+        await Promise.all(issuesSymptomsRef.docs.map(doc => doc.ref.delete()))
+        // Then: add new ones to IssuesSymptoms collection
+        await Promise.all(
+          symptoms.map(({ id, name, desc, uid }) =>
+            this.issuesSymptomsCollection.add({
+              issueId: issueDoc.id,
+              symptomId: id,
+              name,
+              desc,
+              uid,
+            }),
+          ),
+        )
+      }
+
+      issueDoc = await docRef.get() // this is in order to return updated doc data
+
+      return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
+    } catch (error) {
+      throw new ServerError(error.message)
     }
-
-    issueDoc = await docRef.get() // this is in order to return updated doc data
-
-    return { ...issueDoc.data(), id: issueDoc.id, symptoms, meds }
   }
 
   async remove(id: string, user: AuthUser): Promise<Issue> {
@@ -201,61 +215,74 @@ export class IssuesService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    await docRef.delete()
+    try {
+      await docRef.delete()
 
-    const issuesMedsRef = await this.issuesMedsCollection.where('issueId', '==', id).get()
-    const issuesSymptomsRef = await this.issuesSymptomsCollection.where('issueId', '==', id).get()
+      const issuesMedsRef = await this.issuesMedsCollection.where('issueId', '==', id).get()
+      const issuesSymptomsRef = await this.issuesSymptomsCollection.where('issueId', '==', id).get()
 
-    await Promise.all(issuesMedsRef.docs.map(doc => doc.ref.delete()))
-    await Promise.all(issuesSymptomsRef.docs.map(doc => doc.ref.delete()))
+      await Promise.all(issuesMedsRef.docs.map(doc => doc.ref.delete()))
+      await Promise.all(issuesSymptomsRef.docs.map(doc => doc.ref.delete()))
 
-    return { ...issueDoc.data(), id, symptoms: [], meds: [] }
+      return { ...issueDoc.data(), id, symptoms: [], meds: [] }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async deleteAllIssuesFromUser(uid: string): Promise<void> {
     const userIssuesRef = await this.issuesCollection.where('uid', '==', uid).get()
-    await Promise.all(userIssuesRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    try {
+      await Promise.all(userIssuesRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async exportPdf(input: IssuesListInput, user: AuthUser): Promise<Buffer> {
     const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']
-    const meds = (
-      await Promise.all(
-        paginatedIssuesList.data.map(({ id }) =>
-          this.issuesMedsCollection.where('issueId', '==', id).get(),
-        ),
-      )
-    ).map(({ docs }) => docs.map(doc => doc.data()))
 
-    const symptoms = (
-      await Promise.all(
-        paginatedIssuesList.data.map(({ id }) =>
-          this.issuesSymptomsCollection.where('issueId', '==', id).get(),
-        ),
-      )
-    ).map(({ docs }) => docs.map(doc => doc.data()))
+    try {
+      const meds = (
+        await Promise.all(
+          paginatedIssuesList.data.map(({ id }) =>
+            this.issuesMedsCollection.where('issueId', '==', id).get(),
+          ),
+        )
+      ).map(({ docs }) => docs.map(doc => doc.data()))
 
-    const rows = paginatedIssuesList.data.map((issue, index) => {
-      const issueSymptoms = symptoms[index].map(({ name }) => name)
-      const issueMeds = meds[index].map(({ name }) => name)
+      const symptoms = (
+        await Promise.all(
+          paginatedIssuesList.data.map(({ id }) =>
+            this.issuesSymptomsCollection.where('issueId', '==', id).get(),
+          ),
+        )
+      ).map(({ docs }) => docs.map(doc => doc.data()))
 
-      return [
-        `${dayjs(issue.date).format('MMMM D, YYYY')}`,
-        issueSymptoms.join(', '),
-        issueMeds.join(', '),
-        issue.notes,
-      ]
-    })
+      const rows = paginatedIssuesList.data.map((issue, index) => {
+        const issueSymptoms = symptoms[index].map(({ name }) => name)
+        const issueMeds = meds[index].map(({ name }) => name)
 
-    const table = {
-      title: 'TUSSIS',
-      subtitle: 'Reporte de afecciones para el periodo',
-      headers,
-      rows,
+        return [
+          `${dayjs(issue.date).format('MMMM D, YYYY')}`,
+          issueSymptoms.join(', '),
+          issueMeds.join(', '),
+          issue.notes,
+        ]
+      })
+
+      const table = {
+        title: 'TUSSIS',
+        subtitle: 'Reporte de afecciones para el periodo',
+        headers,
+        rows,
+      }
+
+      return generatePdfTable(table)
+    } catch (error) {
+      throw new ServerError(error.message)
     }
-
-    return generatePdfTable(table)
   }
 }

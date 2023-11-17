@@ -2,6 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import { CollectionReference } from 'firebase-admin/firestore'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
+import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
 import { AuthUser } from '../../shared/types/auth.types'
 import { getPaginatedList, getValidDto } from '../../shared/utils'
@@ -29,11 +30,15 @@ export class SymptomsService {
       uid: user.sub,
     }
 
-    const docRef = await this.symptomsCollection.add(newSymptom)
+    try {
+      const docRef = await this.symptomsCollection.add(newSymptom)
 
-    const symptomDoc = await docRef.get()
+      const symptomDoc = await docRef.get()
 
-    return { ...symptomDoc.data(), id: symptomDoc.id }
+      return { ...symptomDoc.data(), id: symptomDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   getList(input: SymptomsListInput, user: AuthUser): Promise<SymptomsList> {
@@ -76,23 +81,28 @@ export class SymptomsService {
       throw new UnauthorizedResourceError(user.sub)
     }
 
-    await docRef.update({
-      ...validInput,
-    })
-    symptomDoc = await docRef.get()
+    try {
+      await docRef.update({
+        ...validInput,
+      })
+      symptomDoc = await docRef.get()
 
-    // here we update IssuesSymptoms collection, so we keep track of this relationship
-    const issuesSymptomsRef = await this.issuesSymptomsCollection.where('symptomId', '==', id).get()
-    await Promise.all(
-      issuesSymptomsRef.docs.map(doc => {
-        return doc.ref.update({
-          name: validInput.name,
-          desc: validInput.desc,
-        })
-      }),
-    )
-
-    return { ...symptomDoc.data(), id: symptomDoc.id }
+      // here we update IssuesSymptoms collection, so we keep track of this relationship
+      const issuesSymptomsRef = await this.issuesSymptomsCollection
+        .where('symptomId', '==', id)
+        .get()
+      await Promise.all(
+        issuesSymptomsRef.docs.map(doc => {
+          return doc.ref.update({
+            name: validInput.name,
+            desc: validInput.desc,
+          })
+        }),
+      )
+      return { ...symptomDoc.data(), id: symptomDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async remove(id: string, user: AuthUser): Promise<Symptom> {
@@ -109,19 +119,29 @@ export class SymptomsService {
 
     await docRef.delete()
 
-    // here we delete all IssuesSymptoms registries related to this document
-    const issuesSymptomsRef = await this.issuesSymptomsCollection.where('symptomId', '==', id).get()
-    await Promise.all(
-      issuesSymptomsRef.docs.map(doc => {
-        return doc.ref.delete()
-      }),
-    )
+    try {
+      // here we delete all IssuesSymptoms registries related to this document
+      const issuesSymptomsRef = await this.issuesSymptomsCollection
+        .where('symptomId', '==', id)
+        .get()
+      await Promise.all(
+        issuesSymptomsRef.docs.map(doc => {
+          return doc.ref.delete()
+        }),
+      )
 
-    return { ...symptomDoc.data(), id: symptomDoc.id }
+      return { ...symptomDoc.data(), id: symptomDoc.id }
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 
   async deleteAllSymptomsFromUser(uid: string): Promise<void> {
     const userSymptomsRef = await this.symptomsCollection.where('uid', '==', uid).get()
-    await Promise.all(userSymptomsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    try {
+      await Promise.all(userSymptomsRef.docs.map(doc => this.remove(doc.id, { sub: uid })))
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 }

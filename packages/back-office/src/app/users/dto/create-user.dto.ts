@@ -1,17 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsOptional, IsString } from 'class-validator'
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+  IsUrl,
+  MinLength,
+} from 'class-validator'
 
 export class CreateUserDto {
   @ApiProperty()
   @IsString()
+  @MinLength(3)
   displayName: string
 
   @ApiProperty()
-  @IsString()
+  @IsEmail()
   email: string
 
   @ApiProperty()
-  @IsString()
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  })
   password: string
 
   @ApiProperty()
@@ -25,7 +40,7 @@ export class CreateUserDto {
   disabled?: boolean
 
   @ApiProperty()
-  @IsString()
+  @IsUrl()
   @IsOptional()
   photoUrl?: string
 }

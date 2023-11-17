@@ -12,20 +12,21 @@ import {
   Select,
   SelectItem,
   SelectedItems,
+  Switch,
   Textarea,
 } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import { Datepicker } from 'flowbite-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { HiPencil, HiPlus } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { v4 as uuid } from 'uuid'
 import { TussisApi } from '../../../../api'
-import { AsyncData, BaseModel, CrudModel } from '../../../models'
+import { BaseModel, CrudModel, ModelKey } from '../../../models'
 import {
-  UIDatePicker,
   UIField,
-  UIInputText,
+  UIRadioGroup,
+  UIRadioGroupOption,
   UISelect,
   UISelectOption,
   UIToggle,
@@ -37,7 +38,7 @@ const EMPTY_FIELD: UIField = {
   name: '',
   placeholder: '',
   label: '',
-  type: 'input',
+  type: 'text',
   value: '',
 }
 
@@ -57,14 +58,16 @@ export default function ModalCreate<T>({
   editMode,
 }: ModalCreateProps<T>) {
   const [fieldValues, setFieldValues] = useState<Map<string, unknown>>(new Map(Object.entries({})))
+  const [formValues, setFormValues] = useState<Map<string, unknown>>(new Map(Object.entries({})))
   const [validationErrors, setValidationErrors] = useState<Map<string, string[]>>(
     new Map(Object.entries({})),
   )
+  const [, setTimestamp] = useState(0) // this is just a workaround to force a re-render
 
   const createMutation = useMutation({
     mutationFn: async (data: T) => {
       const res = await TussisApi.add<T>(model.create.endpoint, data)
-      setFieldValues(new Map(Object.entries({})))
+      setFormValues(new Map(Object.entries({})))
       onClose?.(true)
       return res
     },
@@ -73,7 +76,7 @@ export default function ModalCreate<T>({
     mutationFn: async (data: T) => {
       const id = (editData as BaseModel)?.id || (editData as BaseModel).uid
       const res = await TussisApi.update<T>(`${model.update.endpoint}/${id}`, data)
-      setFieldValues(new Map(Object.entries({})))
+      setFormValues(new Map(Object.entries({})))
       onClose?.(true)
       return res
     },
@@ -86,91 +89,139 @@ export default function ModalCreate<T>({
   const fields: UIField[] = useMemo(() => {
     if (model.create.model) {
       return Object.entries(model.create.model).map(([key, value]) => {
-        const editValue = editData?.[key as keyof typeof editData]
-        const placeholder = `Enter the ${removeCamelCase(key)} here`
-        const label = removeCamelCase(key)
+        const fieldType = (value as ModelKey).type
+        const fieldData = (value as ModelKey).data
+        const currentValue = formValues.get(key)
+
+        const fieldValue =
+          currentValue !== undefined ? currentValue : editData?.[key as keyof typeof editData]
+
         const errorMessage = validationErrors.get(key)?.join(', ')
+        const normalizedKey = removeCamelCase(key)
+        const placeholder = `Enter the ${normalizedKey} here`
+        const label = removeCamelCase(key)
 
-        /**
-         * RETURNS A MODEL TO RENDER AN ON/OFF TOGGLE
-         */
-        if (typeof value === 'boolean') {
-          const field = {
-            id: uuid(),
-            value: (editValue || false) as boolean,
-            label,
-            errorMessage,
-            name: key,
-            type: 'toggle',
-          } as UIToggle
-
-          setFieldValues(fieldValues.set(field.name, field.value))
-          return field
+        const descriptionMap: Record<typeof fieldType, string | undefined> = {
+          text: 'Must contain at least 3 characters',
+          password:
+            'Must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character',
+          email: 'Must be a valid email address',
+          url: 'Must be a valid URL',
+          textarea: undefined,
+          datepicker: undefined,
+          select: undefined,
+          multiselect: undefined,
+          radiogroup: undefined,
+          toggle: undefined,
         }
 
-        /**
-         * RETURNS A MODEL TO RENDER A DATEPICKER
-         */
-        if (dayjs(value as string).isValid()) {
-          const field: UIDatePicker = {
-            id: uuid(),
-            value: (editValue || dayjs(Date.now()).format('YYYY-MM-DD')) as string,
-            errorMessage,
-            name: key,
-            placeholder,
-            label,
-            type: 'datepicker',
-          }
-          // here we store the date, so we don't need to click on it again
-          setFieldValues(fieldValues.set(field.name, field.value))
-          return field
+        let field = null
+        switch (fieldType) {
+          case 'text':
+          case 'password':
+          case 'email':
+          case 'textarea':
+          case 'url':
+            /**
+             * RETURNS A MODEL TO RENDER A TEXT INPUT
+             */
+            field = {
+              id: uuid(),
+              value: (fieldValue || '') as string,
+              errorMessage,
+              name: key,
+              placeholder:
+                editMode && fieldType === 'password'
+                  ? 'Leave empty to keep the same password'
+                  : placeholder,
+              label,
+              title: label,
+              type: fieldType,
+            }
+            break
+          case 'datepicker':
+            /**
+             * RETURNS A MODEL TO RENDER A DATEPICKER
+             */
+            field = {
+              id: uuid(),
+              value: (fieldValue || dayjs(Date.now()).format('YYYY-MM-DD')) as string,
+              errorMessage,
+              name: key,
+              placeholder,
+              label,
+              type: fieldType,
+            }
+            setFormValues(formValues.set(key, field.value))
+            break
+          case 'multiselect':
+          case 'select':
+            /**
+             * RETURNS A MODEL TO RENDER A SELECT WITH OPTIONS LOADED ASYNC
+             */
+            field = {
+              id: uuid(),
+              items: fieldData as UISelectOption[],
+              value: (fieldValue?.map(({ id }: keyof T) => id) || []) as string[],
+              name: key,
+              loading: (value as ModelKey).isLoading,
+              errorMessage: [(value as ModelKey).error?.message as string, errorMessage]
+                .filter(msg => msg)
+                .join(', '),
+              placeholder: `Select the ${removeCamelCase(key)} from the list`,
+              label,
+              type: fieldType,
+            } as UISelect
+            break
+          case 'radiogroup':
+            /**
+             * RETURNS A MODEL TO RENDER A RADIO_GROUP
+             */
+            field = {
+              id: uuid(),
+              value: fieldValue,
+              label,
+              errorMessage,
+              items: fieldData as UIRadioGroupOption[],
+              name: key,
+              type: fieldType,
+            } as UIRadioGroup
+            break
+          case 'toggle':
+            /**
+             * RETURNS A MODEL TO RENDER AN ON/OFF TOGGLE
+             */
+            field = {
+              id: uuid(),
+              value: fieldValue,
+              label,
+              errorMessage,
+              items: fieldData as UIRadioGroupOption[],
+              name: key,
+              type: fieldType,
+            } as UIToggle
+            break
+          default:
+            field = EMPTY_FIELD
+            break
         }
 
-        /**
-         * RETURNS A MODEL TO RENDER A SELECT WITH OPTIONS LOADED ASYNC
-         */
-        if (typeof value === 'object' && value?.data) {
-          const field: UISelect = {
-            id: uuid(),
-            items: (value as AsyncData<T>).data as UISelectOption[],
-            value: (editValue?.map(({ id }: keyof T) => id) || []) as string[],
-            name: key,
-            loading: (value as AsyncData<T>).isLoading,
-            errorMessage: (value as AsyncData<T>).error?.message,
-            placeholder: `Select the ${removeCamelCase(key)} from the list`,
-            label,
-            type: 'select',
-          }
-          return field
-        }
-
-        /**
-         * RETURNS A MODEL TO RENDER A TEXT INPUT
-         */
-        if (typeof value === 'string') {
-          const type: UIType =
-            value.indexOf('*') >= 0 ? 'password' : value.length <= 8 ? 'input' : 'textarea'
-          const field: UIInputText = {
-            id: uuid(),
-            value: (editValue || '') as string,
-            errorMessage,
-            name: key,
-            placeholder,
-            label,
-            type,
-          }
-          return field
-        }
-
-        /**
-         * RETURNS A MODEL TO RENDER AN EMPTY FIELD
-         */
-        return EMPTY_FIELD
+        field.description = descriptionMap[field.type as UIType]
+        setFieldValues(fieldValues.set(key, field.value))
+        return field
       })
     }
 
     return [EMPTY_FIELD]
-  }, [model.create.model, editData, removeCamelCase, validationErrors, fieldValues])
+  }, [
+    model.create.model,
+    formValues,
+    editData,
+    validationErrors,
+    removeCamelCase,
+    fieldValues,
+    editMode,
+  ])
 
   useEffect(() => {
     const errorMessage = editMode ? updateMutation.error?.message : createMutation.error?.message
@@ -185,16 +236,22 @@ export default function ModalCreate<T>({
           setValidationErrors(errors)
         }
       } catch (e) {
-        console.log(e)
+        // do something here
       }
     }
   }, [createMutation.error, editMode, updateMutation.error])
+
+  const resetModalState = useCallback(() => {
+    setFieldValues(new Map(Object.entries({})))
+    setFormValues(new Map(Object.entries({})))
+    setValidationErrors(new Map(Object.entries({})))
+  }, [])
 
   const handleOnSubmit = useCallback(() => {
     if (!createMutation.isLoading && !updateMutation.isLoading) {
       // TODO: improve this, since it's just a workaround
       const rawData: Record<string, unknown> = {}
-      for (const [key, value] of fieldValues.entries()) {
+      for (const [key, value] of formValues.entries()) {
         rawData[key] = typeof value === 'object' ? Array.from((value as Set<T>).values()) : value
       }
 
@@ -225,29 +282,54 @@ export default function ModalCreate<T>({
         createMutation.mutate(data as T)
       }
     }
-  }, [createMutation, editMode, fieldValues, updateMutation])
+  }, [createMutation, editMode, formValues, updateMutation])
+
+  const updateFieldValue = useCallback(
+    (key: string) => (value: unknown) => {
+      setFormValues(formValues.set(key, value))
+      setFieldValues(fieldValues.set(key, value))
+      setTimestamp(Date.now())
+    },
+    [fieldValues, formValues],
+  )
 
   const renderField = useCallback(
     (field: UIField) => {
       switch (field.type) {
         case 'toggle':
           return (
-            <div className="w-full">
-              <RadioGroup
-                key={field.id}
-                label={field.label}
-                orientation="horizontal"
-                errorMessage={field.errorMessage}
-                defaultValue={(fieldValues.get(field.name) as boolean) ? 'yes' : 'no'}
-                onValueChange={value =>
-                  setFieldValues(fieldValues.set(field.name, value === 'yes'))
-                }
-              >
-                <Radio value="yes">SI</Radio>
-                <Radio value="no">NO</Radio>
-              </RadioGroup>
-            </div>
+            <Switch
+              key={field.id}
+              isSelected={fieldValues.get(field.name) as boolean}
+              onValueChange={updateFieldValue(field.name)}
+              size="sm"
+            >
+              {field.label}
+            </Switch>
           )
+        case 'radiogroup':
+          return (
+            <RadioGroup
+              key={field.id}
+              label={field.label}
+              orientation="horizontal"
+              errorMessage={field.errorMessage}
+              isInvalid={!!field.errorMessage}
+              value={fieldValues.get(field.name) as string}
+              onValueChange={updateFieldValue(field.name)}
+              className="w-full"
+            >
+              {Object.entries((field as UIRadioGroup).items).map(([key, value]) => (
+                <Radio
+                  value={key}
+                  key={key}
+                >
+                  {value as ReactNode}
+                </Radio>
+              ))}
+            </RadioGroup>
+          )
+        case 'multiselect':
         case 'select':
           return (
             <Select
@@ -255,14 +337,12 @@ export default function ModalCreate<T>({
               id={field.id}
               items={(field as UISelect).items as UISelectOption[]}
               label={field.label}
-              defaultSelectedKeys={(field.value as string[]) || []}
-              onSelectionChange={entries =>
-                setFieldValues(fieldValues.set(field.name, Array.from(entries)))
-              }
+              selectedKeys={(fieldValues.get(field.name) as string[]) || []}
+              onSelectionChange={entries => updateFieldValue(field.name)(Array.from(entries))}
               variant="flat"
               isMultiline={true}
               isLoading={field.loading}
-              selectionMode="multiple"
+              selectionMode={field.type === 'multiselect' ? 'multiple' : 'single'}
               disabled={(field as UISelect).items.length === 0}
               placeholder={field.placeholder}
               errorMessage={field.errorMessage}
@@ -306,18 +386,23 @@ export default function ModalCreate<T>({
               )}
             </Select>
           )
-        case 'input':
+        case 'text':
+        case 'url':
         case 'password':
+        case 'email':
           return (
             <Input
               id={field.id}
               key={field.id}
               autoFocus={field.autofocus}
-              type={field.type === 'password' ? 'password' : 'text'}
-              defaultValue={fieldValues.get(field.name) as string}
-              onValueChange={value => setFieldValues(fieldValues.set(field.name, value))}
+              type={field.type}
+              value={fieldValues.get(field.name) as string}
+              onValueChange={updateFieldValue(field.name)}
               errorMessage={field.errorMessage}
+              isInvalid={!!field.errorMessage}
               placeholder={field.placeholder}
+              title={field.title}
+              description={field.description}
               variant="flat"
               label={field.label}
               classNames={{
@@ -332,9 +417,10 @@ export default function ModalCreate<T>({
               id={field.id}
               key={field.id}
               label={field.label}
-              defaultValue={fieldValues.get(field.name) as string}
-              onValueChange={value => setFieldValues(fieldValues.set(field.name, value))}
+              value={fieldValues.get(field.name) as string}
+              onValueChange={updateFieldValue(field.name)}
               errorMessage={field.errorMessage}
+              isInvalid={!!field.errorMessage}
               labelPlacement="outside"
               placeholder={field.placeholder}
               classNames={{
@@ -350,7 +436,7 @@ export default function ModalCreate<T>({
               id={field.id}
               defaultDate={dayjs(field.value as string).toDate()}
               onSelectedDateChanged={value =>
-                setFieldValues(fieldValues.set(field.name, dayjs(value).format('YYYY-MM-DD')))
+                updateFieldValue(field.name)(dayjs(value).format('YYYY-MM-DD'))
               }
               name={field.name}
               language="es-ES"
@@ -365,20 +451,20 @@ export default function ModalCreate<T>({
           return <span key={field.id}>{`Uknown field <${field.name}>`}</span>
       }
     },
-    [fieldValues],
+    [fieldValues, updateFieldValue],
   )
 
-  const onCloseModal = useCallback(() => {
-    setFieldValues(new Map(Object.entries({})))
-    setValidationErrors(new Map(Object.entries({})))
-    onClose?.()
-  }, [onClose])
+  useEffect(() => {
+    if (isOpen) {
+      resetModalState()
+    }
+  }, [isOpen, resetModalState])
 
   return (
     <Modal
       backdrop={'blur'}
       isOpen={isOpen}
-      onClose={onCloseModal}
+      onClose={onClose}
       isDismissable={false}
     >
       <ModalContent className="dark:bg-gray-800">

@@ -19,6 +19,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import React, { Dispatch, ReactElement, useCallback, useMemo } from 'react'
 import { HiDotsVertical } from 'react-icons/hi'
+import { v4 as uuid } from 'uuid'
 import BottomContent, { BottomContentProps } from '../bottom-content/BottomContent'
 import TopContent, { TopContentProps } from '../top-content/TopContent'
 
@@ -82,24 +83,25 @@ export default function DataTable<T>({
     [onView],
   )
   const parseDateValue = useCallback((value: string) => {
-    const date = dayjs(value)
-    const diff = dayjs(Date.now()).diff(date, 'day')
-    if (diff < 2 && diff > 0) {
-      dayjs.extend(relativeTime)
-      return date.fromNow()
-    }
-    return date.format('D MMM, YYYY')
+    const date = dayjs(value as string)
+      .toDate()
+      .toLocaleDateString()
+
+    dayjs.extend(relativeTime)
+    return [date, dayjs(value).fromNow()].join(' - ')
   }, [])
 
   const renderCell = useCallback(
     (item: T, columnKey: keyof T) => {
       const cellValue = item[columnKey]
       const columnType = columns.find(column => column.uid === columnKey)?.type
+      const cellId = uuid()
 
       switch (columnType) {
         case 'picture':
           return (
             <Avatar
+              key={cellId}
               src={cellValue as string}
               size="sm"
             />
@@ -108,18 +110,21 @@ export default function DataTable<T>({
           return (cellValue as T[keyof T][]).map((subItem: T[keyof T]) => (
             <Chip
               className="mx-1 my-1 border-cyan-600 border-1 bg-transparent text-cyan-600 dark:text-white dark:bg-cyan-600"
-              key={subItem.id}
+              key={`${cellId}-${subItem.id}`}
             >
               {subItem.name}
             </Chip>
           ))
         case 'date':
-          return parseDateValue(cellValue as string)
+          return <span key={cellId}>{parseDateValue(cellValue as string)}</span>
         case 'boolean':
-          return <span>{cellValue ? 'SI' : 'NO'}</span>
+          return <span key={cellId}>{cellValue ? 'SI' : 'NO'}</span>
         case 'action':
           return (
-            <div className="relative flex justify-end items-center gap-2">
+            <div
+              className="relative flex justify-end items-center gap-2"
+              key={cellId}
+            >
               <Dropdown
                 classNames={{
                   base: 'dark:bg-gray-800 dark:text-white',

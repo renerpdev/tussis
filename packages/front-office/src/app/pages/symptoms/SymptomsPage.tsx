@@ -28,8 +28,12 @@ export default function SymptomsPage() {
     create: {
       endpoint: 'symptoms',
       model: {
-        name: '',
-        desc: 'here goes a long string',
+        name: {
+          type: 'text',
+        },
+        desc: {
+          type: 'textarea',
+        },
       },
     },
     update: {

@@ -1,4 +1,14 @@
-export type UIType = 'input' | 'textarea' | 'password' | 'select' | 'datepicker' | 'toggle'
+export type UIType =
+  | 'url'
+  | 'text'
+  | 'textarea'
+  | 'password'
+  | 'email'
+  | 'select'
+  | 'multiselect'
+  | 'datepicker'
+  | 'radiogroup'
+  | 'toggle'
 
 interface UIComponent {
   id: string
@@ -11,12 +21,14 @@ export interface UIField extends UIComponent {
   placeholder?: string
   errorMessage?: string
   autofocus?: boolean
+  description?: string
+  title?: string
   value: unknown[] | unknown
   loading?: boolean
 }
 
 export interface UIInputText extends UIField {
-  type: 'input' | 'textarea' | 'password'
+  type: 'text' | 'textarea' | 'password' | 'email' | 'url'
   value: string
 }
 
@@ -28,14 +40,13 @@ export interface UIDatePicker extends UIField {
 export interface UISelect extends UIField {
   value: string[]
   items: UISelectOption[]
-  type: 'select'
+  type: 'select' | 'multiselect'
 }
 
 export interface UISelectOption {
   id: string
   name: string
   desc: string
-  type: 'select'
 }
 
 export interface Column {
@@ -43,6 +54,14 @@ export interface Column {
   name: string
   type: 'date' | 'string' | 'array' | 'action' | 'boolean' | 'picture'
   sortable?: boolean
+}
+
+export type UIRadioGroupOption<V = any> = Record<string, V>
+
+export interface UIRadioGroup<V = any> extends UIField {
+  type: 'radiogroup'
+  value: V
+  items: UIRadioGroupOption<V>[]
 }
 
 export interface UIToggle extends UIField {

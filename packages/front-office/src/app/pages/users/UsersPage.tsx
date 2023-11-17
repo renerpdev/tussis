@@ -33,12 +33,24 @@ export default function UsersPage() {
     create: {
       endpoint: 'users',
       model: {
-        displayName: '',
-        email: '',
-        password: '***',
-        emailVerified: false,
-        disabled: false,
-        photoUrl: '',
+        displayName: {
+          type: 'text',
+        },
+        email: {
+          type: 'email',
+        },
+        password: {
+          type: 'password',
+        },
+        emailVerified: {
+          type: 'toggle',
+        },
+        disabled: {
+          type: 'toggle',
+        },
+        photoUrl: {
+          type: 'url',
+        },
       },
     },
     update: {
