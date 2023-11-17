@@ -1,6 +1,6 @@
-import { UnauthorizedException } from '@nestjs/common'
+import { ForbiddenError } from './forbidden-error'
 
-export class InvalidRoleError extends UnauthorizedException {
+export class InvalidRoleError extends ForbiddenError {
   roles: string[]
   constructor(validRoles: string[]) {
     super(
