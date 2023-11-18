@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { AuthUser } from '../../shared/types/auth.types'
@@ -6,6 +17,7 @@ import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { Roles } from '../auth/roles.decorator'
 import { RolesGuard } from '../auth/roles.guard'
 import { CreateUserDto } from './dto/create-user.dto'
+import { UsersListInput } from './dto/get-all-users.dto'
 import { UpdateUserClaimsDto } from './dto/update-user-claims.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UsersService } from './users.service'
@@ -20,8 +32,8 @@ export class UsersController {
 
   @Roles('admin')
   @Get()
-  async getUsersList() {
-    return this.usersService.getUserList()
+  async getUsersList(@Query() input: UsersListInput) {
+    return this.usersService.getUserList(input)
   }
 
   @Roles('admin')

@@ -39,7 +39,6 @@ class AxiosWrapper {
     // intercepts axios request
     axios.interceptors.request.use(
       async request => {
-        // TODO: handle here the auth token insertion
         const token = JSON.parse(localStorage.getItem('tussis-store') || '{}').state?.currentUser
           ?.stsTokenManager?.accessToken
         if (token) {

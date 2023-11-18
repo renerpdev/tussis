@@ -8,6 +8,7 @@ import { IssuesService } from '../issues/issues.service'
 import { MedsService } from '../meds/meds.service'
 import { SymptomsService } from '../symptoms/symptoms.service'
 import { CreateUserDto } from './dto/create-user.dto'
+import { UsersList, UsersListInput } from './dto/get-all-users.dto'
 import { UpdateUserClaimsDto } from './dto/update-user-claims.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from './entities/User'
@@ -20,12 +21,15 @@ export class UsersService {
     private medsService: MedsService,
   ) {}
 
-  async getUserList(): Promise<User[]> {
+  async getUserList(input: UsersListInput): Promise<UsersList> {
+    const { offset, limit } = getValidDto(UsersListInput, input)
+
     return getAuth()
       .listUsers()
       .then(listUsersResult => {
-        return listUsersResult.users.map(
-          ({ uid, displayName, email, emailVerified, disabled, customClaims, photoURL }) => ({
+        const data = listUsersResult.users
+          .slice(offset, offset + limit)
+          .map(({ uid, displayName, email, emailVerified, disabled, customClaims, photoURL }) => ({
             uid,
             displayName,
             email,
@@ -33,8 +37,15 @@ export class UsersService {
             disabled,
             role: customClaims?.role,
             photoUrl: photoURL,
-          }),
-        )
+          }))
+
+        return {
+          data,
+          offset,
+          limit,
+          total: listUsersResult.users.length,
+          hasMore: listUsersResult.pageToken !== null,
+        }
       })
       .catch(error => {
         throw new ServerError(error.message)

@@ -196,16 +196,11 @@ export function CrudScreen<DataType>({
     [onModalCreateClose, setTimestamp],
   )
 
-  const handleOnModalDeleteClose = React.useCallback(
-    (submitted?: boolean) => {
-      if (submitted) {
-        setTimestamp(Date.now())
-        toast.success('Request Successful!')
-      }
-      onModalDeleteClose()
-    },
-    [onModalDeleteClose, setTimestamp],
-  )
+  const handleOnModalDeleteDone = React.useCallback(() => {
+    setTimestamp(Date.now())
+    toast.success('Request Successful!')
+    setPage(1)
+  }, [setPage, setTimestamp])
 
   return (
     <>
@@ -216,7 +211,9 @@ export function CrudScreen<DataType>({
         filterValue={filterValue}
         loadingState={loadingState}
         onClear={onClear}
-        onExportTableData={model.report && onExportTableData}
+        onExportTableData={
+          ((response?.total || 0) > 0 && model.report && onExportTableData) || undefined
+        }
         isExportPdfLoading={isDownloadPdfLoading}
         onModalCreateOpen={handleOnModalCreateOpen}
         onNextPage={onNextPage}
@@ -247,7 +244,8 @@ export function CrudScreen<DataType>({
         isOpen={isModalDeleteOpen}
         deleteData={selectedItem || ({} as Record<keyof DataType, unknown>)}
         model={model}
-        onClose={handleOnModalDeleteClose}
+        onClose={onModalDeleteClose}
+        onDeleteDone={handleOnModalDeleteDone}
       />
 
       <ModalView<DataType>

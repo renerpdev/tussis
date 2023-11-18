@@ -1,9 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsIn, IsString } from 'class-validator'
+import { IsIn } from 'class-validator'
 
 export class UpdateUserClaimsDto {
   @ApiProperty()
-  @IsString()
-  @IsIn(['admin', 'editor'])
+  @IsIn(['admin', 'editor', null])
   role: string
 }

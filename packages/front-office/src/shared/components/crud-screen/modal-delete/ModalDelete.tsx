@@ -9,7 +9,8 @@ interface ModalDeleteProps<T> {
   isOpen: boolean
   deleteData: Record<keyof T, unknown>
   model: CrudModel<T>
-  onClose: (submitted?: boolean) => void
+  onClose: () => void
+  onDeleteDone?: () => void
 }
 
 export default function ModalDelete<T>({
@@ -17,12 +18,14 @@ export default function ModalDelete<T>({
   onClose,
   deleteData,
   model,
+  onDeleteDone,
 }: ModalDeleteProps<T>) {
   const deleteMutation = useMutation({
     mutationFn: async T => {
       const id = (deleteData as BaseModel)?.id || (deleteData as BaseModel).uid
       const res = await TussisApi.delete<T>(`${model.update.endpoint}/${id}`)
-      onClose?.(true)
+      onClose?.()
+      onDeleteDone?.()
       return res
     },
   })
