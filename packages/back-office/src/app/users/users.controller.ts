@@ -11,44 +11,40 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UsersService } from './users.service'
 
 @ApiTags(UsersController.path)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
 @Controller(UsersController.path)
 export class UsersController {
   static path = 'users'
 
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('admin')
   @Get()
   async getUsersList() {
     return this.usersService.getUserList()
   }
 
-  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('admin')
   @Post()
   async createUser(@Body() userDto: CreateUserDto) {
     return this.usersService.createUser(userDto)
   }
 
-  @UseGuards(FirebaseAuthGuard, RolesGuard)
-  @Roles('admin', 'editor')
+  @Roles('admin')
   @Patch(':uid')
   async updateUser(@Param('uid') uid: string, @Body() userDto: UpdateUserDto) {
     return this.usersService.updateUser(uid, userDto)
   }
 
-  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':uid')
   async deleteUser(@Param('uid') uid: string, @Req() req: Request) {
     return this.usersService.deleteUser(uid, req.user as AuthUser)
   }
 
-  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles('admin')
-  @Patch('claims')
-  async updateClaims(@Body() dto: UpdateUserClaimsDto) {
-    return this.usersService.updateUserRole(dto)
+  @Patch(':uid/claims')
+  async updateClaims(@Param('uid') uid: string, @Body() dto: UpdateUserClaimsDto) {
+    return this.usersService.updateUserRole(uid, dto)
   }
 }

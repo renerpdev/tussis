@@ -1,7 +1,7 @@
 import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
 import { usePersistedStore } from '../../../app/useStore'
@@ -134,26 +134,27 @@ export function CrudScreen<DataType>({
     setPage(1)
   }, [setPage])
 
+  const { mutateAsync: requestDownloadPdf, isLoading: isDownloadPdfLoading } = useMutation(() =>
+    TussisApi.getPDF(model?.report?.endpoint || '', {
+      limit: response?.total,
+      sort: `${sortDescriptor.column}:${sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'}`,
+      offset: 0,
+    }),
+  )
+
   const onExportTableData = React.useCallback(async () => {
     if (model.report) {
       try {
-        const blob = await TussisApi.getPDF(model.report.endpoint, {
-          limit: response?.total,
-          sort: `${sortDescriptor.column}:${
-            sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'
-          }`,
-          offset: 0,
-        })
-
-        downloadBlobFile(blob.data)
+        const blob = await requestDownloadPdf()
+        const filename = `tussis-report-${Date.now()}.pdf`
+        downloadBlobFile(blob.data, filename)
       } catch (e: any) {
-        console.log(e)
         toast.error(e.message, {
           toastId: e.status,
         })
       }
     }
-  }, [model.report, response?.total, sortDescriptor.column, sortDescriptor.direction])
+  }, [model.report, requestDownloadPdf])
 
   const handleOnEditItem = React.useCallback(
     (item: DataType) => {
@@ -216,6 +217,7 @@ export function CrudScreen<DataType>({
         loadingState={loadingState}
         onClear={onClear}
         onExportTableData={model.report && onExportTableData}
+        isExportPdfLoading={isDownloadPdfLoading}
         onModalCreateOpen={handleOnModalCreateOpen}
         onNextPage={onNextPage}
         onPreviousPage={onPreviousPage}

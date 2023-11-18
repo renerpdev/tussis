@@ -31,6 +31,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     const provider = new GoogleAuthProvider()
+    provider.setDefaultLanguage('es-ES')
 
     signInWithPopup(auth, provider)
       .catch(error => {

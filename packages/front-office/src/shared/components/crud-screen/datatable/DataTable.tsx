@@ -31,6 +31,7 @@ interface DataTableProps<T> extends BottomContentProps, TopContentProps {
   onDelete?: (item: T) => void
   onEdit?: (item: T) => void
   onView?: (item: T) => void
+  isExportPdfLoading?: boolean
 }
 
 export default function DataTable<T>({
@@ -57,6 +58,7 @@ export default function DataTable<T>({
   onView,
   onEdit,
   onDelete,
+  isExportPdfLoading,
 }: DataTableProps<T>) {
   const headerColumns = useMemo(() => {
     if (visibleColumns === 'all') return columns
@@ -193,6 +195,7 @@ export default function DataTable<T>({
           columns={columns}
           filterValue={filterValue}
           onClear={onClear}
+          isExportPdfLoading={isExportPdfLoading}
           onExportTableData={onExportTableData}
           onModalCreateOpen={onModalCreateOpen}
           onRowsPerPageChange={onRowsPerPageChange}

@@ -29,9 +29,6 @@ class AxiosWrapper {
           await getAuth().signOut()
           return axios(config)
         }
-        toast.error(message, {
-          toastId: error.response.status,
-        })
         return Promise.reject(error)
       },
     )
@@ -45,11 +42,9 @@ class AxiosWrapper {
         if (token) {
           request.headers.set('Authorization', `Bearer ${token}`)
         }
-
         return request
       },
       onRejected => {
-        console.log('onRejected', onRejected)
         return Promise.reject(onRejected)
       },
     )
@@ -87,9 +82,9 @@ class AxiosWrapper {
         ...(params ? { ...params } : {}),
       },
       responseType: 'blob',
-      timeout: 120,
+      signal: AbortSignal.timeout(2000),
       headers: {
-        Accept: 'application/octet-stream',
+        Accept: 'application/pdf',
         ...(headers || {}),
       },
     })

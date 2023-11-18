@@ -2,6 +2,7 @@ import { CollectionReference } from '@google-cloud/firestore'
 import { Inject, Injectable, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
+import PDFDocumentWithTables from 'pdfkit-table'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
@@ -239,7 +240,7 @@ export class IssuesService {
     }
   }
 
-  async exportPdf(input: IssuesListInput, user: AuthUser): Promise<Buffer> {
+  async exportPdf(input: IssuesListInput, user: AuthUser): Promise<PDFDocumentWithTables> {
     const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']

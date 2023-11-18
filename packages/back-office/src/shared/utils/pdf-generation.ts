@@ -1,4 +1,5 @@
-import PdfKitTable from 'pdfkit-table'
+import * as fs from 'fs'
+import PDFDocumentWithTables from 'pdfkit-table'
 
 interface PdfTable {
   title?: string
@@ -7,26 +8,19 @@ interface PdfTable {
   rows?: string[][]
 }
 
-export const generatePdfTable = (table: PdfTable, options = {}): Promise<Buffer> => {
-  return new Promise(resolve => {
-    const doc = new PdfKitTable({
-      margin: 20,
-      size: 'A4',
-      bufferPages: true,
-    })
+export const generatePdfTable = async (
+  table: PdfTable,
+  options = {},
+): Promise<PDFDocumentWithTables> => {
+  const doc = new PDFDocumentWithTables({ margin: 20, size: 'A4' })
+  // save document
+  doc.pipe(fs.createWriteStream('./document.pdf'))
 
-    doc.table(table, {
-      padding: [2],
-      ...options,
-    })
-    if (table.rows?.length < 1) doc.text('No existen hay datos para mostrar')
-
-    const buffer = []
-    doc.on('data', buffer.push.bind(buffer))
-    doc.on('end', () => {
-      const data = Buffer.concat(buffer)
-      resolve(data)
-    })
-    doc.end()
+  await doc.table(table, {
+    padding: [2],
+    ...options,
   })
+  if (table.rows?.length < 1) doc.text('No existen hay datos para mostrar')
+
+  return doc
 }

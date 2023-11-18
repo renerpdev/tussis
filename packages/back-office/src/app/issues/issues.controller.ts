@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -11,7 +12,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { Response } from 'firebase-functions/v1'
 import { AuthUser } from '../../shared/types/auth.types'
@@ -42,17 +43,21 @@ export class IssuesController {
     return this.issuesService.getList(input, req.user as AuthUser)
   }
 
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
+  @ApiProduces('application/pdf')
   @Roles('admin', 'editor')
   @Get('export/pdf')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'attachment; filename="tussis-report.pdf"')
   async exportPdf(@Res() res: Response, @Query() input: IssuesListInput, @Req() req: Request) {
-    const buffer = await this.issuesService.exportPdf(input, req.user as AuthUser)
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; tussis-report.pdf',
-      'Content-Length': buffer.length,
-    })
-
-    res.end(buffer)
+    const doc = await this.issuesService.exportPdf(input, req.user as AuthUser)
+    doc.pipe(res)
+    doc.end()
   }
 
   @Get(':id')

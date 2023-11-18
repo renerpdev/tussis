@@ -100,28 +100,40 @@ export class UsersService {
   }
 
   async deleteUser(uid: string, user: AuthUser): Promise<void> {
-    if (user.sub === uid) return Promise.reject(new UserError('You cannot delete yourself'))
+    if (user.sub === uid) {
+      throw new UserError('You cannot delete yourself')
+    }
 
-    return getAuth()
-      .deleteUser(uid)
-      .then(() => {
-        // here we clean up all the data related to this user
-        this.issuesService.deleteAllIssuesFromUser(uid)
-        this.symptomsService.deleteAllSymptomsFromUser(uid)
-        this.medsService.deleteAllMedsFromUser(uid)
-      })
-      .catch(error => {
-        throw new ServerError(error.message)
-      })
+    let userRecord = null
+    try {
+      // validate the user to be deleted isn't an admin
+      userRecord = await getAuth().getUser(uid)
+    } catch (error: any) {
+      throw new ServerError(error.message)
+    }
+
+    if (userRecord?.customClaims?.role === 'admin') {
+      throw new UserError('You cannot delete an admin')
+    }
+
+    try {
+      await getAuth().deleteUser(uid)
+      // here we clean up all the data related to this user
+      await this.issuesService.deleteAllIssuesFromUser(uid)
+      await this.symptomsService.deleteAllSymptomsFromUser(uid)
+      await this.medsService.deleteAllMedsFromUser(uid)
+    } catch (error: any) {
+      throw new ServerError(error.message)
+    }
   }
 
-  async updateUserRole(userDto: UpdateUserClaimsDto): Promise<void> {
+  async updateUserRole(uid: string, userDto: UpdateUserClaimsDto): Promise<void> {
     const validDto = getValidDto(UpdateUserClaimsDto, userDto)
 
     return getAuth()
-      .setCustomUserClaims(validDto.uid, { role: validDto.role })
+      .setCustomUserClaims(uid, { role: validDto.role })
       .catch(error => {
-        throw new ServerError(error)
+        throw new ServerError(error.message)
       })
   }
 }

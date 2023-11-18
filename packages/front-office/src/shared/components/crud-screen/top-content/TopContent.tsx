@@ -6,6 +6,7 @@ import {
   DropdownTrigger,
   Input,
   Selection,
+  Spinner,
 } from '@nextui-org/react'
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import { HiChevronDown, HiPlus, HiSave, HiSearch } from 'react-icons/hi'
@@ -24,6 +25,7 @@ export interface TopContentProps {
   onRowsPerPageChange: (e: ChangeEvent<HTMLSelectElement>) => void
   onSearchChange?: () => void
   onExportTableData?: () => void
+  isExportPdfLoading?: boolean
 }
 
 export default function TopContent({
@@ -38,6 +40,7 @@ export default function TopContent({
   onExportTableData,
   onModalCreateOpen,
   onRowsPerPageChange,
+  isExportPdfLoading,
 }: TopContentProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -100,12 +103,20 @@ export default function TopContent({
           </Button>
           {onExportTableData && (
             <Button
+              disabled={isExportPdfLoading}
               className="bg-transparent border-cyan-600 dark:border-cyan-500 border-2 text-cyan-600 dark:text-cyan-500 hover:bg-cyan-500 hover:text-white dark:hover:text-white"
               endContent={
-                <HiSave
-                  className="h-6 w-6"
-                  onClick={onExportTableData}
-                />
+                isExportPdfLoading ? (
+                  <Spinner
+                    size="sm"
+                    className="text-white"
+                  />
+                ) : (
+                  <HiSave
+                    className="h-6 w-6"
+                    onClick={onExportTableData}
+                  />
+                )
               }
             />
           )}
