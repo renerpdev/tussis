@@ -32,6 +32,8 @@ export default function LoginPage() {
 
     const provider = new GoogleAuthProvider()
     provider.setDefaultLanguage('es-ES')
+    provider.addScope('https://www.googleapis.com/auth/userinfo.email')
+    provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
 
     signInWithPopup(auth, provider)
       .catch(error => {

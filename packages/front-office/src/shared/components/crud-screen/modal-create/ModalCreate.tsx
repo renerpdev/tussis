@@ -248,7 +248,7 @@ export default function ModalCreate<T>({
   }, [])
 
   const handleOnSubmit = useCallback(() => {
-    if (!createMutation.isLoading && !updateMutation.isLoading) {
+    if (formValues.size > 0 && !createMutation.isLoading && !updateMutation.isLoading) {
       // TODO: improve this, since it's just a workaround
       const rawData: Record<string, unknown> = {}
       for (const [key, value] of formValues.entries()) {
@@ -494,7 +494,7 @@ export default function ModalCreate<T>({
                 <Button
                   className="bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50"
                   onPress={handleOnSubmit}
-                  disabled={fields.length === 0}
+                  disabled={formValues.size === 0}
                   isLoading={createMutation.isLoading || updateMutation.isLoading}
                 >
                   {editMode ? 'Edit' : 'Add'} {editMode ? <HiPencil /> : <HiPlus />}{' '}

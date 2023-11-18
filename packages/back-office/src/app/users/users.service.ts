@@ -29,15 +29,27 @@ export class UsersService {
       .then(listUsersResult => {
         const data = listUsersResult.users
           .slice(offset, offset + limit)
-          .map(({ uid, displayName, email, emailVerified, disabled, customClaims, photoURL }) => ({
-            uid,
-            displayName,
-            email,
-            emailVerified,
-            disabled,
-            role: customClaims?.role,
-            photoUrl: photoURL,
-          }))
+          .map(
+            ({
+              uid,
+              displayName,
+              email,
+              emailVerified,
+              disabled,
+              customClaims,
+              photoURL,
+              metadata,
+            }) => ({
+              uid,
+              displayName,
+              email,
+              emailVerified,
+              disabled,
+              role: customClaims?.role,
+              photoUrl: photoURL,
+              lastLoginAt: metadata.lastSignInTime,
+            }),
+          )
 
         return {
           data,

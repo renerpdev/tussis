@@ -16,6 +16,7 @@ const columns: Column[] = [
   { name: 'EMAIL', uid: 'email', type: 'string', sortable: true },
   { name: 'ROLE', uid: 'role', type: 'string' },
   { name: 'DISABLED', uid: 'disabled', type: 'boolean' },
+  { name: 'LAST LOGIN', uid: 'lastLoginAt', type: 'string' },
   { name: 'EMAIL VERIFIED', uid: 'emailVerified', type: 'boolean' },
   { name: 'ACTIONS', uid: 'actions', type: 'action' },
 ]
