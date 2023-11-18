@@ -122,6 +122,10 @@ export class UsersService {
       })
   }
 
+  async deleteAccount(user: AuthUser): Promise<void> {
+    return this.privateDeleteUserAccount(user.sub)
+  }
+
   async deleteUser(uid: string, user: AuthUser): Promise<void> {
     if (user.sub === uid) {
       throw new UserError('You cannot delete yourself')
@@ -139,15 +143,7 @@ export class UsersService {
       throw new UserError('You cannot delete an admin')
     }
 
-    try {
-      await getAuth().deleteUser(uid)
-      // here we clean up all the data related to this user
-      await this.issuesService.deleteAllIssuesFromUser(uid)
-      await this.symptomsService.deleteAllSymptomsFromUser(uid)
-      await this.medsService.deleteAllMedsFromUser(uid)
-    } catch (error: any) {
-      throw new ServerError(error.message)
-    }
+    return this.privateDeleteUserAccount(uid)
   }
 
   async updateUserRole(uid: string, userDto: UpdateUserClaimsDto): Promise<void> {
@@ -156,6 +152,18 @@ export class UsersService {
     try {
       await getAuth().setCustomUserClaims(uid, { role: validDto.role })
       await getAuth().revokeRefreshTokens(uid)
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
+  }
+
+  async privateDeleteUserAccount(uid: string): Promise<void> {
+    try {
+      await getAuth().deleteUser(uid)
+      // here we clean up all the data related to this user
+      await this.issuesService.deleteAllIssuesFromUser(uid)
+      await this.symptomsService.deleteAllSymptomsFromUser(uid)
+      await this.medsService.deleteAllMedsFromUser(uid)
     } catch (error) {
       throw new ServerError(error.message)
     }

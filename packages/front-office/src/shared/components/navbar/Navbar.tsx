@@ -1,7 +1,7 @@
 import { getAuth } from '@firebase/auth'
 import { Avatar, DarkThemeToggle, Dropdown, Navbar as FNavbar } from 'flowbite-react'
 import { useCallback } from 'react'
-import { HiLogout, HiMenu } from 'react-icons/hi'
+import { HiLogout, HiMenu, HiTrash } from 'react-icons/hi'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { usePersistedStore, useStore } from '../../../app/useStore'
@@ -10,6 +10,23 @@ export const Navbar = () => {
   const navigate = useNavigate()
   const { currentUser } = usePersistedStore()
   const { sidebarOpen, setSidebarOpen } = useStore()
+
+  const handleRemoveAccount = useCallback(() => {
+    const confirmedDeletion = window.confirm('Are you sure you want to delete your account?')
+    if (confirmedDeletion) {
+      currentUser
+        ?.delete()
+        .then(() => {
+          toast.success('Account deleted!')
+          navigate('/login')
+        })
+        .catch(error => {
+          toast.error(error.message, {
+            toastId: 'delete-account',
+          })
+        })
+    }
+  }, [currentUser, navigate])
 
   const handleSignOut = useCallback(() => {
     getAuth()
@@ -76,14 +93,13 @@ export const Navbar = () => {
                 <span className="block truncate text-sm font-medium">{currentUser?.email}</span>
               )}
             </Dropdown.Header>
-            {/*<Dropdown.Item*/}
-            {/*  icon={HiUser}*/}
-            {/*  as={NavLink}*/}
-            {/*  to="/profile"*/}
-            {/*>*/}
-            {/*  Profile*/}
-            {/*</Dropdown.Item>*/}
-            {/*<Dropdown.Divider />*/}
+            <Dropdown.Item
+              icon={HiTrash}
+              onClick={handleRemoveAccount}
+            >
+              Delete Account
+            </Dropdown.Item>
+            <Dropdown.Divider />
             <Dropdown.Item
               icon={HiLogout}
               onClick={handleSignOut}

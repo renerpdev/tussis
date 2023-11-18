@@ -54,6 +54,11 @@ export class UsersController {
     return this.usersService.deleteUser(uid, req.user as AuthUser)
   }
 
+  @Delete('remove-account')
+  async deleteAccount(@Req() req: Request) {
+    return this.usersService.deleteAccount(req.user as AuthUser)
+  }
+
   @Roles('admin')
   @Patch(':uid/claims')
   async updateClaims(@Param('uid') uid: string, @Body() dto: UpdateUserClaimsDto) {
