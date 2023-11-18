@@ -29,6 +29,9 @@ class AxiosWrapper {
           await getAuth().signOut()
           return axios(config)
         }
+        toast.error(message, {
+          toastId: error?.response?.status || 500,
+        })
         return Promise.reject(error)
       },
     )
