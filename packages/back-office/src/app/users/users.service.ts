@@ -153,10 +153,11 @@ export class UsersService {
   async updateUserRole(uid: string, userDto: UpdateUserClaimsDto): Promise<void> {
     const validDto = getValidDto(UpdateUserClaimsDto, userDto)
 
-    return getAuth()
-      .setCustomUserClaims(uid, { role: validDto.role })
-      .catch(error => {
-        throw new ServerError(error.message)
-      })
+    try {
+      await getAuth().setCustomUserClaims(uid, { role: validDto.role })
+      await getAuth().revokeRefreshTokens(uid)
+    } catch (error) {
+      throw new ServerError(error.message)
+    }
   }
 }
