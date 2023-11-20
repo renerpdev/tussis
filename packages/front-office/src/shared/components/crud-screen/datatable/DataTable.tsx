@@ -17,7 +17,6 @@ import {
   TableRow,
 } from '@nextui-org/react'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import React, { Dispatch, ReactElement, useCallback, useMemo } from 'react'
 import { HiDotsVertical } from 'react-icons/hi'
 import { v4 as uuid } from 'uuid'
@@ -89,33 +88,32 @@ export default function DataTable<T>({
   )
 
   const renderParsedDateTime = useCallback((value: string) => {
-    const date = dayjs(value as string)
-      .toDate()
-      .toLocaleDateString()
-
-    const time = dayjs(value as string)
-      .toDate()
-      .toLocaleTimeString()
+    const datetime = dayjs(value).format('MMM DD, YYYY - hh:mm A')
 
     return (
-      <span>
-        {date} - {time}
-      </span>
+      <>
+        <span>{datetime}</span>
+        <br />
+        <span className="text-xs text-gray-400">({dayjs(value).fromNow()})</span>
+      </>
     )
   }, [])
 
   const renderParsedDate = useCallback((value: string) => {
-    const date = dayjs(value as string)
-      .toDate()
-      .toLocaleDateString()
+    const date = dayjs(value).format('MMM DD, YYYY')
 
-    dayjs.extend(relativeTime)
-    return (
-      <>
-        <span>{date}</span>
-        <span className="ml-1 text-xs text-gray-400">({dayjs(value).fromNow()})</span>
-      </>
-    )
+    const diff = dayjs(Date.now()).diff(date, 'day')
+    if (diff > 0) {
+      return (
+        <>
+          <span>{date}</span>
+          <br />
+          <span className="text-xs text-gray-400">({dayjs(value).fromNow()})</span>
+        </>
+      )
+    }
+
+    return date
   }, [])
 
   const renderCell = useCallback(

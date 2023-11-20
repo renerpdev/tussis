@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import PDFDocumentWithTables from 'pdfkit-table'
 
 interface PdfTable {
@@ -14,7 +13,6 @@ export const generatePdfTable = async (
 ): Promise<PDFDocumentWithTables> => {
   const doc = new PDFDocumentWithTables({ margin: 20, size: 'A4' })
   // save document
-  doc.pipe(fs.createWriteStream('./document.pdf'))
 
   await doc.table(table, {
     padding: [2],

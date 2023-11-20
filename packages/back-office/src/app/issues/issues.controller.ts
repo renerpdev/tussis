@@ -13,8 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger'
-import { Request } from 'express'
-import { Response } from 'firebase-functions/v1'
+import { Request, Response } from 'express'
 import { AuthUser } from '../../shared/types/auth.types'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { Roles } from '../auth/roles.decorator'
@@ -55,9 +54,7 @@ export class IssuesController {
   @Header('Content-Type', 'application/pdf')
   @Header('Content-Disposition', 'attachment; filename="tussis-report.pdf"')
   async exportPdf(@Res() res: Response, @Query() input: IssuesListInput, @Req() req: Request) {
-    const doc = await this.issuesService.exportPdf(input, req.user as AuthUser)
-    doc.pipe(res)
-    doc.end()
+    return this.issuesService.exportPdf(input, req.user as AuthUser, res)
   }
 
   @Get(':id')

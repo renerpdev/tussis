@@ -1,8 +1,9 @@
 import { CollectionReference } from '@google-cloud/firestore'
-import { Inject, Injectable, Scope } from '@nestjs/common'
+import { Inject, Injectable, Res, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
-import PDFDocumentWithTables from 'pdfkit-table'
+import 'dayjs/locale/es'
+import { Response } from 'express'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
@@ -240,7 +241,7 @@ export class IssuesService {
     }
   }
 
-  async exportPdf(input: IssuesListInput, user: AuthUser): Promise<PDFDocumentWithTables> {
+  async exportPdf(input: IssuesListInput, user: AuthUser, @Res() res: Response): Promise<void> {
     const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']
@@ -267,7 +268,7 @@ export class IssuesService {
         const issueMeds = meds[index].map(({ name }) => name)
 
         return [
-          `${dayjs(issue.date).format('MMMM D, YYYY')}`,
+          `${dayjs(issue.date).locale('es').format('MMMM D, YYYY')}`,
           issueSymptoms.join(', '),
           issueMeds.join(', '),
           issue.notes,
@@ -281,7 +282,9 @@ export class IssuesService {
         rows,
       }
 
-      return generatePdfTable(table)
+      const doc = await generatePdfTable(table)
+      doc.pipe(res)
+      doc.end()
     } catch (error) {
       throw new ServerError(error.message)
     }

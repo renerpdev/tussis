@@ -1,4 +1,7 @@
 import { NextUIProvider } from '@nextui-org/react'
+import dayjs from 'dayjs'
+import 'dayjs/locale/es'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import 'flowbite/dist/flowbite.min.js'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
@@ -6,6 +9,9 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './app/app'
+
+dayjs.locale('es')
+dayjs.extend(relativeTime)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +23,7 @@ const queryClient = new QueryClient({
 })
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+
 root.render(
   <QueryClientProvider client={queryClient}>
     <StrictMode>
