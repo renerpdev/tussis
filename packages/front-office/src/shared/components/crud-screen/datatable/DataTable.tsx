@@ -1,3 +1,4 @@
+import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
 import {
   Avatar,
   Button,
@@ -32,6 +33,7 @@ interface DataTableProps<T> extends BottomContentProps, TopContentProps {
   onEdit?: (item: T) => void
   onView?: (item: T) => void
   isExportPdfLoading?: boolean
+  additionalDropdownItems?: MenuItemBaseProps[]
 }
 
 export default function DataTable<T>({
@@ -59,6 +61,7 @@ export default function DataTable<T>({
   onEdit,
   onDelete,
   isExportPdfLoading,
+  additionalDropdownItems = [],
 }: DataTableProps<T>) {
   const headerColumns = useMemo(() => {
     if (visibleColumns === 'all') return columns
@@ -84,13 +87,35 @@ export default function DataTable<T>({
     },
     [onView],
   )
-  const parseDateValue = useCallback((value: string) => {
+
+  const renderParsedDateTime = useCallback((value: string) => {
+    const date = dayjs(value as string)
+      .toDate()
+      .toLocaleDateString()
+
+    const time = dayjs(value as string)
+      .toDate()
+      .toLocaleTimeString()
+
+    return (
+      <span>
+        {date} - {time}
+      </span>
+    )
+  }, [])
+
+  const renderParsedDate = useCallback((value: string) => {
     const date = dayjs(value as string)
       .toDate()
       .toLocaleDateString()
 
     dayjs.extend(relativeTime)
-    return [date, dayjs(value).fromNow()].join(' - ')
+    return (
+      <>
+        <span>{date}</span>
+        <span className="ml-1 text-xs text-gray-400">({dayjs(value).fromNow()})</span>
+      </>
+    )
   }, [])
 
   const renderCell = useCallback(
@@ -118,7 +143,9 @@ export default function DataTable<T>({
             </Chip>
           ))
         case 'date':
-          return <span key={cellId}>{parseDateValue(cellValue as string)}</span>
+          return <span key={cellId}>{renderParsedDate(cellValue as string)}</span>
+        case 'datetime':
+          return <span key={cellId}>{renderParsedDateTime(cellValue as string)}</span>
         case 'boolean':
           return <span key={cellId}>{cellValue ? 'SI' : 'NO'}</span>
         case 'action':
@@ -160,6 +187,16 @@ export default function DataTable<T>({
                   >
                     Delete
                   </DropdownItem>
+                  {/* This code works, although it is a hijacking */}
+                  {/* @ts-ignore */}
+                  {(additionalDropdownItems as MenuItemBaseProps[])?.map(
+                    ({ onPress, ...itemProps }) => (
+                      <DropdownItem
+                        {...itemProps}
+                        onPress={() => onPress?.(item as any)}
+                      />
+                    ),
+                  )}
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -168,7 +205,15 @@ export default function DataTable<T>({
           return cellValue
       }
     },
-    [columns, handleOnDelete, handleOnEdit, handleOnView, parseDateValue],
+    [
+      additionalDropdownItems,
+      columns,
+      handleOnDelete,
+      handleOnEdit,
+      handleOnView,
+      renderParsedDate,
+      renderParsedDateTime,
+    ],
   )
 
   return (

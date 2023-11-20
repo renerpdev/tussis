@@ -1,5 +1,6 @@
 import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 
+import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
@@ -25,6 +26,7 @@ interface CrudScreenProps<T> {
   columns: Column[]
   timestamp: number
   setTimestamp: (timestamp: number) => void
+  additionDropdownItems?: MenuItemBaseProps[]
 }
 export function CrudScreen<DataType>({
   model,
@@ -38,6 +40,7 @@ export function CrudScreen<DataType>({
   columns,
   timestamp,
   setTimestamp,
+  additionDropdownItems,
 }: CrudScreenProps<DataType>) {
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
@@ -211,6 +214,7 @@ export function CrudScreen<DataType>({
         filterValue={filterValue}
         loadingState={loadingState}
         onClear={onClear}
+        additionalDropdownItems={additionDropdownItems}
         onExportTableData={
           ((response?.total || 0) > 0 && model.report && onExportTableData) || undefined
         }

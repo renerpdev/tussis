@@ -1,11 +1,12 @@
-import { SortDescriptor } from '@nextui-org/react'
-import React from 'react'
+import { SortDescriptor, useDisclosure } from '@nextui-org/react'
+import React, { useCallback } from 'react'
 import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel } from '../../../shared/models'
 import { User } from '../../../shared/models/user.model'
 import { Column } from '../../../shared/types'
 import { useStore } from '../../useStore'
+import ModalUpdateRole from './modal-update-role/ModalUpdateRole'
 
 const INITIAL_VISIBLE_COLUMNS = ['photoUrl', 'displayName', 'email', 'role', 'actions']
 
@@ -16,7 +17,7 @@ const columns: Column[] = [
   { name: 'EMAIL', uid: 'email', type: 'string', sortable: true },
   { name: 'ROLE', uid: 'role', type: 'string' },
   { name: 'DISABLED', uid: 'disabled', type: 'boolean' },
-  { name: 'LAST LOGIN', uid: 'lastLoginAt', type: 'string' },
+  { name: 'LAST LOGIN', uid: 'lastLoginAt', type: 'datetime' },
   { name: 'EMAIL VERIFIED', uid: 'emailVerified', type: 'boolean' },
   { name: 'ACTIONS', uid: 'actions', type: 'action' },
 ]
@@ -29,6 +30,7 @@ export default function UsersPage() {
   })
   const [page, setPage] = React.useState(1)
   const { usersUpdatedAt, setUsersUpdatedAt } = useStore()
+  const [selectedUser, setSelectedUser] = React.useState<User | undefined>(undefined)
 
   const model: CrudModel<User> = {
     create: {
@@ -65,19 +67,47 @@ export default function UsersPage() {
     },
   }
 
+  const { isOpen: isModalOpen, onClose: onModalClose, onOpen: onModalOpen } = useDisclosure()
+
+  const handleOnUpdateRole = useCallback(
+    (user: User) => {
+      setSelectedUser(user)
+      onModalOpen()
+    },
+    [onModalOpen],
+  )
+
+  const additionDropdownItems = [
+    {
+      key: 'update-role',
+      onPress: handleOnUpdateRole,
+      className: 'dark:hover:bg-cyan-600',
+      children: 'Update role',
+    },
+  ]
+
   return (
-    <CrudScreen<User>
-      model={model}
-      defaultColumns={INITIAL_VISIBLE_COLUMNS}
-      page={page}
-      setPage={setPage}
-      rowsPerPage={rowsPerPage}
-      setRowsPerPage={setRowsPerPage}
-      sortDescriptor={sortDescriptor}
-      setSortDescriptor={setSortDescriptor}
-      columns={columns}
-      timestamp={usersUpdatedAt}
-      setTimestamp={setUsersUpdatedAt}
-    />
+    <>
+      <CrudScreen<User>
+        model={model}
+        defaultColumns={INITIAL_VISIBLE_COLUMNS}
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        sortDescriptor={sortDescriptor}
+        setSortDescriptor={setSortDescriptor}
+        columns={columns}
+        timestamp={usersUpdatedAt}
+        setTimestamp={setUsersUpdatedAt}
+        additionDropdownItems={additionDropdownItems}
+      />
+      <ModalUpdateRole
+        model={model}
+        isOpen={isModalOpen}
+        user={selectedUser}
+        onClose={onModalClose}
+      />
+    </>
   )
 }

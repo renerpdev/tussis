@@ -52,7 +52,7 @@ export interface UISelectOption {
 export interface Column {
   uid: string
   name: string
-  type: 'date' | 'string' | 'array' | 'action' | 'boolean' | 'picture'
+  type: 'date' | 'string' | 'array' | 'action' | 'boolean' | 'picture' | 'datetime'
   sortable?: boolean
 }
 
