@@ -69,8 +69,8 @@ export default function ModalUpdateRole({ isOpen, onClose, user, model }: ModalV
               <Select
                 items={roles}
                 disallowEmptySelection
-                label="Favorite Animal"
-                placeholder="Select an animal"
+                label="User Role"
+                placeholder="Select a role"
                 className="w-full"
                 selectedKeys={value}
                 onSelectionChange={setValue}

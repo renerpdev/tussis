@@ -152,7 +152,9 @@ export default function ModalCreate<T>({
               label,
               type: fieldType,
             }
-            setFormValues(formValues.set(key, field.value))
+            if (!editMode) {
+              setFormValues(formValues.set(key, field.value))
+            }
             break
           case 'multiselect':
           case 'select':
