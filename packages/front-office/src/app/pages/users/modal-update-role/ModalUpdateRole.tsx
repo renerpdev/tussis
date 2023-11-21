@@ -74,6 +74,11 @@ export default function ModalUpdateRole({ isOpen, onClose, user, model }: ModalV
                 className="w-full"
                 selectedKeys={value}
                 onSelectionChange={setValue}
+                classNames={{
+                  trigger:
+                    'bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 dark:focus:ring-cyan-500',
+                  popover: 'dark:bg-gray-600',
+                }}
               >
                 {role => (
                   <SelectItem

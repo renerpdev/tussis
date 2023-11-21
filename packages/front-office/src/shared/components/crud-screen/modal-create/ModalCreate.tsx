@@ -409,7 +409,7 @@ export default function ModalCreate<T>({
               label={field.label}
               classNames={{
                 inputWrapper:
-                  'bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 darK:focus:ring-cyan-500',
+                  'bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 dark:focus:ring-cyan-500',
               }}
             />
           )
