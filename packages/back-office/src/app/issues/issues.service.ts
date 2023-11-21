@@ -242,6 +242,7 @@ export class IssuesService {
   }
 
   async exportPdf(input: IssuesListInput, user: AuthUser, @Res() res: Response): Promise<void> {
+    input.sort = 'date:desc'
     const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']
@@ -263,26 +264,33 @@ export class IssuesService {
         )
       ).map(({ docs }) => docs.map(doc => doc.data()))
 
-      const rows = paginatedIssuesList.data.map((issue, index) => {
+      const tablesMap = new Map(Object.entries({}))
+      paginatedIssuesList.data.forEach((issue, index) => {
         const issueSymptoms = symptoms[index].map(({ name }) => name)
         const issueMeds = meds[index].map(({ name }) => name)
 
-        return [
+        const row = [
           `${dayjs(issue.date).locale('es').format('MMMM D, YYYY')}`,
           issueSymptoms.join(', '),
           issueMeds.join(', '),
           issue.notes,
         ]
+
+        const monthYear = dayjs(issue.date).locale('es').format('MMMM YYYY').toUpperCase()
+        const currentTableRows = (tablesMap.get(monthYear) as string[]) || []
+        tablesMap.set(monthYear, [...currentTableRows, row])
       })
 
-      const table = {
-        title: 'TUSSIS',
-        subtitle: 'Reporte de afecciones para el periodo',
-        headers,
-        rows,
+      const tables = []
+      for (const [key, value] of tablesMap.entries()) {
+        tables.push({
+          subtitle: key,
+          headers,
+          rows: value,
+        })
       }
 
-      const doc = await generatePdfTable(table)
+      const doc = await generatePdfTable(tables)
       doc.pipe(res)
       doc.end()
     } catch (error) {
