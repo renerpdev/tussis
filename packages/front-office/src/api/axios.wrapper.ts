@@ -2,6 +2,7 @@ import { getAuth } from '@firebase/auth'
 import axios, { AxiosResponse, Method } from 'axios'
 import { toast } from 'react-toastify'
 import { HttpCodes } from '../shared/types'
+import { getAuthCookie } from '../shared/utils/cookies'
 
 export type Headers = unknown
 
@@ -39,8 +40,7 @@ class AxiosWrapper {
     // intercepts axios request
     axios.interceptors.request.use(
       async request => {
-        const token = JSON.parse(localStorage.getItem('tussis-store') || '{}').state?.currentUser
-          ?.stsTokenManager?.accessToken
+        const token = getAuthCookie()?.accessToken
         if (token) {
           request.headers.set('Authorization', `Bearer ${token}`)
         }

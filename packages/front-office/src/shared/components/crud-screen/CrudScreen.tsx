@@ -2,13 +2,14 @@ import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 
 import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
+import { useCookies } from 'react-cookie'
 import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
-import { usePersistedStore } from '../../../app/useStore'
 import { CrudModel } from '../../models'
 import { Column, PaginatedQueryResponse } from '../../types'
 import { downloadBlobFile } from '../../utils'
+import { AUTH_COOKIE_NAME } from '../../utils/cookies'
 import DataTable from './datatable/DataTable'
 import ModalCreate from './modal-create/ModalCreate'
 import ModalDelete from './modal-delete/ModalDelete'
@@ -45,7 +46,8 @@ export function CrudScreen<DataType>({
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
-  const { currentUser } = usePersistedStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const currentUser = useMemo(() => cookies.auth.user, [cookies])
 
   const {
     isOpen: isModalCreateOpen,

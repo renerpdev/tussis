@@ -1,10 +1,11 @@
 import { getAuth } from '@firebase/auth'
 import { Spinner } from '@nextui-org/react'
-import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect } from 'react'
+import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect, useMemo } from 'react'
+import { useCookies } from 'react-cookie'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AUTH_COOKIE_NAME } from '../shared/utils/cookies'
 import { ErrorPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
-import { usePersistedStore } from './useStore'
 
 const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
@@ -13,9 +14,9 @@ const LazyDashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
 const LazyUsersPage = lazy(() => import('./pages/users/UsersPage'))
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
-  const { currentUser } = usePersistedStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
 
-  if (!currentUser) {
+  if (!cookies.auth) {
     return (
       <Navigate
         to={'/login'}
@@ -27,9 +28,9 @@ const ProtectedRoute = ({ children }: PropsWithChildren) => {
   return children as ReactElement
 }
 const UnProtectedRoute = ({ children }: PropsWithChildren) => {
-  const { currentUser } = usePersistedStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
 
-  if (currentUser) {
+  if (cookies.auth) {
     return (
       <Navigate
         to={'/'}
@@ -42,19 +43,23 @@ const UnProtectedRoute = ({ children }: PropsWithChildren) => {
 }
 
 const App = () => {
-  const { setCurrentUser } = usePersistedStore()
+  const [cookies, setCookie] = useCookies([AUTH_COOKIE_NAME])
+  const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
+  const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
 
   useEffect(() => {
     getAuth().useDeviceLanguage()
 
-    const unsubscribe = getAuth().onAuthStateChanged(user => {
-      setCurrentUser(user)
+    const unsubscribe = getAuth().onAuthStateChanged(async user => {
+      if (!user) {
+        setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
+      }
     })
 
     return () => {
       unsubscribe()
     }
-  }, [setCurrentUser])
+  }, [setCookie])
 
   return (
     <BrowserRouter basename="/">
@@ -87,43 +92,49 @@ const App = () => {
               />
             }
           />
-          <Route
-            path={'/issues'}
-            element={
-              <Suspense
-                children={<LazyIssuesPage />}
-                fallback={<Spinner />}
+          {(isEditor || isAdmin) && (
+            <>
+              <Route
+                path={'/issues'}
+                element={
+                  <Suspense
+                    children={<LazyIssuesPage />}
+                    fallback={<Spinner />}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path={'/meds'}
-            element={
-              <Suspense
-                children={<LazyMedsPage />}
-                fallback={<Spinner />}
+              <Route
+                path={'/meds'}
+                element={
+                  <Suspense
+                    children={<LazyMedsPage />}
+                    fallback={<Spinner />}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path={'/symptoms'}
-            element={
-              <Suspense
-                children={<LazySymptomsPage />}
-                fallback={<Spinner />}
+              <Route
+                path={'/symptoms'}
+                element={
+                  <Suspense
+                    children={<LazySymptomsPage />}
+                    fallback={<Spinner />}
+                  />
+                }
               />
-            }
-          />
+            </>
+          )}
 
-          <Route
-            path={'/users'}
-            element={
-              <Suspense
-                children={<LazyUsersPage />}
-                fallback={<Spinner />}
-              />
-            }
-          />
+          {isAdmin && (
+            <Route
+              path={'/users'}
+              element={
+                <Suspense
+                  children={<LazyUsersPage />}
+                  fallback={<Spinner />}
+                />
+              }
+            />
+          )}
         </Route>
         <Route
           index

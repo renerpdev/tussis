@@ -1,11 +1,4 @@
-import { User } from '@firebase/auth'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
-
-type PersistedState = {
-  currentUser: null | User
-  setCurrentUser: (currentUser: User | null) => void
-}
 
 type State = {
   issuesUpdatedAt: number
@@ -19,19 +12,6 @@ type State = {
   usersUpdatedAt: number
   setUsersUpdatedAt: (usersUpdatedAt: number) => void
 }
-
-export const usePersistedStore = create(
-  persist<PersistedState>(
-    set => ({
-      currentUser: null,
-      setCurrentUser: (currentUser: User | null) => set({ currentUser }),
-    }),
-    {
-      name: 'tussis-store',
-      storage: createJSONStorage(() => localStorage),
-    },
-  ),
-)
 
 const currentTimestamp = Date.now()
 

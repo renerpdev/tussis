@@ -4,6 +4,7 @@ import 'dayjs/locale/es'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'flowbite/dist/flowbite.min.js'
 import { StrictMode } from 'react'
+import { CookiesProvider } from 'react-cookie'
 import * as ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ToastContainer } from 'react-toastify'
@@ -28,11 +29,13 @@ root.render(
   <QueryClientProvider client={queryClient}>
     <StrictMode>
       <NextUIProvider>
-        <App />
+        <CookiesProvider>
+          <App />
+        </CookiesProvider>
         <ToastContainer
           position={'bottom-right'}
           draggablePercent={60}
-          autoClose={2000}
+          autoClose={3000}
         />
       </NextUIProvider>
     </StrictMode>

@@ -1,9 +1,18 @@
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from '@firebase/auth'
+import {
+  GoogleAuthProvider,
+  IdTokenResult,
+  User,
+  getIdTokenResult,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from '@firebase/auth'
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
+import { useCookies } from 'react-cookie'
 import { FaGoogle } from 'react-icons/fa'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
+import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
 import auth from '../../auth/auth'
 
 export default function LoginPage() {
@@ -11,21 +20,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+  const [, setCookie] = useCookies([AUTH_COOKIE_NAME])
 
-  const handleUserPassLogin = useCallback(() => {
+  const updateCookie = useCallback(
+    (user: User, tokenResult: IdTokenResult) => {
+      const cookieValue = {
+        user: {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          role: tokenResult?.claims.role,
+        },
+        accessToken: tokenResult?.token,
+      }
+      setCookie(AUTH_COOKIE_NAME, cookieValue, { path: '/' })
+    },
+    [setCookie],
+  )
+
+  const handleUserPassLogin = useCallback(async () => {
     setIsLoading(true)
 
-    signInWithEmailAndPassword(auth, email, password)
-      .catch(error => {
-        const errorMessage = error.message
-        toast.error(errorMessage, {
-          toastId: 'error-login',
-        })
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password)
+      const tokenResult = await getIdTokenResult(userCred.user)
+      updateCookie(userCred.user, tokenResult)
+    } catch (error: any) {
+      const errorMessage = error.message
+      toast.error(errorMessage, {
+        toastId: 'error-login',
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [email, password])
+    }
+    setIsLoading(false)
+  }, [email, password, updateCookie])
 
   const handleGoogleLogin = useCallback(async () => {
     setIsLoading(true)
@@ -35,17 +63,18 @@ export default function LoginPage() {
     provider.addScope('https://www.googleapis.com/auth/userinfo.email')
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
 
-    signInWithPopup(auth, provider)
-      .catch(error => {
-        const errorMessage = error.message
-        toast.error(errorMessage, {
-          toastId: 'error-google-login',
-        })
+    try {
+      const userCred = await signInWithPopup(auth, provider)
+      const tokenResult = await getIdTokenResult(userCred.user)
+      updateCookie(userCred.user, tokenResult)
+    } catch (error: any) {
+      const errorMessage = error.message
+      toast.error(errorMessage, {
+        toastId: 'error-google-login',
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [])
+    }
+    setIsLoading(false)
+  }, [updateCookie])
 
   return (
     <div

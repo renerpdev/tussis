@@ -1,32 +1,36 @@
 import { getAuth } from '@firebase/auth'
+import { Chip, Spinner } from '@nextui-org/react'
 import { Avatar, DarkThemeToggle, Dropdown, Navbar as FNavbar } from 'flowbite-react'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useCookies } from 'react-cookie'
 import { HiLogout, HiMenu, HiTrash } from 'react-icons/hi'
+import { useMutation } from 'react-query'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { usePersistedStore, useStore } from '../../../app/useStore'
+import { TussisApi } from '../../../api'
+import { useStore } from '../../../app/useStore'
+import { AUTH_COOKIE_NAME } from '../../utils/cookies'
 
 export const Navbar = () => {
   const navigate = useNavigate()
-  const { currentUser } = usePersistedStore()
   const { sidebarOpen, setSidebarOpen } = useStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const currentUser = useMemo(() => cookies.auth?.user, [cookies])
+  const userRole = useMemo(() => currentUser.role, [currentUser])
+
+  const { mutateAsync: deleteUserAccount, isLoading: isLoadingDeleteUserAccount } = useMutation({
+    mutationFn: async () => await TussisApi.delete(`users/remove-account`),
+  })
 
   const handleRemoveAccount = useCallback(() => {
     const confirmedDeletion = window.confirm('Are you sure you want to delete your account?')
     if (confirmedDeletion) {
-      currentUser
-        ?.delete()
-        .then(() => {
-          toast.success('Account deleted!')
-          navigate('/login')
-        })
-        .catch(error => {
-          toast.error(error.message, {
-            toastId: 'delete-account',
-          })
-        })
+      deleteUserAccount().then(() => {
+        toast.success('Account deleted!')
+        navigate('/login')
+      })
     }
-  }, [currentUser, navigate])
+  }, [navigate, deleteUserAccount])
 
   const handleSignOut = useCallback(() => {
     getAuth()
@@ -68,6 +72,7 @@ export const Navbar = () => {
         </span>
       </FNavbar.Brand>
       <div className="flex md:order-2">
+        {isLoadingDeleteUserAccount && <Spinner size="sm" />}
         <DarkThemeToggle />
         {currentUser && (
           <Dropdown
@@ -83,15 +88,30 @@ export const Navbar = () => {
             }
           >
             <Dropdown.Header>
-              {currentUser?.displayName && (
-                <span className="block text-sm capitalize">{currentUser?.displayName}</span>
-              )}
-              {currentUser?.isAnonymous && (
-                <span className="block text-sm capitalize">Anonymous</span>
-              )}
-              {currentUser?.email && (
-                <span className="block truncate text-sm font-medium">{currentUser?.email}</span>
-              )}
+              <div className="flex flex-col gap-2">
+                <div>
+                  {currentUser?.displayName && (
+                    <span className="block text-sm capitalize">{currentUser?.displayName}</span>
+                  )}
+                  {currentUser?.isAnonymous && (
+                    <span className="block text-sm capitalize">Anonymous</span>
+                  )}
+                  {currentUser?.email && (
+                    <span className="block truncate text-xs font-medium text-gray-600 dark:text-gray-300">
+                      {currentUser?.email}
+                    </span>
+                  )}
+                </div>
+                {userRole && (
+                  <Chip
+                    variant="faded"
+                    size="sm"
+                    className="text-xs capitalize"
+                  >
+                    {userRole}
+                  </Chip>
+                )}
+              </div>
             </Dropdown.Header>
             <Dropdown.Item
               icon={HiTrash}

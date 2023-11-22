@@ -1,8 +1,10 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useCookies } from 'react-cookie'
 import { HiChartPie, HiInbox, HiUsers, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
-import { usePersistedStore, useStore } from '../../../app/useStore'
+import { useStore } from '../../../app/useStore'
+import { AUTH_COOKIE_NAME } from '../../utils/cookies'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: boolean }[] = [
   {
@@ -11,6 +13,17 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
     icon: HiChartPie,
     isPublic: true,
   },
+]
+
+const ADMIN_ITEMS = [
+  {
+    route: 'users',
+    value: 'Users',
+    icon: HiUsers,
+  },
+]
+
+const EDITOR_ITEMS = [
   {
     route: 'issues',
     value: 'Issues',
@@ -26,16 +39,14 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
     value: 'Meds',
     icon: HiInbox,
   },
-  {
-    route: 'users',
-    value: 'Users',
-    icon: HiUsers,
-  },
 ]
 
 export function Sidebar() {
-  const { currentUser } = usePersistedStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const { sidebarOpen, setSidebarOpen } = useStore()
+  const currentUser = useMemo(() => cookies.auth?.user, [cookies])
+  const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
+  const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
 
   const handleSidebarVisibility = useCallback(() => {
     setSidebarOpen(!sidebarOpen)
@@ -58,33 +69,35 @@ export function Sidebar() {
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
-            {SIDEBAR_ITEMS.map(({ icon: Icon, route, value, isPublic }) => {
-              const canAccess = currentUser || isPublic
-              return (
-                <li
-                  key={route}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <NavLink
-                    to={`/${route}`}
-                    title={!canAccess ? 'You must be logged in to access this page' : undefined}
-                    className={({ isActive }) =>
-                      `flex items-center p-2 rounded-lg dark:text-white hover:text-white hover:bg-cyan-500 group ${
-                        !canAccess ? 'hidden' : ''
-                      }
+            {SIDEBAR_ITEMS.concat(isEditor || isAdmin ? EDITOR_ITEMS : [])
+              .concat(isAdmin ? ADMIN_ITEMS : [])
+              .map(({ icon: Icon, route, value, isPublic }) => {
+                const canAccess = currentUser || isPublic
+                return (
+                  <li
+                    key={route}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <NavLink
+                      to={`/${route}`}
+                      title={!canAccess ? 'You must be logged in to access this page' : undefined}
+                      className={({ isActive }) =>
+                        `flex items-center p-2 rounded-lg dark:text-white hover:text-white hover:bg-cyan-500 group ${
+                          !canAccess ? 'hidden' : ''
+                        }
                   ${
                     isActive
                       ? 'text-cyan-600 dark:bg-cyan-600 dark:hover:text-white'
                       : 'text-gray-900 dark:hover:bg-cyan-500'
                   }`
-                    }
-                  >
-                    {<Icon />}
-                    <span className="ml-3">{value}</span>
-                  </NavLink>
-                </li>
-              )
-            })}
+                      }
+                    >
+                      {<Icon />}
+                      <span className="ml-3">{value}</span>
+                    </NavLink>
+                  </li>
+                )
+              })}
           </ul>
         </div>
       </aside>

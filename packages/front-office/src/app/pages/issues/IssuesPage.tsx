@@ -1,12 +1,14 @@
 import { SortDescriptor } from '@nextui-org/react'
-import React from 'react'
+import React, { useMemo } from 'react'
+import { useCookies } from 'react-cookie'
 import { useQuery } from 'react-query'
 import { TussisApi } from '../../../api'
 import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Issue } from '../../../shared/models'
 import { Column } from '../../../shared/types'
-import { usePersistedStore, useStore } from '../../useStore'
+import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
+import { useStore } from '../../useStore'
 
 const INITIAL_VISIBLE_COLUMNS = ['date', 'symptoms', 'meds', 'actions']
 
@@ -27,7 +29,8 @@ export default function IssuesPage() {
   })
   const [page, setPage] = React.useState(1)
   const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt, setIssuesUpdatedAt } = useStore()
-  const { currentUser } = usePersistedStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const currentUser = useMemo(() => cookies.auth.user, [cookies])
 
   const {
     isFetching: isFetchingMeds,

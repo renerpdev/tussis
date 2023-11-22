@@ -21,6 +21,7 @@ type Role = 'admin' | 'editor' | null
 const roles = [
   { label: 'Admin', value: 'admin' },
   { label: 'Editor', value: 'editor' },
+  { label: 'Supervisor', value: 'supervisor' },
   { label: 'N/A', value: '' },
 ]
 

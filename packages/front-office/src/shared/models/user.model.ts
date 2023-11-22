@@ -1,3 +1,4 @@
+import { UserRole } from '../types/auth.types'
 import { BaseModel } from './index'
 
 export interface User extends BaseModel {
@@ -8,5 +9,5 @@ export interface User extends BaseModel {
   disabled?: boolean
   emailVerified?: boolean
   photoUrl?: string
-  role?: 'admin' | 'editor'
+  role?: UserRole
 }

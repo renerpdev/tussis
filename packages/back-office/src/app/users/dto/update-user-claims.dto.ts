@@ -3,6 +3,6 @@ import { IsIn } from 'class-validator'
 
 export class UpdateUserClaimsDto {
   @ApiProperty()
-  @IsIn(['admin', 'editor', null])
+  @IsIn(['admin', 'editor', 'supervisor', null])
   role: string
 }
