@@ -1,7 +1,7 @@
 import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 
 import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
-import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
+import React, { Dispatch, SetStateAction, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
@@ -27,7 +27,7 @@ interface CrudScreenProps<T> {
   columns: Column[]
   timestamp: number
   setTimestamp: (timestamp: number) => void
-  additionDropdownItems?: MenuItemBaseProps[]
+  additionalDropdownItems?: MenuItemBaseProps[]
 }
 export function CrudScreen<DataType>({
   model,
@@ -41,7 +41,7 @@ export function CrudScreen<DataType>({
   columns,
   timestamp,
   setTimestamp,
-  additionDropdownItems,
+  additionalDropdownItems,
 }: CrudScreenProps<DataType>) {
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
@@ -70,7 +70,6 @@ export function CrudScreen<DataType>({
   const {
     isLoading,
     isFetching,
-    error,
     data: response,
   } = useQuery<unknown, unknown, PaginatedQueryResponse<DataType>>(
     [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp, currentUser?.uid],
@@ -83,14 +82,6 @@ export function CrudScreen<DataType>({
         offset: rowsPerPage * (page - 1),
       }),
   )
-
-  useEffect(() => {
-    if (error) {
-      toast.error((error as any).message, {
-        toastId: (error as any).status,
-      })
-    }
-  }, [error])
 
   const pages = useMemo(() => {
     const pageCount = response?.total ? Math.ceil(response?.total / rowsPerPage) : 0
@@ -216,7 +207,7 @@ export function CrudScreen<DataType>({
         filterValue={filterValue}
         loadingState={loadingState}
         onClear={onClear}
-        additionalDropdownItems={additionDropdownItems}
+        additionalDropdownItems={additionalDropdownItems}
         onExportTableData={
           ((response?.total || 0) > 0 && model.report && onExportTableData) || undefined
         }

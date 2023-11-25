@@ -77,7 +77,7 @@ export default function UsersPage() {
     [onModalOpen],
   )
 
-  const additionDropdownItems = [
+  const additionalDropdownItems = [
     {
       key: 'update-role',
       onPress: handleOnUpdateRole,
@@ -100,13 +100,14 @@ export default function UsersPage() {
         columns={columns}
         timestamp={usersUpdatedAt}
         setTimestamp={setUsersUpdatedAt}
-        additionDropdownItems={additionDropdownItems}
+        additionalDropdownItems={additionalDropdownItems}
       />
       <ModalUpdateRole
         model={model}
         isOpen={isModalOpen}
         user={selectedUser}
         onClose={onModalClose}
+        sortDescriptor={sortDescriptor}
       />
     </>
   )

@@ -146,11 +146,11 @@ export class UsersService {
     return this.privateDeleteUserAccount(uid)
   }
 
-  async updateUserRole(uid: string, userDto: UpdateUserClaimsDto): Promise<void> {
+  async updateUserClaims(uid: string, userDto: UpdateUserClaimsDto): Promise<void> {
     const validDto = getValidDto(UpdateUserClaimsDto, userDto)
 
     try {
-      await getAuth().setCustomUserClaims(uid, { role: validDto.role })
+      await getAuth().setCustomUserClaims(uid, validDto)
       await getAuth().revokeRefreshTokens(uid)
     } catch (error) {
       throw new ServerError(error.message)

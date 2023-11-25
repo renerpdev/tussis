@@ -62,6 +62,6 @@ export class UsersController {
   @Roles('admin')
   @Patch(':uid/claims')
   async updateClaims(@Param('uid') uid: string, @Body() dto: UpdateUserClaimsDto) {
-    return this.usersService.updateUserRole(uid, dto)
+    return this.usersService.updateUserClaims(uid, dto)
   }
 }

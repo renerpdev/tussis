@@ -355,7 +355,7 @@ export default function ModalCreate<T>({
                 base: (field as UISelect).items.length === 0 ? 'opacity-30' : '',
                 trigger:
                   'min-h-unit-12 py-2 bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 dark:focus:ring-cyan-500',
-                popover: 'dark:bg-gray-800',
+                popoverContent: 'dark:bg-gray-800',
               }}
               renderValue={(items: SelectedItems<UISelectOption>) => {
                 return (

@@ -5,4 +5,5 @@ export type UserRole = 'admin' | 'editor' | 'supervisor'
 
 export type AuthUser = Pick<FirebaseIdToken, 'sub' | 'picture' | 'name' | 'email'> & {
   role?: UserRole
+  supervisedUid?: string
 }

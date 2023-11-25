@@ -84,14 +84,18 @@ export class IssuesService {
   }
 
   async getList(input: IssuesListInput, user: AuthUser): Promise<IssuesList> {
+    console.log('user', user)
     const validInput = getValidDto(IssuesListInput, input)
+
+    // if the user is a supervisor, then we get the issues of the supervised user
+    const supervisedUid = user.role === 'supervisor' ? user.supervisedUid : null
 
     return getPaginatedIssuesList<Issue, IssueDocument, IssueMedDocument, IssueSymptomDocument>({
       ...validInput,
       collection: this.issuesCollection,
       symptomsCollection: this.issuesSymptomsCollection,
       medsCollection: this.issuesMedsCollection,
-      uid: user.sub,
+      uid: supervisedUid || user.sub,
     })
   }
 

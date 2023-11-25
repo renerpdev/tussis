@@ -147,7 +147,7 @@ export const LineChart = () => {
               base: 'max-w-[200px]',
               trigger:
                 'bg-transparent  max-h-[40px] shadow-none text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:bg-gray-600 text-center inline-flex items-center dark:hover:text-white py-0',
-              popover: 'dark:bg-gray-800',
+              popoverContent: 'dark:bg-gray-800',
             }}
           >
             {period => (
