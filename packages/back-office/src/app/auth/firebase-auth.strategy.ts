@@ -1,30 +1,19 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import * as firebase from 'firebase-admin'
 import { ExtractJwt, Strategy } from 'passport-firebase-jwt'
-import { FirebaseAuthProvider } from './auth.providers'
-
-const MODE = process.env.ENV
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(Strategy, 'firebase-auth') {
   private defaultApp: any
 
-  constructor(@Inject(FirebaseAuthProvider) auth: any) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     })
-    if (MODE === 'development') {
-      if (auth.keyFilename) {
-        import(auth.keyFilename).then(serviceAccount => {
-          this.defaultApp = firebase.initializeApp({
-            credential: firebase.credential.cert(serviceAccount),
-          })
-        })
-      }
-    } else {
-      this.defaultApp = firebase.initializeApp()
-    }
+    this.defaultApp = firebase.initializeApp({
+      credential: firebase.credential.applicationDefault(),
+    })
   }
 
   async validate(token: string) {

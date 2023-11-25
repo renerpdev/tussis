@@ -1,5 +1,5 @@
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
-import firebaseApp from './firebase' // This is the Firebase object from the previous tutorial
+import firebaseApp from './firebase'
 
 const auth = getAuth(firebaseApp)
 auth.languageCode = 'es'

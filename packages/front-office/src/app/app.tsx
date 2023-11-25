@@ -50,7 +50,7 @@ const App = () => {
   useEffect(() => {
     getAuth().useDeviceLanguage()
 
-    const unsubscribe = getAuth().onAuthStateChanged(async user => {
+    const unsubscribe = getAuth().onAuthStateChanged(user => {
       if (!user) {
         setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
       }

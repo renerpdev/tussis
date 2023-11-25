@@ -13,7 +13,7 @@ import { FaGoogle } from 'react-icons/fa'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
-import auth from '../../auth/auth'
+import auth from '../../firebase/auth'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)

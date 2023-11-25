@@ -21,13 +21,7 @@ import { UsersModule } from './users/users.module'
       }),
       inject: [ConfigService],
     }),
-    AuthModule.forRoot({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        keyFilename: configService.get<string>('SA_KEY'),
-      }),
-      inject: [ConfigService],
-    }),
+    AuthModule,
     UsersModule,
   ],
   controllers: [],
