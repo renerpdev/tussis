@@ -1,4 +1,4 @@
-import { BaseEntity } from '../../../shared/types/base-entity'
+import { BaseEntity } from '../../../shared/types'
 import { Med } from '../../meds/entities/med.entity'
 import { Symptom } from '../../symptoms/entities/symptom.entity'
 

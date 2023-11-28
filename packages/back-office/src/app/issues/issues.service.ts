@@ -8,7 +8,12 @@ import { DocumentNotFoundError } from '../../shared/errors/document-not-found-er
 import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
 import { AuthUser } from '../../shared/types/auth.types'
-import { generatePdfTable, getPaginatedIssuesList, getValidDto } from '../../shared/utils'
+import {
+  generatePdfTable,
+  getIssuesReport,
+  getPaginatedIssuesList,
+  getValidDto,
+} from '../../shared/utils'
 import { Med } from '../meds/entities/med.entity'
 import { MedsService } from '../meds/meds.service'
 import { Symptom } from '../symptoms/entities/symptom.entity'
@@ -18,6 +23,7 @@ import { IssueMedDocument } from './documents/issues_meds.document'
 import { IssueSymptomDocument } from './documents/issues_symptoms.document'
 import { CreateIssueDto } from './dto/create-issue.dto'
 import { IssuesList, IssuesListInput } from './dto/get-all-issues.dto'
+import { IssuesReportInput, IssuesReportList } from './dto/get-issues-report.dto'
 import { UpdateIssueDto } from './dto/update-issue.dto'
 import { Issue } from './entities/issue.entity'
 
@@ -90,6 +96,19 @@ export class IssuesService {
     const supervisedUid = user.role === 'supervisor' ? user.supervisedUid : null
 
     return getPaginatedIssuesList<Issue, IssueDocument, IssueMedDocument, IssueSymptomDocument>({
+      ...validInput,
+      collection: this.issuesCollection,
+      symptomsCollection: this.issuesSymptomsCollection,
+      medsCollection: this.issuesMedsCollection,
+      uid: supervisedUid || user.sub,
+    })
+  }
+
+  async getReport(input: IssuesReportInput, user: AuthUser): Promise<IssuesReportList> {
+    const validInput = getValidDto(IssuesReportInput, input)
+    const supervisedUid = user.role === 'supervisor' ? user.supervisedUid : null
+
+    return getIssuesReport<IssueDocument, IssueMedDocument, IssueSymptomDocument>({
       ...validInput,
       collection: this.issuesCollection,
       symptomsCollection: this.issuesSymptomsCollection,

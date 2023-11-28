@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator'
 import { firestore } from 'firebase-admin'
+import QuerySnapshot = firestore.QuerySnapshot
+import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
 export const DEFAULT_PAGE_SIZE = 20
 export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD'
@@ -53,7 +55,21 @@ export abstract class PaginatedSnapshot<T> extends BasePagination {
    */
   hasMore: boolean
 
-  snapshot: firestore.QuerySnapshot<T>
+  snapshot: QuerySnapshot<T>
+}
+
+export abstract class PaginatedSnapshotList<C, M, S> extends BasePagination {
+  /*
+   * Total number of records existent in the store
+   */
+  total: number
+
+  /*
+   * Whether there are more records to be fetched
+   */
+  hasMore: boolean
+
+  snapshotList: [QueryDocumentSnapshot<C>, QuerySnapshot<M>, QuerySnapshot<S>][]
 }
 
 export class PaginatedListInput extends BasePagination {
