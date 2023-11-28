@@ -84,7 +84,6 @@ export class IssuesService {
   }
 
   async getList(input: IssuesListInput, user: AuthUser): Promise<IssuesList> {
-    console.log('user', user)
     const validInput = getValidDto(IssuesListInput, input)
 
     // if the user is a supervisor, then we get the issues of the supervised user

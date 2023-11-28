@@ -164,7 +164,10 @@ export default function ModalCreate<T>({
             field = {
               id: uuid(),
               items: fieldData as UISelectOption[],
-              value: (fieldValue?.map(({ id }: keyof T) => id) || []) as string[],
+              //TODO: not scalable, should be improved
+              value: (fieldValue?.map(
+                ({ id, symptomId, medId }: keyof T) => id || symptomId || medId,
+              ) || []) as string[],
               name: key,
               loading: (value as ModelKey).isLoading,
               errorMessage: [(value as ModelKey).error?.message as string, errorMessage]

@@ -135,7 +135,7 @@ export default function DataTable<T>({
           return (cellValue as T[keyof T][]).map((subItem: T[keyof T]) => (
             <Chip
               className="mx-1 my-1 border-cyan-600 border-1 bg-transparent text-cyan-600 dark:text-white dark:bg-cyan-600"
-              key={`${cellId}-${subItem.id}`}
+              key={`${cellId}-${subItem.id || subItem.symptomId || subItem.medId}`}
             >
               {subItem.name}
             </Chip>
