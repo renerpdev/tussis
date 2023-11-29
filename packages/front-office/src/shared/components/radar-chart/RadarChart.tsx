@@ -9,23 +9,56 @@ import {
 } from '@nextui-org/react'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
+import { useCookies } from 'react-cookie'
 import { HiChevronDown, HiChevronRight } from 'react-icons/hi'
+import { useQuery } from 'react-query'
 import { NavLink } from 'react-router-dom'
+import { TussisApi } from '../../../api'
+import { useStore } from '../../../app/useStore'
+import { ReportQueryParams } from '../../types'
+import { AUTH_COOKIE_NAME } from '../../utils/cookies'
 import { capitalize } from '../crud-screen/utils'
 
-const INITIAL_VISIBLE_FILTERS = ['2023', '2022', '2021', '2020', '2019']
-
-const filters: any[] = [
-  { name: '2018', uid: '2018' },
-  { name: '2019', uid: '2019' },
-  { name: '2020', uid: '2020' },
-  { name: '2021', uid: '2021' },
-  { name: '2022', uid: '2022' },
-  { name: '2023', uid: '2023' },
-]
-
 export const RadarChart = () => {
-  const [visibleFilters, setVisibleFilters] = useState<Selection>(new Set(INITIAL_VISIBLE_FILTERS))
+  const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt } = useStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const currentUser = useMemo(() => cookies.auth.user, [cookies])
+  const [visibleFilters, setVisibleFilters] = useState<Selection>(
+    new Set([new Date().getFullYear()]),
+  )
+
+  const { isFetching, data: response } = useQuery(
+    [
+      'issues/report',
+      'issues_per_year',
+      currentUser?.uid,
+      issuesUpdatedAt,
+      medsUpdatedAt,
+      symptomsUpdatedAt,
+    ],
+    () =>
+      TussisApi.get<unknown, ReportQueryParams>('issues/report', {
+        frequency: 'yearly',
+      }),
+  )
+
+  const filters: any[] = useMemo(() => {
+    const years = Object.keys(response?.data || {})
+      .map(year => ({ name: year, uid: year }))
+      .sort((a, b) => Number(a.uid) - Number(b.uid))
+    setVisibleFilters(new Set(years.map(year => year.uid)))
+    return years
+  }, [response?.data])
+
+  const series = useMemo<any>(
+    () => [
+      {
+        name: 'Issues',
+        data: [...visibleFilters].map((year: any) => response?.data?.[year]?.total || 0),
+      },
+    ],
+    [response?.data, visibleFilters],
+  )
 
   const options = useMemo<any>(
     () => ({
@@ -69,7 +102,7 @@ export const RadarChart = () => {
         show: false,
       },
       xaxis: {
-        categories: [...visibleFilters].sort((a, b) => Number(a) - Number(b)),
+        categories: [...visibleFilters],
         labels: {
           style: {
             fontSize: '14px',
@@ -104,17 +137,6 @@ export const RadarChart = () => {
         },
       },
     }),
-    [visibleFilters],
-  )
-
-  const series = useMemo<any>(
-    () => [
-      {
-        color: '#06B6D4',
-        name: 'Series 1',
-        data: [80, 50, 30, 40, 100, 20].slice(0, Array.from(visibleFilters).length),
-      },
-    ],
     [visibleFilters],
   )
 
@@ -165,7 +187,7 @@ export const RadarChart = () => {
         </div>
       </div>
 
-      {(options && series && (
+      {(!isFetching && options && series && (
         <Chart
           options={options}
           series={series}

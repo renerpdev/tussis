@@ -19,6 +19,11 @@ export interface BaseQueryParams {
   range?: string
 }
 
+export interface ReportQueryParams {
+  range?: string
+  frequency?: 'daily' | 'monthly' | 'yearly'
+}
+
 export interface PaginatedQueryResponse<T> {
   data: T[]
   total?: number

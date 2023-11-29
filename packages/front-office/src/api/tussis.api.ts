@@ -11,9 +11,9 @@ class TussisApi {
     this.axiosWrapper = axiosWrapper
   }
 
-  async get<T>(
+  async get<T, P>(
     endpoint: string,
-    params?: BaseQueryParams,
+    params?: P | BaseQueryParams,
     headers?: Headers,
   ): Promise<PaginatedQueryResponse<T>> {
     return this.axiosWrapper.get<BaseQueryParams, PaginatedQueryResponse<T>>(
