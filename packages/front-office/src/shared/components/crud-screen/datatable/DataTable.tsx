@@ -18,6 +18,7 @@ import {
 } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import React, { Dispatch, ReactElement, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { HiDotsVertical } from 'react-icons/hi'
 import { v4 as uuid } from 'uuid'
 import BottomContent, { BottomContentProps } from '../bottom-content/BottomContent'
@@ -62,6 +63,10 @@ export default function DataTable<T>({
   isExportPdfLoading,
   additionalDropdownItems = [],
 }: DataTableProps<T>) {
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+
   const headerColumns = useMemo(() => {
     if (visibleColumns === 'all') return columns
 
@@ -171,19 +176,19 @@ export default function DataTable<T>({
                     onPress={handleOnView(item)}
                     className="dark:hover:bg-cyan-600"
                   >
-                    View
+                    {tCrud('view')}
                   </DropdownItem>
                   <DropdownItem
                     onPress={handleOnEdit(item)}
                     className="dark:hover:bg-cyan-600"
                   >
-                    Edit
+                    {tCrud('edit')}
                   </DropdownItem>
                   <DropdownItem
                     onPress={handleOnDelete(item)}
                     className="dark:hover:bg-cyan-600"
                   >
-                    Delete
+                    {tCrud('delete')}
                   </DropdownItem>
                   {/* This code works, although it is a hijacking */}
                   {/* @ts-ignore */}
@@ -211,6 +216,7 @@ export default function DataTable<T>({
       handleOnView,
       renderParsedDate,
       renderParsedDateTime,
+      tCrud,
     ],
   )
 

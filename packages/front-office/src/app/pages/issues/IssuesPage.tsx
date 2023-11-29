@@ -3,22 +3,38 @@ import React, { useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery } from 'react-query'
 import { TussisApi } from '../../../api'
+import i18next from '../../../i18n'
 import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Issue } from '../../../shared/models'
 import { Column } from '../../../shared/types'
-import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 import { useStore } from '../../useStore'
 
 const INITIAL_VISIBLE_COLUMNS = ['date', 'symptoms', 'meds', 'actions']
 
 const columns: Column[] = [
-  { name: 'ID', uid: 'id', type: 'string', sortable: true },
-  { name: 'DATE', uid: 'date', type: 'date', sortable: true },
-  { name: 'SYMPTOMS', uid: 'symptoms', type: 'array' },
-  { name: 'MEDS', uid: 'meds', type: 'array' },
-  { name: 'NOTES', uid: 'notes', type: 'string', sortable: true },
-  { name: 'ACTIONS', uid: 'actions', type: 'action' },
+  {
+    name: i18next.t('components.data-table.columns.ID'),
+    uid: 'id',
+    type: 'string',
+    sortable: true,
+  },
+  {
+    name: i18next.t('components.data-table.columns.DATE'),
+    uid: 'date',
+    type: 'date',
+    sortable: true,
+  },
+  { name: i18next.t('components.data-table.columns.SYMPTOMS'), uid: 'symptoms', type: 'array' },
+  { name: i18next.t('components.data-table.columns.MEDS'), uid: 'meds', type: 'array' },
+  {
+    name: i18next.t('components.data-table.columns.NOTES'),
+    uid: 'notes',
+    type: 'string',
+    sortable: true,
+  },
+  { name: i18next.t('components.data-table.columns.ACTIONS'), uid: 'actions', type: 'action' },
 ]
 
 export default function IssuesPage() {

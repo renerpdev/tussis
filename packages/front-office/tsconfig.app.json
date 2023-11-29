@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["node", "vite/client"],
+    "resolveJsonModule": true,
     "baseUrl": "src",
     "paths": {
       "@/*": ["src/*"],

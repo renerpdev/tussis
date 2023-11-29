@@ -3,13 +3,14 @@ import { Chip, Spinner } from '@nextui-org/react'
 import { Avatar, DarkThemeToggle, Dropdown, Navbar as FNavbar } from 'flowbite-react'
 import { useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { HiLogout, HiMenu, HiTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
 import { useStore } from '../../../app/useStore'
-import { AUTH_COOKIE_NAME } from '../../utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../utils'
 
 export const Navbar = () => {
   const navigate = useNavigate()
@@ -17,6 +18,15 @@ export const Navbar = () => {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth?.user, [cookies])
   const userRole = useMemo(() => currentUser.role, [currentUser])
+  const { t: tNav } = useTranslation('translation', {
+    keyPrefix: 'components.navbar',
+  })
+  const { t: tProfile } = useTranslation('translation', {
+    keyPrefix: 'profile',
+  })
+  const { t: tApp } = useTranslation('translation', {
+    keyPrefix: 'app',
+  })
 
   const { mutateAsync: deleteUserAccount, isLoading: isLoadingDeleteUserAccount } = useMutation({
     mutationFn: async () => await TussisApi.delete(`users/remove-account`),
@@ -68,7 +78,7 @@ export const Navbar = () => {
         to="/"
       >
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white uppercase">
-          Tussis
+          {tApp('title')}
         </span>
       </FNavbar.Brand>
       <div className="flex md:order-2">
@@ -93,9 +103,6 @@ export const Navbar = () => {
                   {currentUser?.displayName && (
                     <span className="block text-sm capitalize">{currentUser?.displayName}</span>
                   )}
-                  {currentUser?.isAnonymous && (
-                    <span className="block text-sm capitalize">Anonymous</span>
-                  )}
                   {currentUser?.email && (
                     <span className="block truncate text-xs font-medium text-gray-600 dark:text-gray-300">
                       {currentUser?.email}
@@ -108,7 +115,7 @@ export const Navbar = () => {
                     size="sm"
                     className="text-xs capitalize"
                   >
-                    {userRole}
+                    {tProfile(`roles.${userRole.toLowerCase()}`)}
                   </Chip>
                 )}
               </div>
@@ -117,14 +124,14 @@ export const Navbar = () => {
               icon={HiTrash}
               onClick={handleRemoveAccount}
             >
-              Delete Account
+              {tNav('delete-account')}
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item
               icon={HiLogout}
               onClick={handleSignOut}
             >
-              Sign out
+              {tNav('logout')}
             </Dropdown.Item>
           </Dropdown>
         )}

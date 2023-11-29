@@ -1,0 +1,117 @@
+{
+  "app": {
+    "title": "Tussis"
+  },
+  "profile": {
+    "roles": {
+      "admin": "Administrador",
+      "editor": "Editor",
+      "supervisor": "Supervisor"
+    }
+  },
+  "filters": {
+    "Last 7 days": "Últimos 7 días",
+    "Last 30 days": "Últimos 30 días",
+    "Last 90 days": "Últimos 90 días",
+    "Last 6 months": "Últimos 6 meses",
+    "Last 12 months": "Últimos 12 meses"
+  },
+  "components": {
+    "line-chart": {
+      "cta-button": "Ver reporte"
+    },
+    "donut-chart": {
+      "title": "Incidencias por categoría",
+      "donut-label": "Incidencias totales",
+      "cta-button": "Ver reporte"
+    },
+    "area-chart": {
+      "subtitle": "Incidencias totales en los {{value}}",
+      "cta-button": "Ver reporte"
+    },
+    "radar-chart": {
+      "title": "Incidencias por años",
+      "cta-button": "Ver reporte",
+      "dropdown-label": "Años"
+    },
+    "sidebar": {
+      "dashboard": "Tablero",
+      "issues": "Incidencias",
+      "symptoms": "Síntomas",
+      "meds": "Medicamentos",
+      "users": "Usuarios"
+    },
+    "navbar": {
+      "delete-account": "Eliminar cuenta",
+      "logout": "Cerrar sesión"
+    },
+    "data-table": {
+      "columns": {
+        "DATE": "Fecha",
+        "ID": "ID",
+        "UID": "UID",
+        "NOTES": "Notas",
+        "MEDS": "Medicamentos",
+        "SYMPTOMS": "Síntomas",
+        "NAME": "Nombre",
+        "DISPLAY NAME": "Nombre",
+        "PASSWORD": "Contraseña",
+        "PHOTO URL": "URL de foto",
+        "DESC": "Descripción",
+        "ROLE": "Rol",
+        "AVATAR": "Avatar",
+        "EMAIL": "Correo electrónico",
+        "DISABLED": "Deshabilitado",
+        "EMAIL VERIFIED": "Email verificado",
+        "LAST LOGIN": "Descripción",
+        "ACTIONS": "Acciones"
+      }
+    }
+  },
+  "pages": {
+    "login": {
+      "welcome": "Bienvenido a <span class=\"text-cyan-800 dark:text-cyan-600\">TUSSIS</span>",
+      "title": "Iniciar sesión",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "login-button": "Iniciar sesión"
+    },
+    "crud": {
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "search": "Buscar",
+      "close": "Cerrar",
+      "create": "Crear",
+      "create-new": "Crear Nuevo",
+      "delete": "Eliminar",
+      "view": "Ver",
+      "update-role": "Actualizar rol",
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "columns-dropdown": "Columnas",
+      "rows-per-page": "Filas por página:",
+      "total-items": "Total {{value}} elementos",
+      "delete-confirmation": "¿Estás seguro de que deseas eliminar este registro?",
+      "delete-confirmation-title": "Confirmación de eliminación",
+      "delete-success": "Registro eliminado correctamente",
+      "create-success": "Registro creado correctamente",
+      "update-success": "Registro actualizado correctamente",
+      "forms": {
+        "input": {
+          "placeholder": {
+            "generic": "Ingrese su {{value}} aquí",
+            "empty-password": "Deje en blanco para no cambiar la contraseña",
+            "select-from-list": "Seleccione aquí los {{value}}"
+          },
+          "description": {
+            "min-length": "Debe tener al menos {{length}} caracteres",
+            "strong-password": "Debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial",
+            "valid-email": "Debe ser un correo electrónico válido",
+            "valid-url": "Debe ser una URL válida"
+          }
+        }
+      }
+    }
+  }
+}

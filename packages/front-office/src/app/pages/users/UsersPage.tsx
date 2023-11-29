@@ -1,5 +1,7 @@
 import { SortDescriptor, useDisclosure } from '@nextui-org/react'
 import React, { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18next from '../../../i18n'
 import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel } from '../../../shared/models'
@@ -11,15 +13,38 @@ import ModalUpdateRole from './modal-update-role/ModalUpdateRole'
 const INITIAL_VISIBLE_COLUMNS = ['photoUrl', 'displayName', 'email', 'role', 'actions']
 
 const columns: Column[] = [
-  { name: 'UID', uid: 'uid', type: 'string', sortable: true },
-  { name: 'AVATAR', uid: 'photoUrl', type: 'picture' },
-  { name: 'NAME', uid: 'displayName', type: 'string', sortable: true },
-  { name: 'EMAIL', uid: 'email', type: 'string', sortable: true },
-  { name: 'ROLE', uid: 'role', type: 'string' },
-  { name: 'DISABLED', uid: 'disabled', type: 'boolean' },
-  { name: 'LAST LOGIN', uid: 'lastLoginAt', type: 'datetime' },
-  { name: 'EMAIL VERIFIED', uid: 'emailVerified', type: 'boolean' },
-  { name: 'ACTIONS', uid: 'actions', type: 'action' },
+  {
+    name: i18next.t('components.data-table.columns.UID'),
+    uid: 'uid',
+    type: 'string',
+    sortable: true,
+  },
+  { name: i18next.t('components.data-table.columns.AVATAR'), uid: 'photoUrl', type: 'picture' },
+  {
+    name: i18next.t('components.data-table.columns.NAME'),
+    uid: 'displayName',
+    type: 'string',
+    sortable: true,
+  },
+  {
+    name: i18next.t('components.data-table.columns.EMAIL'),
+    uid: 'email',
+    type: 'string',
+    sortable: true,
+  },
+  { name: i18next.t('components.data-table.columns.ROLE'), uid: 'role', type: 'string' },
+  { name: i18next.t('components.data-table.columns.DISABLED'), uid: 'disabled', type: 'boolean' },
+  {
+    name: i18next.t('components.data-table.columns.LAST LOGIN'),
+    uid: 'lastLoginAt',
+    type: 'datetime',
+  },
+  {
+    name: i18next.t('components.data-table.columns.EMAIL VERIFIED'),
+    uid: 'emailVerified',
+    type: 'boolean',
+  },
+  { name: i18next.t('components.data-table.columns.ACTIONS'), uid: 'actions', type: 'action' },
 ]
 
 export default function UsersPage() {
@@ -31,6 +56,9 @@ export default function UsersPage() {
   const [page, setPage] = React.useState(1)
   const { usersUpdatedAt, setUsersUpdatedAt } = useStore()
   const [selectedUser, setSelectedUser] = React.useState<User | undefined>(undefined)
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
 
   const model: CrudModel<User> = {
     create: {
@@ -82,7 +110,7 @@ export default function UsersPage() {
       key: 'update-role',
       onPress: handleOnUpdateRole,
       className: 'dark:hover:bg-cyan-600',
-      children: 'Update role',
+      children: tCrud('update-role'),
     },
   ]
 

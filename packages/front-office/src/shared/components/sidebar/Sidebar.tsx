@@ -1,15 +1,17 @@
 import { useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { HiChartPie, HiInbox, HiUsers, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
 import { useStore } from '../../../app/useStore'
+import i18next from '../../../i18n'
 import { AUTH_COOKIE_NAME } from '../../utils'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: boolean }[] = [
   {
     route: 'dashboard',
-    value: 'Dashboard',
+    value: i18next.t('components.sidebar.dashboard'),
     icon: HiChartPie,
     isPublic: true,
   },
@@ -18,7 +20,7 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
 const ADMIN_ITEMS = [
   {
     route: 'users',
-    value: 'Users',
+    value: i18next.t('components.sidebar.users'),
     icon: HiUsers,
   },
 ]
@@ -26,17 +28,17 @@ const ADMIN_ITEMS = [
 const EDITOR_ITEMS = [
   {
     route: 'issues',
-    value: 'Issues',
+    value: i18next.t('components.sidebar.issues'),
     icon: HiViewBoards,
   },
   {
     route: 'symptoms',
-    value: 'Symptoms',
+    value: i18next.t('components.sidebar.symptoms'),
     icon: HiInbox,
   },
   {
     route: 'meds',
-    value: 'Meds',
+    value: i18next.t('components.sidebar.meds'),
     icon: HiInbox,
   },
 ]
@@ -47,6 +49,9 @@ export function Sidebar() {
   const currentUser = useMemo(() => cookies.auth?.user, [cookies])
   const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
   const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'components.sidebar',
+  })
 
   const handleSidebarVisibility = useCallback(() => {
     setSidebarOpen(!sidebarOpen)

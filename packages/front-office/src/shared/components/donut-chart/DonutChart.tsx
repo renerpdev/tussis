@@ -2,21 +2,15 @@ import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { HiChevronRight } from 'react-icons/hi'
 import { useQuery } from 'react-query'
 import { NavLink } from 'react-router-dom'
 import { TussisApi } from '../../../api'
 import { useStore } from '../../../app/useStore'
+import { PERIOD_FILTERS } from '../../constants'
 import { ReportQueryParams } from '../../types'
 import { AUTH_COOKIE_NAME, DateRange, formatNumberValue } from '../../utils'
-
-export const periods = [
-  { label: 'Last 7 days', value: 'last_7_days' },
-  { label: 'Last 30 days', value: 'last_30_days' },
-  { label: 'Last 90 days', value: 'last_90_days' },
-  { label: 'Last 6 months', value: 'last_6_months' },
-  { label: 'Last year', value: 'last_year' },
-]
 
 const INITIAL_FILTER = 'last_7_days'
 
@@ -29,6 +23,9 @@ export const DonutChart = () => {
     () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
     [cookies.auth?.user.role],
   )
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'components.donut-chart',
+  })
 
   const range = useMemo(
     () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
@@ -105,7 +102,7 @@ export const DonutChart = () => {
               total: {
                 showAlways: true,
                 show: true,
-                label: 'Total Issues',
+                label: t('donut-label'),
                 fontFamily: 'Inter, sans-serif',
                 formatter: function () {
                   return formatNumberValue(response?.total || 0)
@@ -160,7 +157,7 @@ export const DonutChart = () => {
       <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
           <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pr-1">
-            Issues per category
+            {t('title')}
           </h5>
         </div>
       </div>
@@ -181,7 +178,7 @@ export const DonutChart = () => {
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-600 justify-between mt-auto">
         <div className="flex justify-between items-center pt-5">
           <Select
-            items={periods}
+            items={PERIOD_FILTERS}
             placeholder="Select a period"
             isLoading={false}
             selectedKeys={selectedFilter}
@@ -208,7 +205,7 @@ export const DonutChart = () => {
               to="/issues"
               className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
             >
-              Issues Report
+              {t('cta-button')}
               <HiChevronRight className="w-5 h-5 ml-1" />
             </NavLink>
           )}

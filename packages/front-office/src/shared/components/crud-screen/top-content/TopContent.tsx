@@ -9,6 +9,7 @@ import {
   Spinner,
 } from '@nextui-org/react'
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 import { HiChevronDown, HiPlus, HiSave, HiSearch } from 'react-icons/hi'
 import { Column } from '../../../types'
 import { capitalize } from '../utils'
@@ -42,13 +43,17 @@ export default function TopContent({
   onRowsPerPageChange,
   isExportPdfLoading,
 }: TopContentProps) {
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between gap-3 items-end flex-col sm:flex-row">
         {
           <Input
             isClearable
-            placeholder="Search by name..."
+            placeholder={tCrud('search')}
             startContent={<HiSearch className="h-4 w-4" />}
             value={filterValue}
             onClear={onClear}
@@ -73,7 +78,7 @@ export default function TopContent({
                 variant="flat"
                 style={{ zIndex: 9 }}
               >
-                Columns
+                {tCrud('columns-dropdown')}
               </Button>
             </DropdownTrigger>
             <DropdownMenu
@@ -99,7 +104,7 @@ export default function TopContent({
             onPress={onModalCreateOpen}
             className="bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            <span className={'hidden md:flex'}>Add New</span>
+            <span className={'hidden md:flex'}>{tCrud('create-new')}</span>
           </Button>
           {onExportTableData && (
             <Button
@@ -124,10 +129,10 @@ export default function TopContent({
       </div>
       <div className="flex justify-between items-center">
         <span className="text-default-400 text-small dark:text-white">
-          Total {totalItems} items
+          {tCrud('total-items', { value: totalItems })}
         </span>
         <label className="flex items-center text-default-400 text-small dark:text-white">
-          Rows per page:
+          {tCrud('rows-per-page')}
           <select
             className="bg-transparent outline-none text-default-400 text-small dark:text-white"
             onChange={onRowsPerPageChange}

@@ -1,5 +1,6 @@
 import { Button, Pagination } from '@nextui-org/react'
 import { Dispatch, SetStateAction } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface BottomContentProps {
   totalPages: number
@@ -16,6 +17,10 @@ const BottomContent = ({
   onPreviousPage,
   onNextPage,
 }: BottomContentProps) => {
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+
   return totalPages > 0 ? (
     <div className="py-2 px-2 flex justify-between items-center">
       <Pagination
@@ -40,7 +45,7 @@ const BottomContent = ({
           variant="flat"
           onPress={onPreviousPage}
         >
-          Previous
+          {tCrud('previous')}
         </Button>
         <Button
           isDisabled={totalPages === currentPage}
@@ -48,7 +53,7 @@ const BottomContent = ({
           variant="flat"
           onPress={onNextPage}
         >
-          Next
+          {tCrud('next')}
         </Button>
       </div>
     </div>

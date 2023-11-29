@@ -1,5 +1,6 @@
 import { SortDescriptor } from '@nextui-org/react'
 import React from 'react'
+import i18next from '../../../i18n'
 import { CrudScreen } from '../../../shared/components'
 import { DEFAULT_ITEMS_PER_PAGE } from '../../../shared/constants'
 import { CrudModel, Symptom } from '../../../shared/models'
@@ -9,10 +10,25 @@ import { useStore } from '../../useStore'
 const INITIAL_VISIBLE_COLUMNS = ['name', 'desc', 'actions']
 
 const columns: Column[] = [
-  { name: 'ID', uid: 'id', type: 'string', sortable: true },
-  { name: 'NAME', uid: 'name', type: 'string', sortable: true },
-  { name: 'DESC', uid: 'desc', type: 'string', sortable: true },
-  { name: 'ACTIONS', uid: 'actions', type: 'action' },
+  {
+    name: i18next.t('components.data-table.columns.ID'),
+    uid: 'id',
+    type: 'string',
+    sortable: true,
+  },
+  {
+    name: i18next.t('components.data-table.columns.NAME'),
+    uid: 'name',
+    type: 'string',
+    sortable: true,
+  },
+  {
+    name: i18next.t('components.data-table.columns.DESC'),
+    uid: 'desc',
+    type: 'string',
+    sortable: true,
+  },
+  { name: i18next.t('components.data-table.columns.ACTIONS'), uid: 'actions', type: 'action' },
 ]
 
 export default function SymptomsPage() {

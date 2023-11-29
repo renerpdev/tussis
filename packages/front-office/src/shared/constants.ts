@@ -1,17 +1,19 @@
+import i18next from '../i18n'
+
 export const DEFAULT_ITEMS_PER_PAGE = 10
 
 export const PERIOD_FILTERS = [
-  { label: 'Last 7 days', value: 'last_7_days' },
-  { label: 'Last 30 days', value: 'last_30_days' },
-  { label: 'Last 90 days', value: 'last_90_days' },
-  { label: 'Last 6 months', value: 'last_6_months' },
-  { label: 'Last year', value: 'last_year' },
+  { label: i18next.t('filters.Last 7 days'), value: 'last_7_days' },
+  { label: i18next.t('filters.Last 30 days'), value: 'last_30_days' },
+  { label: i18next.t('filters.Last 90 days'), value: 'last_90_days' },
+  { label: i18next.t('filters.Last 6 months'), value: 'last_6_months' },
+  { label: i18next.t('filters.Last 12 months'), value: 'last_12_months' },
 ]
 
 export const PERIOD_NAMES = {
-  last_7_days: 'Last 7 days',
-  last_30_days: 'Last 30 days',
-  last_90_days: 'Last 90 days',
-  last_6_months: 'Last 6 months',
-  last_year: 'Last year',
+  last_7_days: i18next.t('filters.Last 7 days'),
+  last_30_days: i18next.t('filters.Last 30 days'),
+  last_90_days: i18next.t('filters.Last 90 days'),
+  last_6_months: i18next.t('filters.Last 6 months'),
+  last_12_months: i18next.t('filters.Last 12 months'),
 }

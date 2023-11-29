@@ -9,10 +9,11 @@ import {
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { FaGoogle } from 'react-icons/fa'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 import auth from '../../firebase/auth'
 
 export default function LoginPage() {
@@ -21,6 +22,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [, setCookie] = useCookies([AUTH_COOKIE_NAME])
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'pages.login',
+  })
 
   const updateCookie = useCallback(
     (user: User, tokenResult: IdTokenResult) => {
@@ -82,11 +86,14 @@ export default function LoginPage() {
       style={{ minHeight: '100vh' }}
     >
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
-        Welcome to <span className="text-cyan-800 dark:text-cyan-600">TUSSIS</span>
+        {/* this is just to load Tailwind classnames */}
+        <span className="text-cyan-800 dark:text-cyan-600 d-none" />
+        {/* end */}
+        <div dangerouslySetInnerHTML={{ __html: t('welcome') }} />
       </h1>
       <div className="py-8 px-6 border-cyan-600 border-1 shadow-lg shadow-cyan-200 bg-white dark:bg-transparent w-full max-w-[20rem] flex flex-col items-center justify-center">
         <h2 className="mb-4 text-xl md:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
-          Login Page
+          {t('title')}
         </h2>
         <div className="w-full flex flex-col gap-3">
           <Input
@@ -94,7 +101,7 @@ export default function LoginPage() {
             autoFocus
             type="email"
             onValueChange={setEmail}
-            label="Email"
+            label={t('email')}
             classNames={{
               inputWrapper: 'dark:bg-gray-500',
               input: 'focus:ring-transparent dark:focus:ring-transparent',
@@ -103,7 +110,7 @@ export default function LoginPage() {
           <Input
             id="pass"
             onValueChange={setPassword}
-            label="Password"
+            label={t('password')}
             classNames={{
               inputWrapper: 'dark:bg-gray-500',
               input: 'focus:ring-transparent dark:focus:ring-transparent',
@@ -128,7 +135,7 @@ export default function LoginPage() {
             type="submit"
             onClick={handleUserPassLogin}
           >
-            Iniciar
+            {t('login-button')}
           </Button>
         </div>
         <div className="h-2 border-b-1 border-b-cyan-800 border-dashed opacity-40 w-full my-5 d-block" />

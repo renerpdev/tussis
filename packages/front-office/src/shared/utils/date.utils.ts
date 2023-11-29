@@ -15,5 +15,5 @@ export const DateRange = {
   last_90_days: `${last90DaysDate}:${todayDate}`,
   last_4_months: `${lastQuarterDate}:${todayDate}`,
   last_6_months: `${lastSemesterDate}:${todayDate}`,
-  last_year: `${lastYearDate}:${todayDate}`,
+  last_12_months: `${lastYearDate}:${todayDate}`,
 }

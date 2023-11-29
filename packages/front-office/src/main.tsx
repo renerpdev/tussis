@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './app/app'
+import './i18n'
 
 dayjs.locale('es')
 dayjs.extend(relativeTime)

@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { HiChevronRight } from 'react-icons/hi'
 import { useQuery } from 'react-query'
 import { NavLink } from 'react-router-dom'
@@ -23,6 +24,9 @@ export const AreaChart = () => {
     [cookies.auth?.user.role],
   )
   const [selectedFilter, setSelectedFilter] = useState<Selection>(new Set([INITIAL_FILTER]))
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'components.area-chart',
+  })
 
   const range = useMemo(
     () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
@@ -185,7 +189,9 @@ export const AreaChart = () => {
             {formatNumberValue(response?.total || 0)}
           </h5>
           <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-            Total Issues from {PERIOD_NAMES[selectedFilter.currentKey || INITIAL_FILTER]}
+            {t('subtitle', {
+              value: PERIOD_NAMES[selectedFilter.currentKey || INITIAL_FILTER].toLowerCase(),
+            })}
           </p>
         </div>
       </div>
@@ -231,7 +237,7 @@ export const AreaChart = () => {
               to="/issues"
               className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
             >
-              Issues Report
+              {t('cta-button')}
               <HiChevronRight className="w-5 h-5 ml-1" />
             </NavLink>
           )}

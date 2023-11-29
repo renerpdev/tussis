@@ -18,6 +18,7 @@ import {
 import dayjs from 'dayjs'
 import { Datepicker } from 'flowbite-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { HiPencil, HiPlus } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { v4 as uuid } from 'uuid'
@@ -63,6 +64,12 @@ export default function ModalCreate<T>({
     new Map(Object.entries({})),
   )
   const [, setTimestamp] = useState(0) // this is just a workaround to force a re-render
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+  const { t: tTable } = useTranslation('translation', {
+    keyPrefix: 'components.data-table',
+  })
 
   const createMutation = useMutation({
     mutationFn: async (data: T) => {
@@ -97,16 +104,15 @@ export default function ModalCreate<T>({
           currentValue !== undefined ? currentValue : editData?.[key as keyof typeof editData]
 
         const errorMessage = validationErrors.get(key)?.join(', ')
-        const normalizedKey = removeCamelCase(key)
-        const placeholder = `Enter the ${normalizedKey} here`
-        const label = removeCamelCase(key)
+        const normalizedKey = tTable('columns.' + removeCamelCase(key))
+        const placeholder = tCrud(`forms.input.placeholder.generic`, { value: normalizedKey })
+        const label = normalizedKey
 
         const descriptionMap: Record<typeof fieldType, string | undefined> = {
-          text: 'Must contain at least 3 characters',
-          password:
-            'Must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character',
-          email: 'Must be a valid email address',
-          url: 'Must be a valid URL',
+          text: tCrud('forms.input.description.min-length', { length: 3 }),
+          password: tCrud('forms.input.description.strong-password'),
+          email: tCrud('forms.input.description.valid-email'),
+          url: tCrud('forms.input.description.valid-url'),
           textarea: undefined,
           datepicker: undefined,
           select: undefined,
@@ -132,7 +138,7 @@ export default function ModalCreate<T>({
               name: key,
               placeholder:
                 editMode && fieldType === 'password'
-                  ? 'Leave empty to keep the same password'
+                  ? tCrud('forms.input.placeholder.empty-password')
                   : placeholder,
               label,
               title: label,
@@ -173,7 +179,9 @@ export default function ModalCreate<T>({
               errorMessage: [(value as ModelKey).error?.message as string, errorMessage]
                 .filter(msg => msg)
                 .join(', '),
-              placeholder: `Select the ${removeCamelCase(key)} from the list`,
+              placeholder: tCrud('forms.input.placeholder.select-from-list', {
+                value: label,
+              }),
               label,
               type: fieldType,
             } as UISelect
@@ -223,9 +231,10 @@ export default function ModalCreate<T>({
     formValues,
     editData,
     validationErrors,
-    removeCamelCase,
+    tCrud,
     fieldValues,
     editMode,
+    removeCamelCase,
   ])
 
   useEffect(() => {
@@ -476,7 +485,7 @@ export default function ModalCreate<T>({
         {onClose => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {editMode ? 'Edit' : 'Add New'}
+              {editMode ? tCrud('edit') : tCrud('create-new')}
             </ModalHeader>
             <ModalBody>
               {(fields.length > 0 && (
@@ -494,7 +503,7 @@ export default function ModalCreate<T>({
                   variant="light"
                   onPress={onClose}
                 >
-                  Close
+                  {tCrud('close')}
                 </Button>
                 <Button
                   className="bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50"
@@ -502,7 +511,8 @@ export default function ModalCreate<T>({
                   disabled={formValues.size === 0}
                   isLoading={createMutation.isLoading || updateMutation.isLoading}
                 >
-                  {editMode ? 'Edit' : 'Add'} {editMode ? <HiPencil /> : <HiPlus />}{' '}
+                  {editMode ? tCrud('edit') : tCrud('create')}{' '}
+                  {editMode ? <HiPencil /> : <HiPlus />}{' '}
                 </Button>
               </ModalFooter>
             )}

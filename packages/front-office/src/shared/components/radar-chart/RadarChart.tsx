@@ -10,6 +10,7 @@ import {
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { HiChevronDown, HiChevronRight } from 'react-icons/hi'
 import { useQuery } from 'react-query'
 import { NavLink } from 'react-router-dom'
@@ -30,6 +31,9 @@ export const RadarChart = () => {
   const [visibleFilters, setVisibleFilters] = useState<Selection>(
     new Set([new Date().getFullYear()]),
   )
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'components.radar-chart',
+  })
 
   const { isFetching, data: response } = useQuery(
     [
@@ -149,7 +153,7 @@ export const RadarChart = () => {
       <div className="flex justify-between">
         <div>
           <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pr-1">
-            Issues per year
+            {t('title')}
           </h5>
         </div>
         <div>
@@ -167,7 +171,7 @@ export const RadarChart = () => {
                 className="px-3 py-2 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100  focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                 isLoading={false}
               >
-                Años
+                {t('dropdown-label')}
               </Button>
             </DropdownTrigger>
             <DropdownMenu
@@ -212,7 +216,7 @@ export const RadarChart = () => {
               to="/issues"
               className="ml-auto uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
             >
-              Issues Report
+              {t('cta-button')}
               <HiChevronRight className="w-5 h-5 ml-1" />
             </NavLink>
           </div>
