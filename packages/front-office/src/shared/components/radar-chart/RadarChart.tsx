@@ -16,7 +16,7 @@ import { NavLink } from 'react-router-dom'
 import { TussisApi } from '../../../api'
 import { useStore } from '../../../app/useStore'
 import { ReportQueryParams } from '../../types'
-import { AUTH_COOKIE_NAME } from '../../utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../utils'
 import { capitalize } from '../crud-screen/utils'
 
 export const RadarChart = () => {

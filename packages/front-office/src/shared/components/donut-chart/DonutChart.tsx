@@ -1,18 +1,69 @@
-import { Select, SelectItem, Spinner } from '@nextui-org/react'
-import { useMemo } from 'react'
+import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
+import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
+import { useCookies } from 'react-cookie'
 import { HiChevronRight } from 'react-icons/hi'
+import { useQuery } from 'react-query'
 import { NavLink } from 'react-router-dom'
+import { TussisApi } from '../../../api'
+import { useStore } from '../../../app/useStore'
+import { ReportQueryParams } from '../../types'
+import { AUTH_COOKIE_NAME, DateRange, formatNumberValue } from '../../utils'
 
 export const periods = [
-  { label: 'This week', value: 'last_7_days' },
+  { label: 'Last 7 days', value: 'last_7_days' },
   { label: 'Last 30 days', value: 'last_30_days' },
   { label: 'Last 90 days', value: 'last_90_days' },
   { label: 'Last 6 months', value: 'last_6_months' },
   { label: 'Last year', value: 'last_year' },
 ]
 
+const INITIAL_FILTER = 'last_7_days'
+
 export const DonutChart = () => {
+  const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt } = useStore()
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const currentUser = useMemo(() => cookies.auth.user, [cookies])
+  const [selectedFilter, setSelectedFilter] = useState<Selection>(new Set([INITIAL_FILTER]))
+
+  const range = useMemo(
+    () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
+    [selectedFilter],
+  )
+
+  const { isFetching, data: response } = useQuery(
+    [
+      'issues/report',
+      selectedFilter.currentKey || INITIAL_FILTER,
+      currentUser?.uid,
+      issuesUpdatedAt,
+      medsUpdatedAt,
+      symptomsUpdatedAt,
+    ],
+    () =>
+      TussisApi.get<unknown, ReportQueryParams>('issues/report', {
+        frequency: 'yearly',
+        range,
+      }),
+  )
+
+  const symptoms: { name: string; total: number }[] = useMemo(() => {
+    const symptomsMap = new Map<string, number>()
+
+    Object.keys(response?.data || {}).forEach(key => {
+      const symptoms = response?.data[key].symptoms
+      Object.entries(symptoms)?.forEach(([name, total]) => {
+        symptomsMap.set(name, (symptomsMap.get(name) || 0) + Number(total))
+      })
+    })
+
+    return Array.from(symptomsMap.entries()).map(([name, total]) => ({ name, total }))
+  }, [response?.data])
+
+  const series = useMemo<any>(() => {
+    return symptoms.map(({ name, total }) => total)
+  }, [symptoms])
+
   const options = useMemo<any>(
     () => ({
       colors: ['#794eef', '#16BDCA', '#FDBA8C', '#E74694'],
@@ -44,16 +95,14 @@ export const DonutChart = () => {
                   const sum = w.globals.seriesTotals.reduce((a, b) => {
                     return a + b
                   }, 0)
-                  return `${sum}k`
+                  return formatNumberValue(sum)
                 },
               },
               value: {
                 show: true,
                 fontFamily: 'Inter, sans-serif',
                 offsetY: -20,
-                formatter: function (value) {
-                  return value + 'k'
-                },
+                formatter: formatNumberValue,
               },
             },
             size: '80%',
@@ -65,7 +114,7 @@ export const DonutChart = () => {
           top: -2,
         },
       },
-      labels: ['Tos', 'Fiebre', 'Prednisolin', 'Despertar'],
+      labels: symptoms.map(({ name }) => name),
       dataLabels: {
         enabled: false,
       },
@@ -75,16 +124,12 @@ export const DonutChart = () => {
       },
       yaxis: {
         labels: {
-          formatter: function (value) {
-            return value + 'k'
-          },
+          formatter: formatNumberValue,
         },
       },
       xaxis: {
         labels: {
-          formatter: function (value) {
-            return value + 'k'
-          },
+          formatter: formatNumberValue,
         },
         axisTicks: {
           show: false,
@@ -94,12 +139,8 @@ export const DonutChart = () => {
         },
       },
     }),
-    [],
+    [symptoms],
   )
-
-  const series = useMemo<any>(() => {
-    return [35.1, 23.5, 2.4, 5.4]
-  }, [])
 
   return (
     <div className="w-full bg-white rounded-lg shadow-lg dark:bg-gray-700 p-4 md:p-6 border-1 dark:border-transparent flex flex-col justify-between gap-4">
@@ -111,7 +152,7 @@ export const DonutChart = () => {
         </div>
       </div>
 
-      {(options && series && (
+      {(!isFetching && options && series && (
         <Chart
           options={options}
           series={series}
@@ -130,7 +171,8 @@ export const DonutChart = () => {
             items={periods}
             placeholder="Select a period"
             isLoading={false}
-            defaultSelectedKeys={['last_7_days']}
+            selectedKeys={selectedFilter}
+            onSelectionChange={setSelectedFilter}
             disallowEmptySelection
             classNames={{
               base: 'max-w-[200px]',
