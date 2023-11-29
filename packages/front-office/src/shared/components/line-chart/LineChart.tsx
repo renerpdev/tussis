@@ -15,6 +15,18 @@ export const periods = [
 export const LineChart = () => {
   const options = useMemo<any>(
     () => ({
+      colors: [
+        '#794eef',
+        '#16BDCA',
+        '#FDBA8C',
+        '#E74694',
+        '#e746df',
+        '#5b46e7',
+        '#c4e746',
+        '#e78446',
+        '#4686e7',
+        '#6a2393',
+      ],
       chart: {
         animations: {
           enabled: true,
@@ -95,12 +107,12 @@ export const LineChart = () => {
       {
         name: 'Current Period',
         data: [6500, 4523, 6456, 4896, 6356, 4523],
-        color: 'rgb(8, 145, 178)',
+        // color: 'rgb(8, 145, 178)',
       },
       {
         name: 'Previous Period',
         data: [1000, 2540, 4000, 2354, 3250, 6456],
-        color: 'rgb(8, 100, 200)',
+        // color: 'rgb(8, 100, 200)',
       },
     ],
     [],

@@ -39,11 +39,13 @@ export class IssuesController {
   }
 
   @Get()
+  @Roles('admin', 'editor', 'supervisor')
   getList(@Query() input: IssuesListInput, @Req() req: Request) {
     return this.issuesService.getList(input, req.user as AuthUser)
   }
 
   @Get('report')
+  @Roles('admin', 'editor', 'supervisor')
   getReport(@Query() input: IssuesReportInput, @Req() req: Request) {
     return this.issuesService.getReport(input, req.user as AuthUser)
   }
@@ -55,7 +57,7 @@ export class IssuesController {
     },
   })
   @ApiProduces('application/pdf')
-  @Roles('admin', 'editor')
+  @Roles('admin', 'editor', 'supervisor')
   @Get('export/pdf')
   @Header('Content-Type', 'application/pdf')
   @Header('Content-Disposition', 'attachment; filename="tussis-report.pdf"')

@@ -4,7 +4,7 @@ import { HiChartPie, HiInbox, HiUsers, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
 import { useStore } from '../../../app/useStore'
-import { AUTH_COOKIE_NAME } from '../../utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../utils'
 
 const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: boolean }[] = [
   {

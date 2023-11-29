@@ -25,6 +25,10 @@ export const DonutChart = () => {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth.user, [cookies])
   const [selectedFilter, setSelectedFilter] = useState<Selection>(new Set([INITIAL_FILTER]))
+  const isAdminOrEditor = useMemo(
+    () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
+    [cookies.auth?.user.role],
+  )
 
   const range = useMemo(
     () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
@@ -34,7 +38,8 @@ export const DonutChart = () => {
   const { isFetching, data: response } = useQuery(
     [
       'issues/report',
-      selectedFilter.currentKey || INITIAL_FILTER,
+      'yearly',
+      range,
       currentUser?.uid,
       issuesUpdatedAt,
       medsUpdatedAt,
@@ -66,7 +71,18 @@ export const DonutChart = () => {
 
   const options = useMemo<any>(
     () => ({
-      colors: ['#794eef', '#16BDCA', '#FDBA8C', '#E74694'],
+      colors: [
+        '#794eef',
+        '#16BDCA',
+        '#FDBA8C',
+        '#E74694',
+        '#e746df',
+        '#5b46e7',
+        '#c4e746',
+        '#e78446',
+        '#4686e7',
+        '#6a2393',
+      ],
       chart: {
         height: '100%',
         width: '100%',
@@ -91,11 +107,8 @@ export const DonutChart = () => {
                 show: true,
                 label: 'Total Issues',
                 fontFamily: 'Inter, sans-serif',
-                formatter: function (w) {
-                  const sum = w.globals.seriesTotals.reduce((a, b) => {
-                    return a + b
-                  }, 0)
-                  return formatNumberValue(sum)
+                formatter: function () {
+                  return formatNumberValue(response?.total || 0)
                 },
               },
               value: {
@@ -139,7 +152,7 @@ export const DonutChart = () => {
         },
       },
     }),
-    [symptoms],
+    [response?.total, symptoms],
   )
 
   return (
@@ -147,7 +160,7 @@ export const DonutChart = () => {
       <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
           <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pr-1">
-            Issues by category
+            Issues per category
           </h5>
         </div>
       </div>
@@ -190,13 +203,15 @@ export const DonutChart = () => {
               </SelectItem>
             )}
           </Select>
-          <NavLink
-            to="/issues"
-            className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
-          >
-            Issues Report
-            <HiChevronRight className="w-5 h-5 ml-1" />
-          </NavLink>
+          {isAdminOrEditor && (
+            <NavLink
+              to="/issues"
+              className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
+            >
+              Issues Report
+              <HiChevronRight className="w-5 h-5 ml-1" />
+            </NavLink>
+          )}
         </div>
       </div>
     </div>
