@@ -1,15 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { ArrayMinSize, IsArray, IsDate, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsDate, IsOptional, IsString } from 'class-validator'
 
 export class CreateIssueDto {
   @ApiProperty()
-  @IsArray()
-  @ArrayMinSize(1)
-  symptoms: string[]
-
   @IsOptional()
+  @IsArray()
+  symptoms?: string[]
+
   @ApiProperty()
+  @IsOptional()
   @IsArray()
   meds?: string[]
 
