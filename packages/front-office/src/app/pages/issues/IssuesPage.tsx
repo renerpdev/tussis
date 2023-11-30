@@ -41,7 +41,7 @@ export default function IssuesPage() {
   const [rowsPerPage, setRowsPerPage] = React.useState(DEFAULT_ITEMS_PER_PAGE)
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: 'date',
-    direction: 'ascending',
+    direction: 'descending',
   })
   const [page, setPage] = React.useState(1)
   const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt, setIssuesUpdatedAt } = useStore()

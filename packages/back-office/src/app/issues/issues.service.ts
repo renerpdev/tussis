@@ -264,7 +264,7 @@ export class IssuesService {
   }
 
   async exportPdf(input: IssuesListInput, user: AuthUser, @Res() res: Response): Promise<void> {
-    input.sort = 'date:desc'
+    input.sort = 'date:asc'
     const paginatedIssuesList = await this.getList(input, user)
 
     const headers = ['Fecha', 'Sintomas', 'Medicamentos', 'Notas']

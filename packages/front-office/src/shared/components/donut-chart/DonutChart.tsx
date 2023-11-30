@@ -35,6 +35,7 @@ export const DonutChart = () => {
   const { isFetching, data: response } = useQuery(
     [
       'issues/report',
+      'issues_per_category',
       'yearly',
       range,
       currentUser?.uid,

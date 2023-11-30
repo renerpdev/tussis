@@ -22,11 +22,11 @@
     },
     "donut-chart": {
       "title": "Incidencias por categoría",
-      "donut-label": "Incidencias totales",
+      "donut-label": "Días en total",
       "cta-button": "Ver reporte"
     },
     "area-chart": {
-      "subtitle": "Incidencias totales en los {{value}}",
+      "subtitle": "Total de días con incidencias en los {{value}}",
       "cta-button": "Ver reporte"
     },
     "radar-chart": {

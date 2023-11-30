@@ -33,10 +33,17 @@ export const AreaChart = () => {
     [selectedFilter],
   )
 
+  const frequency = useMemo(
+    () =>
+      range === DateRange.last_7_days || range === DateRange.last_30_days ? 'daily' : 'monthly',
+    [range],
+  )
+
   const { isFetching, data: response } = useQuery(
     [
       'issues/report',
-      'yearly',
+      'issues_in_period',
+      frequency,
       range,
       currentUser?.uid,
       issuesUpdatedAt,
@@ -45,8 +52,7 @@ export const AreaChart = () => {
     ],
     () =>
       TussisApi.get<unknown, ReportQueryParams>('issues/report', {
-        frequency:
-          range === DateRange.last_7_days || range === DateRange.last_30_days ? 'daily' : 'monthly',
+        frequency,
         range,
       }),
   )
