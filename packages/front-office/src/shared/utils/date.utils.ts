@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 
 const DATE_FORMAT = 'YYYY-MM-DD'
+const SHORT_DATE_FORMAT = 'YYYY-MM'
+
 const todayDate = dayjs().format(DATE_FORMAT)
 const lastWeekDate = dayjs().subtract(1, 'week').format(DATE_FORMAT)
 const lastMonthDate = dayjs().subtract(1, 'month').format(DATE_FORMAT)
@@ -16,4 +18,63 @@ export const DateRange = {
   last_4_months: `${lastQuarterDate}:${todayDate}`,
   last_6_months: `${lastSemesterDate}:${todayDate}`,
   last_12_months: `${lastYearDate}:${todayDate}`,
+}
+
+export const DatesInAWeek = (format?: string) =>
+  [...Array(7).keys()].map(i =>
+    dayjs()
+      .subtract(7 - i - 1, 'day')
+      .format(format ?? DATE_FORMAT),
+  )
+
+export const DatesInAMonth = (format?: string) =>
+  [...Array(30).keys()].map(i =>
+    dayjs()
+      .subtract(30 - i - 1, 'day')
+      .format(format ?? DATE_FORMAT),
+  )
+
+export const DatesIn90Days = (format?: string) =>
+  [...Array(90).keys()].map(i =>
+    dayjs()
+      .subtract(90 - i - 1, 'day')
+      .format(format ?? DATE_FORMAT),
+  )
+
+export const DatesIn6Months = (format?: string) =>
+  [...Array(6).keys()].map(i =>
+    dayjs()
+      .subtract(6 - i - 1, 'month')
+      .format(format ?? SHORT_DATE_FORMAT),
+  )
+
+export const DatesIn4Months = (format?: string) =>
+  [...Array(4).keys()].map(i =>
+    dayjs()
+      .subtract(4 - i - 1, 'month')
+      .format(format ?? SHORT_DATE_FORMAT),
+  )
+
+export const DatesInAYear = (format?: string) =>
+  [...Array(12).keys()].map(i =>
+    dayjs()
+      .subtract(12 - i - 1, 'month')
+      .format(format ?? SHORT_DATE_FORMAT),
+  )
+
+export const getDatesFromFilter = (
+  filter: keyof typeof DateRange,
+  longFormat?: string,
+  shortFormat?: string,
+) => {
+  const datesMap = {
+    last_7_days: DatesInAWeek(longFormat),
+    last_30_days: DatesInAMonth(longFormat),
+    last_90_days: DatesIn90Days(longFormat),
+    last_4_months: DatesIn4Months(shortFormat),
+    last_6_months: DatesIn6Months(shortFormat),
+    last_12_months: DatesInAYear(shortFormat),
+  }
+
+  return datesMap[filter]
 }

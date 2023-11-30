@@ -1,4 +1,5 @@
 import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
+import { ApexOptions } from 'apexcharts'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useCookies } from 'react-cookie'
@@ -32,11 +33,20 @@ export const DonutChart = () => {
     [selectedFilter],
   )
 
+  const frequency = useMemo(
+    () =>
+      range === DateRange.last_7_days ||
+      range === DateRange.last_30_days ||
+      range === DateRange.last_90_days
+        ? 'daily'
+        : 'monthly',
+    [range],
+  )
+
   const { isFetching, data: response } = useQuery(
     [
       'issues/report',
-      'issues_per_category',
-      'yearly',
+      frequency,
       range,
       currentUser?.uid,
       issuesUpdatedAt,
@@ -45,7 +55,7 @@ export const DonutChart = () => {
     ],
     () =>
       TussisApi.get<unknown, ReportQueryParams>('issues/report', {
-        frequency: 'yearly',
+        frequency,
         range,
       }),
   )
@@ -68,11 +78,11 @@ export const DonutChart = () => {
     return Array.from(eventsMap.entries()).map(([name, total]) => ({ name, total }))
   }, [response?.data])
 
-  const series = useMemo<any>(() => {
+  const series = useMemo<ApexOptions['series']>(() => {
     return events.map(({ name, total }) => total)
   }, [events])
 
-  const options = useMemo<any>(
+  const options = useMemo<ApexOptions>(
     () => ({
       colors: [
         '#794eef',

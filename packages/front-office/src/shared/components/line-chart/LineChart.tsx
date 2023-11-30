@@ -1,4 +1,5 @@
 import { Select, SelectItem, Spinner } from '@nextui-org/react'
+import { ApexOptions } from 'apexcharts'
 import { useMemo } from 'react'
 import Chart from 'react-apexcharts'
 import { HiArrowUp, HiChevronRight } from 'react-icons/hi'
@@ -13,7 +14,7 @@ export const periods = [
 ]
 
 export const LineChart = () => {
-  const options = useMemo<any>(
+  const options = useMemo<ApexOptions>(
     () => ({
       colors: [
         '#794eef',
@@ -102,7 +103,7 @@ export const LineChart = () => {
     [],
   )
 
-  const series = useMemo<any>(
+  const series = useMemo<ApexOptions['series']>(
     () => [
       {
         name: 'Current Period',

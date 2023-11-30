@@ -7,6 +7,7 @@ import {
   Selection,
   Spinner,
 } from '@nextui-org/react'
+import { ApexOptions } from 'apexcharts'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import { useCookies } from 'react-cookie'
@@ -58,7 +59,7 @@ export const RadarChart = () => {
     return years
   }, [response?.data])
 
-  const series = useMemo<any>(
+  const series = useMemo<ApexOptions['series']>(
     () => [
       {
         name: 'Issues',
@@ -68,7 +69,7 @@ export const RadarChart = () => {
     [response?.data, visibleFilters],
   )
 
-  const options = useMemo<any>(
+  const options = useMemo<ApexOptions>(
     () => ({
       chart: {
         height: '100%',
@@ -87,7 +88,8 @@ export const RadarChart = () => {
       plotOptions: {
         radar: {
           polygons: {
-            strokeColor: '#6f929d',
+            strokeColors: 'rgba(111,146,157,0.5)',
+            connectorColors: 'rgba(111,146,157,0.5)',
           },
         },
       },

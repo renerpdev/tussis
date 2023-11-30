@@ -1,4 +1,5 @@
 import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
+import { ApexOptions } from 'apexcharts'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
@@ -11,7 +12,7 @@ import { TussisApi } from '../../../api'
 import { useStore } from '../../../app/useStore'
 import { PERIOD_FILTERS, PERIOD_NAMES } from '../../constants'
 import { ReportQueryParams } from '../../types'
-import { AUTH_COOKIE_NAME, DateRange, formatNumberValue } from '../../utils'
+import { AUTH_COOKIE_NAME, DateRange, formatNumberValue, getDatesFromFilter } from '../../utils'
 
 const INITIAL_FILTER = 'last_7_days'
 
@@ -35,14 +36,17 @@ export const AreaChart = () => {
 
   const frequency = useMemo(
     () =>
-      range === DateRange.last_7_days || range === DateRange.last_30_days ? 'daily' : 'monthly',
+      range === DateRange.last_7_days ||
+      range === DateRange.last_30_days ||
+      range === DateRange.last_90_days
+        ? 'daily'
+        : 'monthly',
     [range],
   )
 
   const { isFetching, data: response } = useQuery(
     [
       'issues/report',
-      'issues_in_period',
       frequency,
       range,
       currentUser?.uid,
@@ -60,13 +64,11 @@ export const AreaChart = () => {
   const responseData = useMemo(() => {
     const eventsMap: Record<string, Map<string, number>> = {}
     const eventNames = new Map<string, boolean>()
+    const longFormat = 'DD MMM YYYY'
+    const shortFormat = 'MMM YYYY'
 
     Object.keys(response?.data || {}).forEach(key => {
-      const date = dayjs(key).format(
-        range === DateRange.last_7_days || range === DateRange.last_30_days
-          ? 'DD MMM YYYY'
-          : 'MMM YYYY',
-      )
+      const date = dayjs(key).format(frequency === 'daily' ? longFormat : shortFormat)
       if (!eventsMap[date]) eventsMap[date] = new Map<string, number>()
 
       const symptoms = response?.data[key].symptoms
@@ -83,10 +85,16 @@ export const AreaChart = () => {
     })
 
     const eventNamesArray = Array.from(eventNames.keys())
-    const datesArray = Object.keys(eventsMap)
+    const datesArray: string[] = getDatesFromFilter(
+      selectedFilter.currentKey || INITIAL_FILTER,
+      longFormat,
+      shortFormat,
+    )
 
     const eventMatrix = eventNamesArray.map(name => {
       const data = datesArray.map(date => {
+        if (!eventsMap[date]) return 0
+
         const total = eventsMap[date].get(name)
         if (!total) return 0
         return total
@@ -96,9 +104,9 @@ export const AreaChart = () => {
     })
 
     return [datesArray, eventMatrix, eventNamesArray]
-  }, [range, response?.data])
+  }, [frequency, response?.data, selectedFilter.currentKey])
 
-  const options = useMemo<any>(
+  const options = useMemo<ApexOptions>(
     () => ({
       colors: [
         '#794eef',
@@ -183,6 +191,7 @@ export const AreaChart = () => {
       legend: {
         show: true,
         offsetY: 10,
+        showForSingleSeries: true,
       },
       yaxis: {
         show: false,
@@ -190,7 +199,7 @@ export const AreaChart = () => {
     }),
     [responseData],
   )
-  const series = useMemo<any>(() => {
+  const series = useMemo<ApexOptions['series']>(() => {
     return responseData[1] // here in pos 1 we stored the symptoms matrix
       .map((symptom, index) => ({
         name: symptom.name,
