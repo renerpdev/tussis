@@ -7,7 +7,7 @@ const todayDate = dayjs().format(DATE_FORMAT)
 const lastWeekDate = dayjs().subtract(1, 'week').format(DATE_FORMAT)
 const lastMonthDate = dayjs().subtract(1, 'month').format(DATE_FORMAT)
 const last90DaysDate = dayjs().subtract(90, 'day').format(DATE_FORMAT)
-const lastQuarterDate = dayjs().subtract(3, 'month').format(DATE_FORMAT)
+const last3MonthsDate = dayjs().subtract(3, 'month').format(DATE_FORMAT)
 const lastSemesterDate = dayjs().subtract(6, 'month').format(DATE_FORMAT)
 const lastYearDate = dayjs().subtract(1, 'year').format(DATE_FORMAT)
 
@@ -15,7 +15,7 @@ export const DateRange = {
   last_7_days: `${lastWeekDate}:${todayDate}`,
   last_30_days: `${lastMonthDate}:${todayDate}`,
   last_90_days: `${last90DaysDate}:${todayDate}`,
-  last_4_months: `${lastQuarterDate}:${todayDate}`,
+  last_3_months: `${last3MonthsDate}:${todayDate}`,
   last_6_months: `${lastSemesterDate}:${todayDate}`,
   last_12_months: `${lastYearDate}:${todayDate}`,
 }
@@ -48,10 +48,10 @@ export const DatesIn6Months = (format?: string) =>
       .format(format ?? SHORT_DATE_FORMAT),
   )
 
-export const DatesIn4Months = (format?: string) =>
-  [...Array(4).keys()].map(i =>
+export const DatesIn3Months = (format?: string) =>
+  [...Array(3).keys()].map(i =>
     dayjs()
-      .subtract(4 - i - 1, 'month')
+      .subtract(3 - i - 1, 'month')
       .format(format ?? SHORT_DATE_FORMAT),
   )
 
@@ -71,7 +71,7 @@ export const getDatesFromFilter = (
     last_7_days: DatesInAWeek(longFormat),
     last_30_days: DatesInAMonth(longFormat),
     last_90_days: DatesIn90Days(longFormat),
-    last_4_months: DatesIn4Months(shortFormat),
+    last_3_months: DatesIn3Months(shortFormat),
     last_6_months: DatesIn6Months(shortFormat),
     last_12_months: DatesInAYear(shortFormat),
   }
