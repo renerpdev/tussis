@@ -1,4 +1,5 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
+import { useTranslation } from 'react-i18next'
 
 interface ModalViewProps<T> {
   isOpen: boolean
@@ -7,6 +8,10 @@ interface ModalViewProps<T> {
 }
 
 export default function ModalView<T>({ isOpen, onClose, viewData }: ModalViewProps<T>) {
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+
   return (
     <Modal
       backdrop={'blur'}
@@ -17,10 +22,10 @@ export default function ModalView<T>({ isOpen, onClose, viewData }: ModalViewPro
       <ModalContent className="dark:bg-gray-800">
         {onClose => (
           <>
-            <ModalHeader className="flex flex-col gap-1">View</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">{t('view-modal-title')}</ModalHeader>
             <ModalBody>
               <h2 className="text-large text-default dark:text-white">
-                These are the item details:
+                {t('view-modal-subtitle')}
               </h2>
               <h6>
                 <code
@@ -37,7 +42,7 @@ export default function ModalView<T>({ isOpen, onClose, viewData }: ModalViewPro
                 variant="light"
                 onPress={onClose}
               >
-                Close
+                {t('close')}
               </Button>
             </ModalFooter>
           </>

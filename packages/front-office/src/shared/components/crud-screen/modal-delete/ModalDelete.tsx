@@ -1,5 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react'
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { HiTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { TussisApi } from '../../../../api'
@@ -20,6 +21,10 @@ export default function ModalDelete<T>({
   model,
   onDeleteDone,
 }: ModalDeleteProps<T>) {
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+
   const deleteMutation = useMutation({
     mutationFn: async T => {
       const id = (deleteData as BaseModel)?.id || (deleteData as BaseModel).uid
@@ -46,10 +51,12 @@ export default function ModalDelete<T>({
       <ModalContent className="dark:bg-gray-800">
         {onClose => (
           <>
-            <ModalHeader className="flex flex-col gap-1">Delete</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              {t('delete-confirmation-title')}
+            </ModalHeader>
             <ModalBody>
               <h2 className="text-large text-default dark:text-white">
-                Are you sure you want to this item?
+                {t('delete-confirmation')}
               </h2>
               <h6>
                 <code
@@ -66,7 +73,7 @@ export default function ModalDelete<T>({
                 variant="light"
                 onPress={onClose}
               >
-                Close
+                {t('close')}
               </Button>
               <Button
                 color="danger"
@@ -76,7 +83,7 @@ export default function ModalDelete<T>({
                 <span>
                   <HiTrash />
                 </span>
-                Delete{' '}
+                {t('delete')}{' '}
               </Button>
             </ModalFooter>
           </>

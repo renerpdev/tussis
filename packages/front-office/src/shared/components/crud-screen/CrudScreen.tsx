@@ -3,6 +3,7 @@ import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
 import React, { Dispatch, SetStateAction, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
@@ -48,6 +49,9 @@ export function CrudScreen<DataType>({
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth.user, [cookies])
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
 
   const {
     isOpen: isModalCreateOpen,
@@ -184,19 +188,19 @@ export function CrudScreen<DataType>({
     (submitted?: boolean) => {
       if (submitted) {
         setTimestamp(Date.now())
-        toast.success('Request Successful!')
+        toast.success(tCrud(`${selectedItem ? 'update' : 'create'}-success`))
       }
       onModalCreateClose()
       setSelectedItem(undefined)
     },
-    [onModalCreateClose, setTimestamp],
+    [onModalCreateClose, selectedItem, setTimestamp, tCrud],
   )
 
   const handleOnModalDeleteDone = React.useCallback(() => {
     setTimestamp(Date.now())
-    toast.success('Request Successful!')
+    toast.success(tCrud('delete-success'))
     setPage(1)
-  }, [setPage, setTimestamp])
+  }, [setPage, setTimestamp, tCrud])
 
   return (
     <>

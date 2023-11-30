@@ -84,7 +84,7 @@ class AxiosWrapper {
         ...(params ? { ...params } : {}),
       },
       responseType: 'blob',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(20000),
       headers: {
         Accept: 'application/pdf',
         ...(headers || {}),

@@ -46,6 +46,7 @@
       "logout": "Cerrar sesión"
     },
     "data-table": {
+      "no-data": "No hay datos disponibles",
       "columns": {
         "DATE": "Fecha",
         "ID": "ID",
@@ -64,7 +65,9 @@
         "DISABLED": "Deshabilitado",
         "EMAIL VERIFIED": "Email verificado",
         "LAST LOGIN": "Descripción",
-        "ACTIONS": "Acciones"
+        "ACTIONS": "Acciones",
+        "USER ROLE": "Rol de usuario",
+        "SUPERVISED USER UID": "UID de usuario supervisado"
       }
     }
   },
@@ -75,6 +78,9 @@
       "email": "Correo electrónico",
       "password": "Contraseña",
       "login-button": "Iniciar sesión"
+    },
+    "root": {
+      "banner-message": "Necesitas permisos para poder <b>agregar | editar | eliminar datos</b>. Por favor contacta a un administrador."
     },
     "crud": {
       "next": "Siguiente",
@@ -87,11 +93,15 @@
       "view": "Ver",
       "update-role": "Actualizar rol",
       "edit": "Editar",
+      "update": "Actualizar",
       "save": "Guardar",
       "cancel": "Cancelar",
       "columns-dropdown": "Columnas",
       "rows-per-page": "Filas por página:",
       "total-items": "Total {{value}} elementos",
+      "update-role-modal-title": "Actualizar Rol de Usuario",
+      "view-modal-title": "Datos del registo",
+      "view-modal-subtitle": "Estos son los datos del registro seleccionado",
       "delete-confirmation": "¿Estás seguro de que deseas eliminar este registro?",
       "delete-confirmation-title": "Confirmación de eliminación",
       "delete-success": "Registro eliminado correctamente",
@@ -108,7 +118,8 @@
             "min-length": "Debe tener al menos {{length}} caracteres",
             "strong-password": "Debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial",
             "valid-email": "Debe ser un correo electrónico válido",
-            "valid-url": "Debe ser una URL válida"
+            "valid-url": "Debe ser una URL válida",
+            "no-results-found": "No se encontraron resultados"
           }
         }
       }

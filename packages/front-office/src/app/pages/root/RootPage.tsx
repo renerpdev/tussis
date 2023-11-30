@@ -2,9 +2,10 @@ import type { CustomFlowbiteTheme } from 'flowbite-react'
 import { Flowbite } from 'flowbite-react'
 import { useMemo } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { Outlet } from 'react-router-dom'
 import { Navbar, Sidebar } from '../../../shared/components'
-import { AUTH_COOKIE_NAME } from '../../../shared/utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 
 const customTheme: CustomFlowbiteTheme = {
   datepicker: {
@@ -41,6 +42,9 @@ export const RootPage = () => {
     () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
     [cookies.auth?.user],
   )
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'pages.root',
+  })
 
   return (
     <Flowbite theme={{ theme: customTheme }}>
@@ -48,10 +52,10 @@ export const RootPage = () => {
       <Sidebar />
       <main className={`md:ml-56 pt-unit-18 p-4 dark:bg-gray-800`}>
         {!isValidRole && (
-          <div className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto">
-            Necesitas permisos para poder <b>agregar | editar | eliminar</b> datos. Por favor
-            contacta a un administrador.
-          </div>
+          <div
+            className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto"
+            dangerouslySetInnerHTML={{ __html: t('banner-message') }}
+          ></div>
         )}
         <div className="rounded-lg">
           <Outlet />

@@ -139,6 +139,7 @@ export const AreaChart = () => {
       },
       tooltip: {
         enabled: true,
+        offsetY: 10,
         x: {
           show: false,
         },

@@ -66,6 +66,9 @@ export default function DataTable<T>({
   const { t: tCrud } = useTranslation('translation', {
     keyPrefix: 'pages.crud',
   })
+  const { t: tTable } = useTranslation('translation', {
+    keyPrefix: 'components.data-table',
+  })
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === 'all') return columns
@@ -270,7 +273,7 @@ export default function DataTable<T>({
         )}
       </TableHeader>
       <TableBody
-        emptyContent={'No data found'}
+        emptyContent={tTable('no-data')}
         items={data ?? []}
         loadingContent={<Spinner />}
         loadingState={loadingState}

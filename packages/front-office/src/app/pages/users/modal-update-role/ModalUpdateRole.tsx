@@ -15,6 +15,7 @@ import {
 import { useFilter } from '@react-aria/i18n'
 import { Key, useCallback, useMemo, useState } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from 'react-query'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../../api'
@@ -22,7 +23,7 @@ import { CrudModel } from '../../../../shared/models'
 import { User } from '../../../../shared/models/user.model'
 import { PaginatedQueryResponse } from '../../../../shared/types'
 import { UserRole } from '../../../../shared/types/auth.types'
-import { AUTH_COOKIE_NAME } from '../../../../shared/utils/cookies'
+import { AUTH_COOKIE_NAME } from '../../../../shared/utils'
 import { useStore } from '../../../useStore'
 
 type UserClaims = {
@@ -64,6 +65,12 @@ export default function ModalUpdateRole({
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth.user, [cookies])
   const [selectorValue, setSelectorValue] = useState<Selection>(new Set([user?.role ?? '']))
+  const { t: tCrud } = useTranslation('translation', {
+    keyPrefix: 'pages.crud',
+  })
+  const { t: tTable } = useTranslation('translation', {
+    keyPrefix: 'components.data-table',
+  })
 
   const isSupervisor = useMemo(
     () => selectorValue.currentKey === 'supervisor',
@@ -175,13 +182,14 @@ export default function ModalUpdateRole({
       <ModalContent className="dark:bg-gray-800">
         {onClose => (
           <>
-            <ModalHeader className="flex flex-col gap-1">Update User Role</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              {tCrud('update-role-modal-title')}
+            </ModalHeader>
             <ModalBody>
               <Select
                 items={roles}
                 disallowEmptySelection
-                label="User Role"
-                placeholder="Select a role"
+                label={tTable('columns.USER ROLE')}
                 className="w-full"
                 selectedKeys={selectorValue}
                 onSelectionChange={setSelectorValue}
@@ -207,8 +215,11 @@ export default function ModalUpdateRole({
                   inputValue={fieldState.inputValue}
                   selectedKey={fieldState.selectedKey}
                   onSelectionChange={onSelectionChange}
-                  label={'Supervised User UID'}
-                  placeholder={'Type the user uid here'}
+                  label={tTable('columns.SUPERVISED USER UID')}
+                  placeholder={tCrud(`forms.input.placeholder.generic`, {
+                    value: tTable('columns.SUPERVISED USER UID'),
+                  })}
+                  labelPlacement="outside"
                   isLoading={isFetchingUsers}
                   variant="flat"
                   classNames={{
@@ -222,7 +233,14 @@ export default function ModalUpdateRole({
                     },
                   }}
                 >
-                  {item => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
+                  {item => (
+                    <AutocompleteItem
+                      key={item.value}
+                      placeholder={tCrud('forms.input.description.no-results-found')}
+                    >
+                      {item.label}
+                    </AutocompleteItem>
+                  )}
                 </Autocomplete>
               )}
             </ModalBody>
@@ -240,7 +258,7 @@ export default function ModalUpdateRole({
                 isLoading={updateClaimsMutation.isLoading}
                 disabled={!isCtaEnabled}
               >
-                Update Role
+                {tCrud('update')}
               </Button>
             </ModalFooter>
           </>
