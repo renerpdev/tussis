@@ -1,7 +1,11 @@
 import { getAuth } from '@firebase/auth'
 import { Spinner } from '@nextui-org/react'
+import dayjs from 'dayjs'
+import 'dayjs/locale/es'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AUTH_COOKIE_NAME } from '../shared/utils/cookies'
 import { ErrorPage, RootPage } from './pages'
@@ -46,6 +50,7 @@ const App = () => {
   const [cookies, setCookie] = useCookies([AUTH_COOKIE_NAME])
   const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
   const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
+  const { i18n } = useTranslation()
 
   useEffect(() => {
     getAuth().useDeviceLanguage()
@@ -60,6 +65,11 @@ const App = () => {
       unsubscribe()
     }
   }, [setCookie])
+
+  useEffect(() => {
+    dayjs.locale(i18n.language)
+    dayjs.extend(relativeTime)
+  }, [i18n.language, setCookie])
 
   return (
     <BrowserRouter basename="/">

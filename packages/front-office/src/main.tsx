@@ -1,7 +1,4 @@
 import { NextUIProvider } from '@nextui-org/react'
-import dayjs from 'dayjs'
-import 'dayjs/locale/es'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import 'flowbite/dist/flowbite.min.js'
 import { StrictMode } from 'react'
 import { CookiesProvider } from 'react-cookie'
@@ -11,9 +8,6 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './app/app'
 import './i18n'
-
-dayjs.locale('es')
-dayjs.extend(relativeTime)
 
 const queryClient = new QueryClient({
   defaultOptions: {

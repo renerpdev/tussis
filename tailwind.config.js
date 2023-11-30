@@ -7,6 +7,7 @@ module.exports = {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
     './node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}',
     './node_modules/flowbite/**/*.js',
+    './node_modules/react-tailwindcss-datepicker/dist/index.esm.js',
   ],
   theme: {
     extend: {},

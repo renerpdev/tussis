@@ -312,7 +312,7 @@ export class IssuesService {
         })
       }
 
-      const doc = await generatePdfTable(tables)
+      const doc = await generatePdfTable(tables, input.range)
       doc.pipe(res)
       doc.end()
     } catch (error) {

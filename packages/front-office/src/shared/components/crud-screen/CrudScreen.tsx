@@ -1,16 +1,17 @@
 import { Selection, SortDescriptor, useDisclosure } from '@nextui-org/react'
 
 import { MenuItemBaseProps } from '@nextui-org/menu/dist/base/menu-item-base'
-import React, { Dispatch, SetStateAction, useMemo } from 'react'
+import dayjs from 'dayjs'
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from 'react-query'
+import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker'
 import { toast } from 'react-toastify'
 import { TussisApi } from '../../../api'
 import { CrudModel } from '../../models'
 import { Column, PaginatedQueryResponse } from '../../types'
-import { downloadBlobFile } from '../../utils'
-import { AUTH_COOKIE_NAME } from '../../utils/cookies'
+import { AUTH_COOKIE_NAME, DATE_FORMAT, downloadBlobFile } from '../../utils'
 import DataTable from './datatable/DataTable'
 import ModalCreate from './modal-create/ModalCreate'
 import ModalDelete from './modal-delete/ModalDelete'
@@ -29,6 +30,7 @@ interface CrudScreenProps<T> {
   timestamp: number
   setTimestamp: (timestamp: number) => void
   additionalDropdownItems?: MenuItemBaseProps[]
+  defaultRange?: DateValueType
 }
 export function CrudScreen<DataType>({
   model,
@@ -43,15 +45,28 @@ export function CrudScreen<DataType>({
   timestamp,
   setTimestamp,
   additionalDropdownItems,
+  defaultRange = {
+    startDate: null,
+    endDate: null,
+  },
 }: CrudScreenProps<DataType>) {
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
   const [selectedItem, setSelectedItem] = React.useState<DataType | undefined>(undefined)
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth.user, [cookies])
-  const { t: tCrud } = useTranslation('translation', {
+  const { t: tCrud, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.crud',
   })
+  const [dateRangeValue, setDateRangeValue] = useState<DateValueType>(defaultRange)
+  const range = useMemo(() => {
+    if (dateRangeValue?.startDate && dateRangeValue?.endDate) {
+      return `${dayjs(dateRangeValue.startDate).format(DATE_FORMAT)}:${dayjs(
+        dateRangeValue.endDate,
+      ).format(DATE_FORMAT)}`
+    }
+    return undefined
+  }, [dateRangeValue])
 
   const {
     isOpen: isModalCreateOpen,
@@ -76,13 +91,14 @@ export function CrudScreen<DataType>({
     isFetching,
     data: response,
   } = useQuery<unknown, unknown, PaginatedQueryResponse<DataType>>(
-    [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp, currentUser?.uid],
+    [model.view.endpoint, page, rowsPerPage, sortDescriptor, timestamp, currentUser?.uid, range],
     () =>
       TussisApi.get(model.view.endpoint, {
         limit: rowsPerPage,
         sort: `${sortDescriptor.column}:${
           sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'
         }`,
+        range,
         offset: rowsPerPage * (page - 1),
       }),
   )
@@ -138,6 +154,7 @@ export function CrudScreen<DataType>({
     TussisApi.getPDF(model?.report?.endpoint || '', {
       limit: response?.total,
       sort: `${sortDescriptor.column}:${sortDescriptor.direction === 'ascending' ? 'asc' : 'desc'}`,
+      range,
       offset: 0,
     }),
   )
@@ -202,8 +219,18 @@ export function CrudScreen<DataType>({
     setPage(1)
   }, [setPage, setTimestamp, tCrud])
 
+  const handleDateRangeValueChange = (newDateRangeValue: DateValueType) => {
+    console.log('newValue:', newDateRangeValue)
+    setDateRangeValue(newDateRangeValue)
+  }
+
   return (
     <>
+      <Datepicker
+        i18n={i18n.language}
+        value={dateRangeValue}
+        onChange={handleDateRangeValueChange}
+      />
       <DataTable<DataType>
         columns={columns}
         currentPage={page}

@@ -1,4 +1,5 @@
 import { SortDescriptor } from '@nextui-org/react'
+import dayjs from 'dayjs'
 import React, { useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery } from 'react-query'
@@ -134,6 +135,14 @@ export default function IssuesPage() {
     },
   }
 
+  const range = useMemo(
+    () => ({
+      startDate: dayjs().subtract(3, 'month').toDate(),
+      endDate: new Date(),
+    }),
+    [],
+  )
+
   return (
     <CrudScreen<Issue>
       model={model}
@@ -147,6 +156,7 @@ export default function IssuesPage() {
       columns={columns}
       timestamp={issuesUpdatedAt + symptomsUpdatedAt + medsUpdatedAt}
       setTimestamp={setIssuesUpdatedAt}
+      defaultRange={range}
     />
   )
 }

@@ -8,12 +8,14 @@ interface PdfTable {
 
 export const generatePdfTable = async (
   tables: PdfTable[],
+  range?: string,
   options = {},
   title?: string,
 ): Promise<PDFDocumentWithTables> => {
   const doc = new PDFDocumentWithTables({ margin: 20, size: 'A4' })
 
-  doc.text(title || 'TUSSIS - Reporte del periodo', { align: 'center' })
+  doc.text(title || 'TUSSIS', { align: 'center', stroke: true })
+  doc.text(`Periodo: ${range || 'Completo'}`, { align: 'center', height: 10 })
   doc.text('\n')
 
   await Promise.all(
