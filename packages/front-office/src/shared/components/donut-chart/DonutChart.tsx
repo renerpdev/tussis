@@ -49,22 +49,27 @@ export const DonutChart = () => {
       }),
   )
 
-  const symptoms: { name: string; total: number }[] = useMemo(() => {
-    const symptomsMap = new Map<string, number>()
+  const events: { name: string; total: number }[] = useMemo(() => {
+    const eventsMap = new Map<string, number>()
 
     Object.keys(response?.data || {}).forEach(key => {
       const symptoms = response?.data[key].symptoms
       Object.entries(symptoms)?.forEach(([name, total]) => {
-        symptomsMap.set(name, (symptomsMap.get(name) || 0) + Number(total))
+        eventsMap.set(name, (eventsMap.get(name) || 0) + Number(total))
+      })
+
+      const meds = response?.data[key].meds
+      Object.entries(meds)?.forEach(([name, total]) => {
+        eventsMap.set(name, (eventsMap.get(name) || 0) + Number(total))
       })
     })
 
-    return Array.from(symptomsMap.entries()).map(([name, total]) => ({ name, total }))
+    return Array.from(eventsMap.entries()).map(([name, total]) => ({ name, total }))
   }, [response?.data])
 
   const series = useMemo<any>(() => {
-    return symptoms.map(({ name, total }) => total)
-  }, [symptoms])
+    return events.map(({ name, total }) => total)
+  }, [events])
 
   const options = useMemo<any>(
     () => ({
@@ -124,7 +129,7 @@ export const DonutChart = () => {
           top: -2,
         },
       },
-      labels: symptoms.map(({ name }) => name),
+      labels: events.map(({ name }) => name),
       dataLabels: {
         enabled: false,
       },
@@ -149,7 +154,7 @@ export const DonutChart = () => {
         },
       },
     }),
-    [response?.total, symptoms],
+    [response?.total, events],
   )
 
   return (

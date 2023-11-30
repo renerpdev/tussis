@@ -45,32 +45,43 @@ export const AreaChart = () => {
     ],
     () =>
       TussisApi.get<unknown, ReportQueryParams>('issues/report', {
-        frequency: 'daily',
+        frequency:
+          range === DateRange.last_7_days || range === DateRange.last_30_days ? 'daily' : 'monthly',
         range,
       }),
   )
 
   const responseData = useMemo(() => {
-    const symptomsMap: Record<string, Map<string, number>> = {}
-    const symptomsNames = new Map<string, boolean>()
+    const eventsMap: Record<string, Map<string, number>> = {}
+    const eventNames = new Map<string, boolean>()
 
     Object.keys(response?.data || {}).forEach(key => {
-      const date = dayjs(key).format('DD MMM YYYY')
-      if (!symptomsMap[date]) symptomsMap[date] = new Map<string, number>()
+      const date = dayjs(key).format(
+        range === DateRange.last_7_days || range === DateRange.last_30_days
+          ? 'DD MMM YYYY'
+          : 'MMM YYYY',
+      )
+      if (!eventsMap[date]) eventsMap[date] = new Map<string, number>()
 
       const symptoms = response?.data[key].symptoms
       Object.entries(symptoms)?.forEach(([name, total]) => {
-        symptomsNames.set(name, true)
-        symptomsMap[date].set(name, (symptomsMap[date].get(name) || 0) + Number(total))
+        eventNames.set(name, true)
+        eventsMap[date].set(name, (eventsMap[date].get(name) || 0) + Number(total))
+      })
+
+      const meds = response?.data[key].meds
+      Object.entries(meds)?.forEach(([name, total]) => {
+        eventNames.set(name, true)
+        eventsMap[date].set(name, (eventsMap[date].get(name) || 0) + Number(total))
       })
     })
 
-    const symptomsNamesArray = Array.from(symptomsNames.keys())
-    const datesArray = Object.keys(symptomsMap)
+    const eventNamesArray = Array.from(eventNames.keys())
+    const datesArray = Object.keys(eventsMap)
 
-    const symptomsMatrix = symptomsNamesArray.map(name => {
+    const eventMatrix = eventNamesArray.map(name => {
       const data = datesArray.map(date => {
-        const total = symptomsMap[date].get(name)
+        const total = eventsMap[date].get(name)
         if (!total) return 0
         return total
       })
@@ -78,8 +89,8 @@ export const AreaChart = () => {
       return { name, data }
     })
 
-    return [datesArray, symptomsMatrix, symptomsNamesArray]
-  }, [response?.data])
+    return [datesArray, eventMatrix, eventNamesArray]
+  }, [range, response?.data])
 
   const options = useMemo<any>(
     () => ({

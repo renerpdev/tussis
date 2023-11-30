@@ -100,7 +100,7 @@
       "forms": {
         "input": {
           "placeholder": {
-            "generic": "Ingrese su {{value}} aquí",
+            "generic": "Ingrese {{value}} aquí",
             "empty-password": "Deje en blanco para no cambiar la contraseña",
             "select-from-list": "Seleccione aquí los {{value}}"
           },
