@@ -45,10 +45,7 @@ export function CrudScreen<DataType>({
   timestamp,
   setTimestamp,
   additionalDropdownItems,
-  defaultRange = {
-    startDate: null,
-    endDate: null,
-  },
+  defaultRange,
 }: CrudScreenProps<DataType>) {
   const [filterValue, setFilterValue] = React.useState('')
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(defaultColumns))
@@ -220,17 +217,18 @@ export function CrudScreen<DataType>({
   }, [setPage, setTimestamp, tCrud])
 
   const handleDateRangeValueChange = (newDateRangeValue: DateValueType) => {
-    console.log('newValue:', newDateRangeValue)
     setDateRangeValue(newDateRangeValue)
   }
 
   return (
     <>
-      <Datepicker
-        i18n={i18n.language}
-        value={dateRangeValue}
-        onChange={handleDateRangeValueChange}
-      />
+      {defaultRange && (
+        <Datepicker
+          i18n={i18n.language}
+          value={dateRangeValue}
+          onChange={handleDateRangeValueChange}
+        />
+      )}
       <DataTable<DataType>
         columns={columns}
         currentPage={page}
