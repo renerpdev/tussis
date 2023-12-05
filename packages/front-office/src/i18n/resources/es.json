@@ -15,11 +15,29 @@
     "Last 90 days": "Últimos 90 días",
     "Last 3 months": "Últimos 3 meses",
     "Last 6 months": "Últimos 6 meses",
-    "Last 12 months": "Últimos 12 meses"
+    "Last 12 months": "Últimos 12 meses",
+    "This week": "Esta semana",
+    "This month": "Este mes",
+    "This quarter": "Este trimestre",
+    "This semester": "Este semestre",
+    "This year": "Este año"
   },
   "components": {
     "line-chart": {
-      "cta-button": "Ver reporte"
+      "cta-button": "Ver reporte",
+      "subtitle": "Total de incidencias <span style='text-decoration:underline'>{{current}}</span> comparado con <span style='text-decoration:underline'>{{previous}}</span>",
+      "current-period": "Período actual",
+      "previous-period": "Período anterior",
+      "this_week": "en esta semana",
+      "this_month": "en este mes",
+      "this_quarter": "en este trimestre",
+      "this_semester": "en este semestre",
+      "this_year": "en este año",
+      "prev_week": "la semana anterior",
+      "prev_month": "el mes anterior",
+      "prev_quarter": "el trimestre anterior",
+      "prev_semester": "el semestre anterior",
+      "prev_year": "el año anterior"
     },
     "donut-chart": {
       "title": "Incidencias por categoría",

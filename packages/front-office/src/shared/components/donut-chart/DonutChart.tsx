@@ -103,7 +103,7 @@ export const DonutChart = () => {
       },
       stroke: {
         colors: ['transparent'],
-        lineCap: '',
+        lineCap: 'square',
       },
       plotOptions: {
         pie: {
