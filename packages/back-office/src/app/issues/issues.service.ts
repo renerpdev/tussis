@@ -2,12 +2,12 @@ import { CollectionReference } from '@google-cloud/firestore'
 import { Inject, Injectable, Res, Scope } from '@nestjs/common'
 
 import dayjs from 'dayjs'
-import 'dayjs/locale/es'
+import 'dayjs/locale/es-us'
 import { Response } from 'express'
 import { DocumentNotFoundError } from '../../shared/errors/document-not-found-error'
 import { ServerError } from '../../shared/errors/server-error'
 import { UnauthorizedResourceError } from '../../shared/errors/unauthorized-resource-error'
-import { AuthUser } from '../../shared/types/auth.types'
+import { AuthUser } from '../../shared/types'
 import {
   generatePdfTable,
   getIssuesReport,
@@ -292,7 +292,7 @@ export class IssuesService {
         const issueMeds = meds[index].map(({ name }) => name)
 
         const row = [
-          `${dayjs(issue.date).locale('es').format('MMMM D, YYYY')}`,
+          `${dayjs(issue.date).locale('es-us').format('MMMM D, YYYY')}`,
           issueSymptoms.join(', '),
           issueMeds.join(', '),
           issue.notes,

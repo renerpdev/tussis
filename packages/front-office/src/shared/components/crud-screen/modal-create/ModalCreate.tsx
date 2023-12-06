@@ -64,7 +64,7 @@ export default function ModalCreate<T>({
     new Map(Object.entries({})),
   )
   const [, setTimestamp] = useState(0) // this is just a workaround to force a re-render
-  const { t: tCrud } = useTranslation('translation', {
+  const { t: tCrud, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.crud',
   })
   const { t: tTable } = useTranslation('translation', {
@@ -453,12 +453,11 @@ export default function ModalCreate<T>({
                 updateFieldValue(field.name)(dayjs(value).format('YYYY-MM-DD'))
               }
               name={field.name}
-              language="es-ES"
+              language={i18n.language}
               showClearButton={false}
               showTodayButton={false}
               className={'w-full'}
               maxDate={new Date(Date.now())}
-              weekStart={2} // First day of week is Sunday
             />
           )
         default:

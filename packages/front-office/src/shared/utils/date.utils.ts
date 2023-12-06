@@ -3,6 +3,12 @@ import dayjs from 'dayjs'
 export const DATE_FORMAT = 'YYYY-MM-DD'
 export const SHORT_DATE_FORMAT = 'YYYY-MM'
 
+const getQuarterStart = (times = 1) => {
+  const currentMonth = dayjs().month()
+  const startOfQuarter = currentMonth - (currentMonth % (3 * times))
+  return dayjs().month(startOfQuarter).startOf('month')
+}
+
 const todayDate = dayjs().format(DATE_FORMAT)
 const last7DaysDates = dayjs().subtract(7, 'day').format(DATE_FORMAT)
 const last30DaysDates = dayjs().subtract(30, 'day').format(DATE_FORMAT)
@@ -13,15 +19,15 @@ const last12MonthsDates = dayjs().subtract(12, 'month').format(DATE_FORMAT)
 
 const thisWeekDates = dayjs().startOf('week')
 const thisMonthDates = dayjs().startOf('month')
-const thisQuarterDates = dayjs().subtract(3, 'month').startOf('month')
-const thisSemesterDates = dayjs().subtract(6, 'month').startOf('month')
-const thisYearDates = dayjs().subtract(12, 'month').startOf('month')
+const thisQuarterDates = getQuarterStart()
+const thisSemesterDates = getQuarterStart(2)
+const thisYearDates = dayjs().startOf('year')
 
 const prevWeekDates = dayjs().subtract(1, 'week').startOf('week')
 const prevMonthDates = dayjs().subtract(1, 'month').startOf('month')
-const prevQuarterDates = dayjs().subtract(6, 'month').startOf('month')
-const prevSemesterDates = dayjs().subtract(12, 'month').startOf('month')
-const prevYearDates = dayjs().subtract(24, 'month').startOf('month')
+const prevQuarterDates = getQuarterStart(2)
+const prevSemesterDates = getQuarterStart(4)
+const prevYearDates = dayjs().subtract(1, 'year').startOf('year')
 
 export const DateRange = {
   last_7_days: `${last7DaysDates}:${todayDate}`,
@@ -44,9 +50,11 @@ export const DateRange = {
     .endOf('month')
     .format(DATE_FORMAT)}`,
   prev_quarter: `${prevQuarterDates.format(DATE_FORMAT)}:${prevQuarterDates
+    .add(2, 'month')
     .endOf('month')
     .format(DATE_FORMAT)}`,
   prev_semester: `${prevSemesterDates.format(DATE_FORMAT)}:${prevSemesterDates
+    .add(5, 'month')
     .endOf('month')
     .format(DATE_FORMAT)}`,
   prev_year: `${prevYearDates.format(DATE_FORMAT)}:${prevYearDates
@@ -79,7 +87,7 @@ export const DatesInAMonth = (format?: string) =>
   )
 
 export const DatesThisMonth = (format?: string, diff = 0) => {
-  const startOfMonth = dayjs().startOf('month')
+  const startOfMonth = dayjs().subtract(diff, 'month').startOf('month')
   const daysInMonth = startOfMonth.daysInMonth()
 
   return [...Array(daysInMonth).keys()].map(i =>
@@ -110,10 +118,8 @@ export const DatesIn3Months = (format?: string) =>
       .format(format ?? SHORT_DATE_FORMAT),
   )
 
-export const DatesInMonthRange = (months: number, format?: string, diff = 0) => {
-  const startOfQuarter = dayjs()
-    .subtract(Math.pow(months, 2 * diff), 'month')
-    .startOf('month')
+export const DatesInMonthRange = (months: number, format?: string, times = 1) => {
+  const startOfQuarter = getQuarterStart(times)
 
   return [...Array(months).keys()].map(i =>
     dayjs(startOfQuarter)
@@ -145,14 +151,14 @@ export const getDatesFromFilter = (
     this_week: DatesThisWeek(longFormat),
     this_month: DatesThisMonth(longFormat),
     this_quarter: DatesInMonthRange(3, shortFormat),
-    this_semester: DatesInMonthRange(6, shortFormat),
-    this_year: DatesInMonthRange(12, shortFormat),
+    this_semester: DatesInMonthRange(6, shortFormat, 2),
+    this_year: DatesInMonthRange(12, shortFormat, 4),
 
     prev_week: DatesThisWeek(longFormat, 1),
     prev_month: DatesThisMonth(longFormat, 1),
-    prev_quarter: DatesInMonthRange(3, shortFormat, 1),
-    prev_semester: DatesInMonthRange(6, shortFormat, 1),
-    prev_year: DatesInMonthRange(12, shortFormat, 1),
+    prev_quarter: DatesInMonthRange(3, shortFormat, 2),
+    prev_semester: DatesInMonthRange(6, shortFormat, 4),
+    prev_year: DatesInMonthRange(12, shortFormat, 8),
   }
 
   return datesMap[filter]

@@ -1,13 +1,14 @@
 import { getAuth } from '@firebase/auth'
 import { Spinner } from '@nextui-org/react'
 import dayjs from 'dayjs'
-import 'dayjs/locale/es'
+import 'dayjs/locale/es-us.js'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
 import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AUTH_COOKIE_NAME } from '../shared/utils/cookies'
+import { AUTH_COOKIE_NAME } from '../shared/utils'
 import { ErrorPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
 
@@ -16,6 +17,10 @@ const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
 const LazySymptomsPage = lazy(() => import('./pages/symptoms/SymptomsPage'))
 const LazyDashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
 const LazyUsersPage = lazy(() => import('./pages/users/UsersPage'))
+
+const locales = {
+  es: 'es-us',
+}
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
@@ -67,8 +72,10 @@ const App = () => {
   }, [setCookie])
 
   useEffect(() => {
-    dayjs.locale(i18n.language)
+    dayjs.locale(locales[i18n.language])
     dayjs.extend(relativeTime)
+    dayjs.extend(timezone)
+    dayjs.tz.setDefault('America/Montevideo')
   }, [i18n.language, setCookie])
 
   return (
