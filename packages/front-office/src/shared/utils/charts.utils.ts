@@ -11,11 +11,11 @@ export const getChartData = (
   const issuesMap = new Map<string, number>()
   const datesMap = new Map<string, string>()
   const eventNames = new Map<string, boolean>()
-  const longFormat = 'DD MMM YYYY'
-  const shortFormat = 'MMM YYYY'
+  const dayFormat = 'DD MMM'
+  const monthFormat = 'MMM YYYY'
 
   Object.keys(responseData || {}).forEach(key => {
-    const date = dayjs(key).format(frequency === 'daily' ? longFormat : shortFormat)
+    const date = dayjs(key).format(frequency === 'daily' ? dayFormat : monthFormat)
     if (!eventsMap[date]) eventsMap[date] = new Map<string, number>()
 
     issuesMap.set(date, (issuesMap.get(date) || 0) + Number(responseData[key].total))
@@ -38,7 +38,7 @@ export const getChartData = (
   const _datesArray: string[] = getDatesFromFilter(selectedFilter)
 
   const issuesArray = _datesArray.map(date => {
-    const fdate = dayjs(date).format(frequency === 'daily' ? longFormat : shortFormat)
+    const fdate = dayjs(date).format(frequency === 'daily' ? dayFormat : monthFormat)
 
     if (dayjs(datesMap.get(fdate) || date).isAfter(dayjs())) return null
 
@@ -47,7 +47,7 @@ export const getChartData = (
 
   const eventMatrix = eventNamesArray.map(name => {
     const data = _datesArray.map(key => {
-      const date = dayjs(key).format(frequency === 'daily' ? longFormat : shortFormat)
+      const date = dayjs(key).format(frequency === 'daily' ? dayFormat : monthFormat)
 
       if (!eventsMap[date]) return 0
 
@@ -60,7 +60,7 @@ export const getChartData = (
   })
 
   const datesArray = _datesArray.map(date =>
-    dayjs(date).format(frequency === 'daily' ? longFormat : shortFormat),
+    dayjs(date).format(frequency === 'daily' ? dayFormat : monthFormat),
   )
 
   return { datesArray, eventMatrix, eventNamesArray, issuesArray }

@@ -1,4 +1,4 @@
-import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
+import { Checkbox, Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
 import { ApexOptions } from 'apexcharts'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
@@ -28,6 +28,7 @@ export const AreaChart = () => {
   const { t } = useTranslation('translation', {
     keyPrefix: 'components.area-chart',
   })
+  const [showXLabels, setShowXLabels] = useState(false)
 
   const range = useMemo(
     () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
@@ -140,7 +141,7 @@ export const AreaChart = () => {
       xaxis: {
         categories: responseData.datesArray,
         labels: {
-          show: false,
+          show: showXLabels,
         },
         axisBorder: {
           show: false,
@@ -158,7 +159,7 @@ export const AreaChart = () => {
         show: false,
       },
     }),
-    [responseData],
+    [responseData, showXLabels],
   )
   const series = useMemo<ApexOptions['series']>(() => {
     return responseData.eventMatrix.map((symptom, index) => ({
@@ -194,6 +195,15 @@ export const AreaChart = () => {
           className="align-center flex-1"
         />
       )}
+      <div className="flex justify-center">
+        <Checkbox
+          checked={showXLabels}
+          onValueChange={setShowXLabels}
+          className="text-xs"
+        >
+          {t('display-xaxis-labels')}
+        </Checkbox>
+      </div>
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-600 justify-between mt-auto">
         <div className="flex justify-between items-center pt-5">
           <Select

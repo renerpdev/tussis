@@ -1,4 +1,4 @@
-import { Select, Selection, SelectItem, Spinner } from '@nextui-org/react'
+import { Checkbox, Select, SelectItem, Selection, Spinner } from '@nextui-org/react'
 import { ApexOptions } from 'apexcharts'
 import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
@@ -44,6 +44,7 @@ export const LineChart = () => {
   const { t } = useTranslation('translation', {
     keyPrefix: 'components.line-chart',
   })
+  const [showXLabels, setShowXLabels] = useState(true)
 
   const currentRange = useMemo(
     () => DateRange[selectedFilter.currentKey || INITIAL_FILTER],
@@ -192,9 +193,9 @@ export const LineChart = () => {
         show: true,
         strokeDashArray: 4,
         padding: {
-          left: 2,
-          right: 2,
-          top: -26,
+          left: 0,
+          right: 0,
+          top: -15,
         },
       },
       legend: {
@@ -205,7 +206,7 @@ export const LineChart = () => {
       xaxis: {
         categories: responseData.datesArray,
         labels: {
-          show: false,
+          show: showXLabels,
           style: {
             fontFamily: 'Inter, sans-serif',
             cssClass: 'text-xs font-normal fill-gray-500 dark:fill-text-white',
@@ -222,7 +223,7 @@ export const LineChart = () => {
         show: false,
       },
     }),
-    [responseData.datesArray],
+    [responseData.datesArray, showXLabels],
   )
 
   const series = useMemo<ApexOptions['series']>(
@@ -288,6 +289,15 @@ export const LineChart = () => {
           className="align-center flex-1"
         />
       )}
+      <div className="flex justify-center">
+        <Checkbox
+          defaultSelected={showXLabels}
+          checked={showXLabels}
+          onValueChange={setShowXLabels}
+        >
+          {t('display-xaxis-labels')}
+        </Checkbox>
+      </div>
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-600 justify-between">
         <div className="flex justify-between items-center pt-5">
           <Select

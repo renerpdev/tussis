@@ -37,7 +37,8 @@
       "prev_month": "el mes anterior",
       "prev_quarter": "el trimestre anterior",
       "prev_semester": "el semestre anterior",
-      "prev_year": "el año anterior"
+      "prev_year": "el año anterior",
+      "display-xaxis-labels": "Mostrar etiquetas del eje X"
     },
     "donut-chart": {
       "title": "Incidencias por categoría",
@@ -46,7 +47,8 @@
     },
     "area-chart": {
       "subtitle": "Total de días con incidencias en los {{value}}",
-      "cta-button": "Ver reporte"
+      "cta-button": "Ver reporte",
+      "display-xaxis-labels": "Mostrar etiquetas del eje X"
     },
     "radar-chart": {
       "title": "Incidencias por años",
