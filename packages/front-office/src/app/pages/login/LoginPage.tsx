@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [, setCookie] = useCookies([AUTH_COOKIE_NAME])
-  const { t } = useTranslation('translation', {
+  const { t, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.login',
   })
 
@@ -63,7 +63,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     const provider = new GoogleAuthProvider()
-    provider.setDefaultLanguage('es-ES')
+    provider.setDefaultLanguage(i18n.language)
     provider.addScope('https://www.googleapis.com/auth/userinfo.email')
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
       })
     }
     setIsLoading(false)
-  }, [updateCookie])
+  }, [i18n.language, updateCookie])
 
   return (
     <div

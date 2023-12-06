@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 import { Datepicker } from 'flowbite-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { HiPencil, HiPlus } from 'react-icons/hi'
+import { HiEye, HiEyeOff, HiPencil, HiPlus } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { v4 as uuid } from 'uuid'
 import { TussisApi } from '../../../../api'
@@ -70,6 +70,9 @@ export default function ModalCreate<T>({
   const { t: tTable } = useTranslation('translation', {
     keyPrefix: 'components.data-table',
   })
+  const [passwordsVisible, setPasswordsVisible] = useState<Map<string, boolean>>(
+    new Map(Object.entries({})),
+  )
 
   const createMutation = useMutation({
     mutationFn: async (data: T) => {
@@ -258,6 +261,7 @@ export default function ModalCreate<T>({
   const resetModalState = useCallback(() => {
     setFieldValues(new Map(Object.entries({})))
     setFormValues(new Map(Object.entries({})))
+    setPasswordsVisible(new Map(Object.entries({})))
     setValidationErrors(new Map(Object.entries({})))
   }, [])
 
@@ -302,9 +306,17 @@ export default function ModalCreate<T>({
     (key: string) => (value: unknown) => {
       setFormValues(formValues.set(key, value))
       setFieldValues(fieldValues.set(key, value))
-      setTimestamp(Date.now())
+      setTimestamp(Date.now()) // this is just a workaround to force a re-render
     },
     [fieldValues, formValues],
+  )
+
+  const togglePasswordVisibility = useCallback(
+    (fieldId: string) => {
+      setPasswordsVisible(passwordsVisible.set(fieldId, !passwordsVisible.get(fieldId)))
+      setTimestamp(Date.now()) // this is just a workaround to force a re-render
+    },
+    [passwordsVisible],
   )
 
   const renderField = useCallback(
@@ -402,7 +414,6 @@ export default function ModalCreate<T>({
           )
         case 'text':
         case 'url':
-        case 'password':
         case 'email':
           return (
             <Input
@@ -423,6 +434,41 @@ export default function ModalCreate<T>({
                 inputWrapper:
                   'bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 dark:focus:ring-cyan-500',
               }}
+            />
+          )
+        case 'password':
+          return (
+            <Input
+              id={field.id}
+              key={field.id}
+              autoFocus={field.autofocus}
+              value={fieldValues.get(field.name) as string}
+              onValueChange={updateFieldValue(field.name)}
+              errorMessage={field.errorMessage}
+              isInvalid={!!field.errorMessage}
+              placeholder={field.placeholder}
+              title={field.title}
+              description={field.description}
+              variant="flat"
+              label={field.label}
+              classNames={{
+                inputWrapper:
+                  'bg-gray-100 dark:bg-gray-700 dark:placeholder-gray-300 dark:focus:ring-cyan-500',
+              }}
+              endContent={
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={() => togglePasswordVisibility(field.id)}
+                >
+                  {passwordsVisible.get(field.id) ? (
+                    <HiEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                  ) : (
+                    <HiEye className="text-2xl text-default-400 pointer-events-none" />
+                  )}
+                </button>
+              }
+              type={passwordsVisible.get(field.id) ? 'text' : 'password'}
             />
           )
         case 'textarea':
@@ -464,7 +510,7 @@ export default function ModalCreate<T>({
           return <span key={field.id}>{`Uknown field <${field.name}>`}</span>
       }
     },
-    [fieldValues, updateFieldValue],
+    [fieldValues, i18n.language, passwordsVisible, togglePasswordVisibility, updateFieldValue],
   )
 
   useEffect(() => {
