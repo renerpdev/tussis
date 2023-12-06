@@ -298,7 +298,7 @@ export class IssuesService {
           issue.notes,
         ]
 
-        const monthYear = dayjs(issue.date).locale('es').format('MMMM YYYY').toUpperCase()
+        const monthYear = dayjs(issue.date).locale('es-us').format('MMMM YYYY').toUpperCase()
         const currentTableRows = (tablesMap.get(monthYear) as string[]) || []
         tablesMap.set(monthYear, [...currentTableRows, row])
       })
