@@ -9,7 +9,6 @@ export default function DashboardPage() {
         <DonutChart />
         <RadarChart />
       </div>
-      <div></div>
     </div>
   )
 }

@@ -10,12 +10,12 @@ const getQuarterStart = (times = 1) => {
 }
 
 const todayDate = dayjs().format(DATE_FORMAT)
-const last7DaysDates = dayjs().subtract(7, 'day').format(DATE_FORMAT)
-const last30DaysDates = dayjs().subtract(30, 'day').format(DATE_FORMAT)
-const last90DaysDates = dayjs().subtract(90, 'day').format(DATE_FORMAT)
-const last3MonthsDates = dayjs().subtract(3, 'month').format(DATE_FORMAT)
-const last6MonthsDates = dayjs().subtract(6, 'month').format(DATE_FORMAT)
-const last12MonthsDates = dayjs().subtract(12, 'month').format(DATE_FORMAT)
+const last7DaysDates = dayjs().subtract(6, 'day').format(DATE_FORMAT)
+const last30DaysDates = dayjs().subtract(29, 'day').format(DATE_FORMAT)
+const last90DaysDates = dayjs().subtract(89, 'day').format(DATE_FORMAT)
+const last3MonthsDates = dayjs().subtract(3, 'month').subtract(1, 'day').format(DATE_FORMAT)
+const last6MonthsDates = dayjs().subtract(6, 'month').subtract(1, 'day').format(DATE_FORMAT)
+const last12MonthsDates = dayjs().subtract(12, 'month').subtract(1, 'day').format(DATE_FORMAT)
 
 const thisWeekDates = dayjs().startOf('week')
 const thisMonthDates = dayjs().startOf('month')
