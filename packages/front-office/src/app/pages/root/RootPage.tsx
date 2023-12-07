@@ -37,6 +37,8 @@ const customTheme: CustomFlowbiteTheme = {
   },
 }
 
+const adminEmail = import.meta.env.VITE_ADMIN_EMAIL
+
 export const RootPage = () => {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const hasWritePermission = useMemo(
@@ -57,7 +59,7 @@ export const RootPage = () => {
           <>
             <div
               className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto"
-              dangerouslySetInnerHTML={{ __html: t('banner-message') }}
+              dangerouslySetInnerHTML={{ __html: t('banner-message', { email: adminEmail }) }}
             />
             {!isSupervisor && (
               <div className="flex items-center justify-center text-cyan-600 h-[200px]">

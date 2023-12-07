@@ -104,7 +104,11 @@
       "login-button": "Iniciar sesión"
     },
     "root": {
-      "banner-message": "Necesitas permisos para poder <b>agregar | editar | eliminar datos</b>. Por favor contacta a un administrador."
+      "banner-message": "Necesitas permisos para poder <b>agregar | editar | eliminar datos</b>. Por favor <a href=\"mailto:{{email}}\" style='text-decoration:underline'>contacta a un administrador</a>."
+    },
+    "error-boundary": {
+      "title": "Lo sentimos, algo salió mal.",
+      "message": "Si el problema persiste, por favor <a href=\"mailto:{{email}}\" style='text-decoration:underline'>contacta a un administrador</a>."
     },
     "crud": {
       "next": "Siguiente",
