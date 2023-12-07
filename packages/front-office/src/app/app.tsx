@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es-us.js'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
-import { lazy, PropsWithChildren, ReactElement, Suspense, useEffect, useMemo } from 'react'
+import { PropsWithChildren, ReactElement, Suspense, lazy, useEffect, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
@@ -61,7 +61,19 @@ const App = () => {
     getAuth().useDeviceLanguage()
 
     const unsubscribe = getAuth().onAuthStateChanged(user => {
-      if (!user) {
+      if (user) {
+        const cookieValue = {
+          user: {
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            role: JSON.parse(user.reloadUserInfo?.customAttributes || '{}').role,
+          },
+          accessToken: user.accessToken,
+        }
+        setCookie(AUTH_COOKIE_NAME, cookieValue, { path: '/' })
+      } else {
         setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
       }
     })

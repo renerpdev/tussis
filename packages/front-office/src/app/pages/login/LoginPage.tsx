@@ -4,7 +4,7 @@ import {
   User,
   getIdTokenResult,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
 } from '@firebase/auth'
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { useCallback, useState } from 'react'
@@ -68,9 +68,7 @@ export default function LoginPage() {
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
 
     try {
-      const userCred = await signInWithPopup(auth, provider)
-      const tokenResult = await getIdTokenResult(userCred.user)
-      updateCookie(userCred.user, tokenResult)
+      await signInWithRedirect(auth, provider)
     } catch (error: any) {
       const errorMessage = error.message
       toast.error(errorMessage, {
@@ -78,7 +76,7 @@ export default function LoginPage() {
       })
     }
     setIsLoading(false)
-  }, [i18n.language, updateCookie])
+  }, [i18n.language])
 
   return (
     <div
