@@ -15,6 +15,7 @@ import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 import auth from '../../firebase/auth'
+import usePersistStore from '../../usePersistStore'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [, setCookie] = useCookies([AUTH_COOKIE_NAME])
+  const { isSigningIn, setIsSigningIn } = usePersistStore()
   const { t, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.login',
   })
@@ -60,7 +62,7 @@ export default function LoginPage() {
   }, [email, password, updateCookie])
 
   const handleGoogleLogin = useCallback(async () => {
-    setIsLoading(true)
+    setIsSigningIn(true)
 
     const provider = new GoogleAuthProvider()
     provider.setDefaultLanguage(i18n.language)
@@ -70,19 +72,17 @@ export default function LoginPage() {
     try {
       await signInWithRedirect(auth, provider)
     } catch (error: any) {
+      setIsSigningIn(false)
       const errorMessage = error.message
       toast.error(errorMessage, {
         toastId: 'error-google-login',
       })
     }
     setIsLoading(false)
-  }, [i18n.language])
+  }, [i18n.language, setIsSigningIn])
 
   return (
-    <div
-      className="flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh]"
-      style={{ minHeight: '100vh' }}
-    >
+    <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative">
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
         {/* this is just to load Tailwind classnames */}
         <span className="text-cyan-800 dark:text-cyan-600 d-none" />
@@ -145,7 +145,7 @@ export default function LoginPage() {
           <FaGoogle className="inline-block" /> Google
         </Button>
 
-        {isLoading && (
+        {(isLoading || isSigningIn) && (
           <div className="text-center h-full z-50 fixed left-0 top-0 flex flex-col justify-center items-center w-full bg-gray-400 bg-opacity-50 overflow-hidden">
             <Spinner
               size="md"

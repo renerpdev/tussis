@@ -11,6 +11,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AUTH_COOKIE_NAME } from '../shared/utils'
 import { ErrorPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
+import usePersistStore from './usePersistStore'
 
 const LazyIssuesPage = lazy(() => import('./pages/issues/IssuesPage'))
 const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
@@ -56,11 +57,15 @@ const App = () => {
   const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
   const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
   const { i18n } = useTranslation()
+  const { setIsSigningIn } = usePersistStore()
 
   useEffect(() => {
     getAuth().useDeviceLanguage()
 
     const unsubscribe = getAuth().onAuthStateChanged(user => {
+      // here we hide the spinner
+      setIsSigningIn(false)
+
       if (user) {
         const cookieValue = {
           user: {
