@@ -39,10 +39,11 @@ const customTheme: CustomFlowbiteTheme = {
 
 export const RootPage = () => {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
-  const isValidRole = useMemo(
+  const hasWritePermission = useMemo(
     () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
     [cookies.auth?.user],
   )
+  const isSupervisor = useMemo(() => cookies.auth?.user.role === 'supervisor', [cookies.auth?.user])
   const { t } = useTranslation('translation', {
     keyPrefix: 'pages.root',
   })
@@ -52,21 +53,23 @@ export const RootPage = () => {
       <Navbar />
       <Sidebar />
       <main className={`md:ml-56 pt-unit-18 p-4 dark:bg-gray-800`}>
-        {!isValidRole && (
+        {!hasWritePermission && (
           <>
             <div
               className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto"
               dangerouslySetInnerHTML={{ __html: t('banner-message') }}
             />
-            <div className="flex items-center justify-center text-cyan-600 h-[200px]">
-              <HiCog
-                size={120}
-                className="animate-spin"
-              />
-            </div>
+            {!isSupervisor && (
+              <div className="flex items-center justify-center text-cyan-600 h-[200px]">
+                <HiCog
+                  size={120}
+                  className="animate-spin"
+                />
+              </div>
+            )}
           </>
         )}
-        {isValidRole && (
+        {(hasWritePermission || isSupervisor) && (
           <div className="rounded-lg">
             <Outlet />
           </div>
