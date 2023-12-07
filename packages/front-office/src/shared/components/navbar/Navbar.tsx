@@ -32,29 +32,20 @@ export const Navbar = () => {
     mutationFn: async () => await TussisApi.delete(`users/remove-account`),
   })
 
-  const handleRemoveAccount = useCallback(() => {
-    const confirmedDeletion = window.confirm('Are you sure you want to delete your account?')
+  const handleRemoveAccount = useCallback(async () => {
+    const confirmedDeletion = window.confirm(tNav('delete-account-confirmation'))
     if (confirmedDeletion) {
-      deleteUserAccount().then(() => {
-        toast.success('Account deleted!')
-        navigate('/login')
-      })
+      await deleteUserAccount()
+      toast.success(tNav('account-deleted'))
+      navigate('/login', { replace: true })
     }
-  }, [navigate, deleteUserAccount])
+  }, [tNav, deleteUserAccount, navigate])
 
-  const handleSignOut = useCallback(() => {
-    getAuth()
-      .signOut()
-      .then(() => {
-        toast.success('Sign-out successful!')
-        navigate('/login')
-      })
-      .catch(error => {
-        toast.error(error.message, {
-          toastId: 'sign-out',
-        })
-      })
-  }, [navigate])
+  const handleSignOut = useCallback(async () => {
+    await getAuth().signOut()
+    toast.success(tNav('logout-success'))
+    navigate('/login', { replace: true })
+  }, [navigate, tNav])
 
   const handleSidebarVisibility = useCallback(() => {
     setSidebarOpen(!sidebarOpen)

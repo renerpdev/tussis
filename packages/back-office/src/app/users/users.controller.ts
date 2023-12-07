@@ -42,6 +42,11 @@ export class UsersController {
     return this.usersService.createUser(userDto)
   }
 
+  @Delete('remove-account')
+  async deleteAccount(@Req() req: Request) {
+    return this.usersService.deleteAccount(req.user as AuthUser)
+  }
+
   @Roles('admin')
   @Patch(':uid')
   async updateUser(@Param('uid') uid: string, @Body() userDto: UpdateUserDto) {
@@ -52,11 +57,6 @@ export class UsersController {
   @Delete(':uid')
   async deleteUser(@Param('uid') uid: string, @Req() req: Request) {
     return this.usersService.deleteUser(uid, req.user as AuthUser)
-  }
-
-  @Delete('remove-account')
-  async deleteAccount(@Req() req: Request) {
-    return this.usersService.deleteAccount(req.user as AuthUser)
   }
 
   @Roles('admin')

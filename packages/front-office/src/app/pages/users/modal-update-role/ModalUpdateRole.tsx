@@ -120,7 +120,7 @@ export default function ModalUpdateRole({
       const res = await TussisApi.update(`${model.update.endpoint}/${user?.uid}/claims`, claims)
       resetFieldState()
       setUsersUpdatedAt(Date.now())
-      toast.success('User role updated successfully')
+      toast.success(tCrud('update-role-success'))
       onClose?.()
       return res
     },

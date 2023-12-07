@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common'
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
-import { AuthUser } from '../../shared/types/auth.types'
+import { AuthUser } from '../../shared/types'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { Roles } from '../auth/roles.decorator'
 import { RolesGuard } from '../auth/roles.guard'

@@ -64,7 +64,10 @@
     },
     "navbar": {
       "delete-account": "Eliminar cuenta",
-      "logout": "Cerrar sesión"
+      "delete-account-confirmation": "¿Estás seguro de que deseas eliminar tu cuenta?",
+      "account-deleted": "Cuenta eliminada correctamente",
+      "logout": "Cerrar sesión",
+      "logout-success": "Sesión cerrada correctamente"
     },
     "data-table": {
       "no-data": "No hay datos disponibles",
@@ -121,6 +124,7 @@
       "rows-per-page": "Filas por página:",
       "total-items": "Total {{value}} elementos",
       "update-role-modal-title": "Actualizar Rol de Usuario",
+      "update-role-success": "Rol de usuario actualizado correctamente",
       "view-modal-title": "Datos del registo",
       "view-modal-subtitle": "Estos son los datos del registro seleccionado",
       "delete-confirmation": "¿Estás seguro de que deseas eliminar este registro?",

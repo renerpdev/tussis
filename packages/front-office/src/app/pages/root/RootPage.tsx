@@ -3,6 +3,7 @@ import { Flowbite } from 'flowbite-react'
 import { useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
+import { HiCog } from 'react-icons/hi'
 import { Outlet } from 'react-router-dom'
 import { Navbar, Sidebar } from '../../../shared/components'
 import { AUTH_COOKIE_NAME } from '../../../shared/utils'
@@ -52,14 +53,24 @@ export const RootPage = () => {
       <Sidebar />
       <main className={`md:ml-56 pt-unit-18 p-4 dark:bg-gray-800`}>
         {!isValidRole && (
-          <div
-            className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto"
-            dangerouslySetInnerHTML={{ __html: t('banner-message') }}
-          ></div>
+          <>
+            <div
+              className="px-4 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-full mb-4 text-center w-fit mx-auto"
+              dangerouslySetInnerHTML={{ __html: t('banner-message') }}
+            />
+            <div className="flex items-center justify-center text-cyan-600 h-[200px]">
+              <HiCog
+                size={120}
+                className="animate-spin"
+              />
+            </div>
+          </>
         )}
-        <div className="rounded-lg">
-          <Outlet />
-        </div>
+        {isValidRole && (
+          <div className="rounded-lg">
+            <Outlet />
+          </div>
+        )}
       </main>
     </Flowbite>
   )

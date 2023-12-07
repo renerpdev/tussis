@@ -159,6 +159,7 @@ export class UsersService {
 
   async privateDeleteUserAccount(uid: string): Promise<void> {
     try {
+      await getAuth().revokeRefreshTokens(uid)
       await getAuth().deleteUser(uid)
       // here we clean up all the data related to this user
       await this.issuesService.deleteAllIssuesFromUser(uid)
