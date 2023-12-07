@@ -104,7 +104,9 @@
       "login-button": "Iniciar sesión"
     },
     "root": {
-      "banner-message": "Necesitas permisos para poder <b>agregar | editar | eliminar datos</b>. Por favor <a href=\"mailto:{{email}}\" style='text-decoration:underline'>contacta a un administrador</a>."
+      "banner-message": "Necesitas permisos para poder <b>agregar | editar | eliminar datos</b>. Por favor <a href=\"mailto:{{email}}\" style='text-decoration:underline'>contacta a un administrador</a>.",
+      "cookies-message": "Este sitio web utiliza cookies para mejorar la experiencia del usuario. Al utilizar nuestro sitio web, usted acepta todas las cookies de acuerdo con nuestra <a href=\"{{url}}\" style='text-decoration:underline'>Política de cookies</a>.",
+      "cookies-button": "Aceptar"
     },
     "error-boundary": {
       "title": "Lo sentimos, algo salió mal.",

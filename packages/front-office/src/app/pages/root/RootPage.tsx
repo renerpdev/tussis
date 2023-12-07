@@ -7,6 +7,7 @@ import { HiCog } from 'react-icons/hi'
 import { Outlet } from 'react-router-dom'
 import { Navbar, Sidebar } from '../../../shared/components'
 import { AUTH_COOKIE_NAME } from '../../../shared/utils'
+import usePersistStore from '../../usePersistStore'
 
 const customTheme: CustomFlowbiteTheme = {
   datepicker: {
@@ -45,6 +46,7 @@ export const RootPage = () => {
     () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
     [cookies.auth?.user],
   )
+  const { cookiesAccepted, setCookiesAccepted } = usePersistStore()
   const isSupervisor = useMemo(() => cookies.auth?.user.role === 'supervisor', [cookies.auth?.user])
   const { t } = useTranslation('translation', {
     keyPrefix: 'pages.root',
@@ -54,6 +56,23 @@ export const RootPage = () => {
     <Flowbite theme={{ theme: customTheme }}>
       <Navbar />
       <Sidebar />
+      {!cookiesAccepted && (
+        <div className="fixed bottom-0 left-0 w-full p-5 z-50 text-cyan-700 bg-cyan-50 dark:bg-gray-800 dark:text-white text-sm text-center border-t-gray-500 border-t-2 animate-appearance-in">
+          <p
+            dangerouslySetInnerHTML={{
+              __html: t('cookies-message', {
+                url: 'https://docs.google.com/document/d/1jtZ_W64UsciV8M2waDhPEBAFIIZDixgyYeBdj6tFcQo',
+              }),
+            }}
+          />
+          <button
+            className="mt-4 px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg"
+            onClick={() => setCookiesAccepted(true)}
+          >
+            {t('cookies-button')}
+          </button>
+        </div>
+      )}
       <main className={`md:ml-56 pt-unit-18 p-4 dark:bg-gray-800`}>
         {!hasWritePermission && (
           <>

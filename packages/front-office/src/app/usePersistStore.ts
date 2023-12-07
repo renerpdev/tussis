@@ -4,6 +4,8 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 type Store = {
   isSigningIn: boolean
   setIsSigningIn: (isSigningIn: boolean) => void
+  cookiesAccepted: boolean
+  setCookiesAccepted: (cookiesAccepted: boolean) => void
 }
 
 const usePersistStore = create(
@@ -11,10 +13,12 @@ const usePersistStore = create(
     set => ({
       isSigningIn: false,
       setIsSigningIn: (isSigningIn: boolean) => set({ isSigningIn }),
+      cookiesAccepted: false,
+      setCookiesAccepted: (cookiesAccepted: boolean) => set({ cookiesAccepted }),
     }),
     {
       name: 'tps',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 )
