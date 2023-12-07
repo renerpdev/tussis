@@ -208,7 +208,14 @@ export const RadarChart = () => {
 
         {isFetching && (
           <div className="align-center absolute top-0 left-0 h-full w-full flex items-center justify-center z-1 bg-white/50">
-            <Spinner size="lg" />
+            <Spinner
+              size="lg"
+              classNames={{
+                wrapper: 'h-16 w-16',
+                circle1: 'border-b-cyan-600',
+                circle2: 'border-b-cyan-600',
+              }}
+            />
           </div>
         )}
       </div>
