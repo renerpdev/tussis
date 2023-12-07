@@ -60,7 +60,7 @@ const App = () => {
   useEffect(() => {
     getAuth().useDeviceLanguage()
 
-    const unsubscribe = getAuth().onAuthStateChanged(user => {
+    const unsubscribe = getAuth().beforeAuthStateChanged(user => {
       if (user) {
         const cookieValue = {
           user: {

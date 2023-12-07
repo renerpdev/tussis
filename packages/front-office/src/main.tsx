@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './app/app'
 import './i18n'
+import ErrorBoundary from './shared/components/error-boundary/ErrorBoundary'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,7 +26,9 @@ root.render(
     <StrictMode>
       <NextUIProvider>
         <CookiesProvider>
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
         </CookiesProvider>
         <ToastContainer
           position={'bottom-right'}
