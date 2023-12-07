@@ -138,7 +138,7 @@ export default function LoginPage() {
         </div>
         <div className="h-2 border-b-1 border-b-cyan-800 border-dashed opacity-40 w-full my-5 d-block" />
         <Button
-          className="bg-transparent dark:bg-cyan-600 border-1 border-cyan-600 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-cyan-600 dark:text-white hover:text-white mx-auto"
+          className="w-full bg-green-500 dark:bg-cyan-600 border-0 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-white hover:text-white mx-auto"
           type="button"
           onClick={handleGoogleLogin}
         >

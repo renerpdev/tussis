@@ -42,9 +42,13 @@ export const Navbar = () => {
   }, [tNav, deleteUserAccount, setCookie])
 
   const handleSignOut = useCallback(async () => {
-    await getAuth().signOut()
-    toast.success(tNav('logout-success'))
-    navigate('/login', { replace: true })
+    try {
+      await getAuth().signOut()
+      toast.success(tNav('logout-success'))
+      navigate('/login', { replace: true })
+    } catch (e: any) {
+      toast.error(e.message)
+    }
   }, [navigate, tNav])
 
   const handleSidebarVisibility = useCallback(() => {
