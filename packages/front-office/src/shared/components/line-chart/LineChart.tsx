@@ -277,18 +277,18 @@ export const LineChart = () => {
           {responseData.tendency === 'down' && <HiArrowDown className="w-4 h-4 ml-1" />}
         </div>
       </div>
-      {(!isFetchingCurrentPeriod && !isFetchingPreviousPeriod && options && series && (
+      <div className="relative">
         <Chart
           options={options}
           series={series}
           type="line"
         />
-      )) || (
-        <Spinner
-          size="lg"
-          className="align-center flex-1"
-        />
-      )}
+        {(isFetchingCurrentPeriod || isFetchingPreviousPeriod) && (
+          <div className="align-center absolute top-0 left-0 h-full w-full flex items-center justify-center z-1 bg-white/50">
+            <Spinner size="lg" />
+          </div>
+        )}
+      </div>
       <div className="flex justify-center">
         <Checkbox
           defaultSelected={showXLabels}

@@ -165,7 +165,7 @@ export const DonutChart = () => {
         },
       },
     }),
-    [response?.total, events],
+    [t, events, response?.total],
   )
 
   return (
@@ -178,18 +178,18 @@ export const DonutChart = () => {
         </div>
       </div>
 
-      {(!isFetching && options && series && (
+      <div className="relative">
         <Chart
           options={options}
           series={series}
           type="donut"
         />
-      )) || (
-        <Spinner
-          size="lg"
-          className="align-center flex-1"
-        />
-      )}
+        {isFetching && (
+          <div className="align-center absolute top-0 left-0 h-full w-full flex items-center justify-center z-1 bg-white/50">
+            <Spinner size="lg" />
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-600 justify-between mt-auto">
         <div className="flex justify-between items-center pt-5">
