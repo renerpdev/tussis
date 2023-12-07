@@ -15,7 +15,7 @@ import { AUTH_COOKIE_NAME } from '../../utils'
 export const Navbar = () => {
   const navigate = useNavigate()
   const { sidebarOpen, setSidebarOpen } = useStore()
-  const [cookies] = useCookies([AUTH_COOKIE_NAME])
+  const [cookies, setCookie] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth?.user, [cookies])
   const userRole = useMemo(() => currentUser.role, [currentUser])
   const { t: tNav } = useTranslation('translation', {
@@ -37,9 +37,9 @@ export const Navbar = () => {
     if (confirmedDeletion) {
       await deleteUserAccount()
       toast.success(tNav('account-deleted'))
-      navigate('/login', { replace: true })
+      setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
     }
-  }, [tNav, deleteUserAccount, navigate])
+  }, [tNav, deleteUserAccount, setCookie])
 
   const handleSignOut = useCallback(async () => {
     await getAuth().signOut()
