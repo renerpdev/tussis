@@ -15,6 +15,7 @@ import {
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { AuthUser } from '../../shared/types'
+import { BlacklistSupervisorGuard } from '../auth/blacklist-supervisor.guard'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { VerifiedUserGuard } from '../auth/verified-user.guard'
 import { CreateIssueDto } from './dto/create-issue.dto'
@@ -31,6 +32,7 @@ export class IssuesController {
 
   constructor(private readonly issuesService: IssuesService) {}
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Post()
   create(@Body() createIssueDto: CreateIssueDto, @Req() req: Request) {
     return this.issuesService.create(createIssueDto, req.user as AuthUser)
@@ -65,11 +67,13 @@ export class IssuesController {
     return this.issuesService.findOne(id, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateIssueDto: UpdateIssueDto, @Req() req: Request) {
     return this.issuesService.update(id, updateIssueDto, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.issuesService.remove(id, req.user as AuthUser)

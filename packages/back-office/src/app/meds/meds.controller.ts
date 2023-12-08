@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger'
 
 import { Request } from 'express'
 import { AuthUser } from '../../shared/types'
+import { BlacklistSupervisorGuard } from '../auth/blacklist-supervisor.guard'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { VerifiedUserGuard } from '../auth/verified-user.guard'
 import { CreateMedDto } from './dto/create-med.dto'
@@ -29,6 +30,7 @@ export class MedsController {
 
   constructor(private readonly medsService: MedsService) {}
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Post()
   create(@Body() createMedDto: CreateMedDto, @Req() req: Request) {
     return this.medsService.create(createMedDto, req.user as AuthUser)
@@ -44,11 +46,13 @@ export class MedsController {
     return this.medsService.findOne(id, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMedDto: UpdateMedDto, @Req() req: Request) {
     return this.medsService.update(id, updateMedDto, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.medsService.remove(id, req.user as AuthUser)

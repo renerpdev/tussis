@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger'
 
 import { Request } from 'express'
 import { AuthUser } from '../../shared/types'
+import { BlacklistSupervisorGuard } from '../auth/blacklist-supervisor.guard'
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard'
 import { VerifiedUserGuard } from '../auth/verified-user.guard'
 import { CreateSymptomDto } from './dto/create-symptom.dto'
@@ -29,6 +30,7 @@ export class SymptomsController {
 
   constructor(private readonly symptomsService: SymptomsService) {}
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Post()
   create(@Body() createSymptomDto: CreateSymptomDto, @Req() req: Request) {
     return this.symptomsService.create(createSymptomDto, req.user as AuthUser)
@@ -44,11 +46,13 @@ export class SymptomsController {
     return this.symptomsService.findOne(id, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSymptomDto: UpdateSymptomDto, @Req() req: Request) {
     return this.symptomsService.update(id, updateSymptomDto, req.user as AuthUser)
   }
 
+  @UseGuards(BlacklistSupervisorGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.symptomsService.remove(id, req.user as AuthUser)
