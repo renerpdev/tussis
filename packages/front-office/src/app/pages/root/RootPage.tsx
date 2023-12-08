@@ -70,7 +70,7 @@ export const RootPage = () => {
         {!userVerified && (
           <div
             className="px-8 py-2 bg-warning-50 dark:bg-warning-100 border-2 border-warning text-cyan-950 dark:text-white rounded-3xl mb-4 text-center w-fit mx-auto"
-            dangerouslySetInnerHTML={{ __html: t('banner-message') }}
+            dangerouslySetInnerHTML={{ __html: t('banner-message', { url: '/my-account' }) }}
           />
         )}
         <div className="rounded-lg">

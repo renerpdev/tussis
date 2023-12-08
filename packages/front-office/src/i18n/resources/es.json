@@ -115,7 +115,7 @@
       "register-button": "Crear cuenta"
     },
     "root": {
-      "banner-message": "Necesitas verificar tu cuenta para poder disfrutar de los servicios de Tussis. Por favor dirígite a 'Mi cuenta' y confirma tu email.",
+      "banner-message": "Necesitas verificar tu cuenta para poder disfrutar de los servicios de Tussis. Por favor dirígite a <a href='{{url}}' style='text-decoration:underline'>Mi cuenta</a> y confirma tu email.",
       "cookies-message": "Este sitio web utiliza cookies para mejorar la experiencia del usuario. Al utilizar nuestro sitio web, usted acepta todas las cookies de acuerdo con nuestra <a href=\"{{url}}\" style='text-decoration:underline'>Política de cookies</a>.",
       "cookies-button": "Aceptar"
     },
