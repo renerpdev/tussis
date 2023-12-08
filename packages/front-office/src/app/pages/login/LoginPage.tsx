@@ -4,6 +4,7 @@ import {
   User,
   createUserWithEmailAndPassword,
   getIdTokenResult,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithRedirect,
 } from '@firebase/auth'
@@ -27,6 +28,9 @@ export default function LoginPage() {
   const { isSigningIn, setIsSigningIn } = usePersistStore()
   const { t, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.login',
+  })
+  const { t: tAccount } = useTranslation('translation', {
+    keyPrefix: 'pages.my-account',
   })
 
   const updateCookie = useCallback(
@@ -88,8 +92,8 @@ export default function LoginPage() {
 
     try {
       const userCred = await createUserWithEmailAndPassword(auth, email, password)
-      const tokenResult = await getIdTokenResult(userCred.user)
-      updateCookie(userCred.user, tokenResult)
+      await sendEmailVerification(userCred.user)
+      toast.success(tAccount('verify-email-sent'))
     } catch (error: any) {
       const errorMessage = error.message
       toast.error(errorMessage, {
@@ -97,7 +101,7 @@ export default function LoginPage() {
       })
     }
     setIsLoading(false)
-  }, [email, password, updateCookie])
+  }, [email, password, t])
 
   return (
     <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative">

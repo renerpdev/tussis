@@ -102,7 +102,7 @@
       "verified-account": "Cuenta verificada",
       "non-verified-account": "Cuenta sin verificar",
       "send-verification-email": "Enviar correo de verificación",
-      "verify-email-sent": "Correo de verificación enviado correctamente. Por favor revise su bandeja de entrada.",
+      "verify-email-sent": "Correo de verificación enviado correctamente. Por favor revise su bandeja de entrada e inicie sesión nuevamente.",
       "save": "Guardar"
     },
     "login": {

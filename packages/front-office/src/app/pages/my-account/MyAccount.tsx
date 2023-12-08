@@ -53,7 +53,6 @@ function MyAccount() {
       const user = getAuth().currentUser
       await sendEmailVerification(user || ({} as any))
       toast.success(t('verify-email-sent'))
-      // clear cookies and redirect to login page after email verification is sent
     } catch (e: any) {
       toast.error(e.message)
     } finally {

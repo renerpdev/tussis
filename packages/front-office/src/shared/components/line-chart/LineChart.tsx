@@ -36,10 +36,6 @@ export const LineChart = () => {
   const { symptomsUpdatedAt, medsUpdatedAt, issuesUpdatedAt } = useStore()
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth.user, [cookies])
-  const isAdminOrEditor = useMemo(
-    () => cookies.auth?.user.role === 'admin' || cookies.auth?.user.role === 'editor',
-    [cookies.auth?.user.role],
-  )
   const [selectedFilter, setSelectedFilter] = useState<Selection>(new Set([INITIAL_FILTER]))
   const { t } = useTranslation('translation', {
     keyPrefix: 'components.line-chart',
@@ -329,15 +325,13 @@ export const LineChart = () => {
               </SelectItem>
             )}
           </Select>
-          {isAdminOrEditor && (
-            <NavLink
-              to="/issues"
-              className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
-            >
-              {t('cta-button')}
-              <HiChevronRight className="w-5 h-5 ml-1" />
-            </NavLink>
-          )}
+          <NavLink
+            to="/issues"
+            className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-600  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
+          >
+            {t('cta-button')}
+            <HiChevronRight className="w-5 h-5 ml-1" />
+          </NavLink>
         </div>
       </div>
     </div>
