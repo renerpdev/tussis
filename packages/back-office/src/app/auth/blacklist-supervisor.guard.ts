@@ -8,9 +8,9 @@ export class BlacklistSupervisorGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const user = request.user
 
-    const isSupervisor = user?.roles?.includes('supervisor')
+    const isSupervisor = user?.role === 'supervisor'
 
-    if (!isSupervisor) {
+    if (isSupervisor) {
       throw new SupervisorNotAllowedError()
     }
 
