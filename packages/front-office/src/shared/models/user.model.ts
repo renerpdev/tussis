@@ -1,4 +1,4 @@
-import { UserRole } from '../types/auth.types'
+import { UserRole } from '../types'
 import { BaseModel } from './index'
 
 export interface User extends BaseModel {

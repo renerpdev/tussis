@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
-import { useTranslation } from 'react-i18next'
 import { HiChartPie, HiInbox, HiUsers, HiViewBoards } from 'react-icons/hi'
 import { IconType } from 'react-icons/lib'
 import { NavLink } from 'react-router-dom'
@@ -15,17 +14,6 @@ const SIDEBAR_ITEMS: { route: string; value: string; icon: IconType; isPublic?: 
     icon: HiChartPie,
     isPublic: true,
   },
-]
-
-const ADMIN_ITEMS = [
-  {
-    route: 'users',
-    value: i18next.t('components.sidebar.users'),
-    icon: HiUsers,
-  },
-]
-
-const EDITOR_ITEMS = [
   {
     route: 'issues',
     value: i18next.t('components.sidebar.issues'),
@@ -43,15 +31,19 @@ const EDITOR_ITEMS = [
   },
 ]
 
+const ADMIN_ITEMS = [
+  {
+    route: 'users',
+    value: i18next.t('components.sidebar.users'),
+    icon: HiUsers,
+  },
+]
+
 export function Sidebar() {
   const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const { sidebarOpen, setSidebarOpen } = useStore()
   const currentUser = useMemo(() => cookies.auth?.user, [cookies])
   const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
-  const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
-  const { t } = useTranslation('translation', {
-    keyPrefix: 'components.sidebar',
-  })
 
   const handleSidebarVisibility = useCallback(() => {
     setSidebarOpen(!sidebarOpen)
@@ -74,9 +66,8 @@ export function Sidebar() {
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
-            {SIDEBAR_ITEMS.concat(isEditor || isAdmin ? EDITOR_ITEMS : [])
-              .concat(isAdmin ? ADMIN_ITEMS : [])
-              .map(({ icon: Icon, route, value, isPublic }) => {
+            {SIDEBAR_ITEMS.concat(isAdmin ? ADMIN_ITEMS : []).map(
+              ({ icon: Icon, route, value, isPublic }) => {
                 const canAccess = currentUser || isPublic
                 return (
                   <li
@@ -102,7 +93,8 @@ export function Sidebar() {
                     </NavLink>
                   </li>
                 )
-              })}
+              },
+            )}
           </ul>
         </div>
       </aside>

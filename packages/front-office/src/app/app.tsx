@@ -18,6 +18,7 @@ const LazyMedsPage = lazy(() => import('./pages/meds/MedsPage'))
 const LazySymptomsPage = lazy(() => import('./pages/symptoms/SymptomsPage'))
 const LazyDashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
 const LazyUsersPage = lazy(() => import('./pages/users/UsersPage'))
+const LazyMyAccountPage = lazy(() => import('./pages/my-account/MyAccount'))
 
 const locales = {
   es: 'es-us',
@@ -55,7 +56,6 @@ const UnProtectedRoute = ({ children }: PropsWithChildren) => {
 const App = () => {
   const [cookies, setCookie] = useCookies([AUTH_COOKIE_NAME])
   const isAdmin = useMemo(() => cookies.auth?.user.role === 'admin', [cookies.auth?.user.role])
-  const isEditor = useMemo(() => cookies.auth?.user.role === 'editor', [cookies.auth?.user.role])
   const { i18n } = useTranslation()
   const { setIsSigningIn } = usePersistStore()
 
@@ -74,6 +74,7 @@ const App = () => {
             email: user.email,
             photoURL: user.photoURL,
             role: JSON.parse(user.reloadUserInfo?.customAttributes || '{}').role,
+            emailVerified: user.emailVerified,
           },
           accessToken: user.accessToken,
         }
@@ -86,7 +87,7 @@ const App = () => {
     return () => {
       unsubscribe()
     }
-  }, [setCookie])
+  }, [setCookie, setIsSigningIn])
 
   useEffect(() => {
     dayjs.locale(locales[i18n.language])
@@ -126,37 +127,42 @@ const App = () => {
               />
             }
           />
-          {(isEditor || isAdmin) && (
-            <>
-              <Route
-                path={'/issues'}
-                element={
-                  <Suspense
-                    children={<LazyIssuesPage />}
-                    fallback={<Spinner />}
-                  />
-                }
+          <Route
+            path={'/issues'}
+            element={
+              <Suspense
+                children={<LazyIssuesPage />}
+                fallback={<Spinner />}
               />
-              <Route
-                path={'/meds'}
-                element={
-                  <Suspense
-                    children={<LazyMedsPage />}
-                    fallback={<Spinner />}
-                  />
-                }
+            }
+          />
+          <Route
+            path={'/meds'}
+            element={
+              <Suspense
+                children={<LazyMedsPage />}
+                fallback={<Spinner />}
               />
-              <Route
-                path={'/symptoms'}
-                element={
-                  <Suspense
-                    children={<LazySymptomsPage />}
-                    fallback={<Spinner />}
-                  />
-                }
+            }
+          />
+          <Route
+            path={'/symptoms'}
+            element={
+              <Suspense
+                children={<LazySymptomsPage />}
+                fallback={<Spinner />}
               />
-            </>
-          )}
+            }
+          />
+          <Route
+            path={'/my-account'}
+            element={
+              <Suspense
+                children={<LazyMyAccountPage />}
+                fallback={<Spinner />}
+              />
+            }
+          />
 
           {isAdmin && (
             <Route

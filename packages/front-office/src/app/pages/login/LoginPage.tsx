@@ -2,6 +2,7 @@ import {
   GoogleAuthProvider,
   IdTokenResult,
   User,
+  createUserWithEmailAndPassword,
   getIdTokenResult,
   signInWithEmailAndPassword,
   signInWithRedirect,
@@ -37,6 +38,7 @@ export default function LoginPage() {
           email: user.email,
           photoURL: user.photoURL,
           role: tokenResult?.claims.role,
+          emailVerified: user.emailVerified,
         },
         accessToken: tokenResult?.token,
       }
@@ -80,6 +82,22 @@ export default function LoginPage() {
     }
     setIsLoading(false)
   }, [i18n.language, setIsSigningIn])
+
+  const handleUserPassSignUp = useCallback(async () => {
+    setIsLoading(true)
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password)
+      const tokenResult = await getIdTokenResult(userCred.user)
+      updateCookie(userCred.user, tokenResult)
+    } catch (error: any) {
+      const errorMessage = error.message
+      toast.error(errorMessage, {
+        toastId: 'error-login',
+      })
+    }
+    setIsLoading(false)
+  }, [email, password, updateCookie])
 
   return (
     <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative">
@@ -135,6 +153,13 @@ export default function LoginPage() {
           >
             {t('login-button')}
           </Button>
+          <Button
+            className="bg-transparent border-2 border-cyan-600 hover:bg-cyan-500 text-cyan-600 hover:text-white w-full"
+            type="submit"
+            onClick={handleUserPassSignUp}
+          >
+            {t('register-button')}
+          </Button>
         </div>
         <div className="h-2 border-b-1 border-b-cyan-800 border-dashed opacity-40 w-full my-5 d-block" />
         <Button
@@ -142,7 +167,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
         >
-          <FaGoogle className="inline-block" /> Google
+          <FaGoogle className="inline-block" /> {t('google-login-button')}
         </Button>
 
         {(isLoading || isSigningIn) && (

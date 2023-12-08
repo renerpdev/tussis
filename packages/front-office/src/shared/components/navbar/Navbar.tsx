@@ -1,21 +1,19 @@
 import { getAuth } from '@firebase/auth'
-import { Chip, Spinner } from '@nextui-org/react'
+import { Chip } from '@nextui-org/react'
 import { Avatar, DarkThemeToggle, Dropdown, Navbar as FNavbar } from 'flowbite-react'
 import { useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
-import { HiLogout, HiMenu, HiTrash } from 'react-icons/hi'
-import { useMutation } from 'react-query'
+import { HiLogout, HiMenu, HiUser } from 'react-icons/hi'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { TussisApi } from '../../../api'
 import { useStore } from '../../../app/useStore'
 import { AUTH_COOKIE_NAME } from '../../utils'
 
 export const Navbar = () => {
   const navigate = useNavigate()
   const { sidebarOpen, setSidebarOpen } = useStore()
-  const [cookies, setCookie] = useCookies([AUTH_COOKIE_NAME])
+  const [cookies] = useCookies([AUTH_COOKIE_NAME])
   const currentUser = useMemo(() => cookies.auth?.user, [cookies])
   const userRole = useMemo(() => currentUser.role, [currentUser])
   const { t: tNav } = useTranslation('translation', {
@@ -27,19 +25,6 @@ export const Navbar = () => {
   const { t: tApp } = useTranslation('translation', {
     keyPrefix: 'app',
   })
-
-  const { mutateAsync: deleteUserAccount, isLoading: isLoadingDeleteUserAccount } = useMutation({
-    mutationFn: async () => await TussisApi.delete(`users/remove-account`),
-  })
-
-  const handleRemoveAccount = useCallback(async () => {
-    const confirmedDeletion = window.confirm(tNav('delete-account-confirmation'))
-    if (confirmedDeletion) {
-      await deleteUserAccount()
-      toast.success(tNav('account-deleted'))
-      setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
-    }
-  }, [tNav, deleteUserAccount, setCookie])
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -77,7 +62,6 @@ export const Navbar = () => {
         </span>
       </FNavbar.Brand>
       <div className="flex md:order-2">
-        {isLoadingDeleteUserAccount && <Spinner size="sm" />}
         <DarkThemeToggle />
         {currentUser && (
           <Dropdown
@@ -116,10 +100,11 @@ export const Navbar = () => {
               </div>
             </Dropdown.Header>
             <Dropdown.Item
-              icon={HiTrash}
-              onClick={handleRemoveAccount}
+              icon={HiUser}
+              as={NavLink}
+              to={'/my-account'}
             >
-              {tNav('delete-account')}
+              {tNav('my-account')}
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item
