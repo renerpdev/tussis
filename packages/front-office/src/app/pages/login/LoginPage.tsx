@@ -23,6 +23,7 @@ import usePersistStore from '../../usePersistStore'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingTemplate, setIsLoadingTemplate] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -109,6 +110,7 @@ export default function LoginPage() {
   }, [email, password, tAccount])
 
   useEffect(() => {
+    setIsLoadingTemplate(true)
     fetchAndActivate(remoteConfig)
       .then(() => {
         setIsNonVerifiedUserSignUpActive(
@@ -119,6 +121,9 @@ export default function LoginPage() {
       })
       .catch(error => {
         toast.error(error.message)
+      })
+      .finally(() => {
+        setIsLoadingTemplate(false)
       })
   }, [])
 
@@ -201,7 +206,7 @@ export default function LoginPage() {
           </Button>
         )}
 
-        {(isLoading || isSigningIn) && (
+        {(isLoading || isSigningIn || isLoadingTemplate) && (
           <div className="text-center h-full z-50 fixed left-0 top-0 flex flex-col justify-center items-center w-full bg-gray-400 bg-opacity-50 overflow-hidden">
             <Spinner
               size="md"
