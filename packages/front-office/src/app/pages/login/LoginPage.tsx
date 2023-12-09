@@ -76,7 +76,7 @@ export default function LoginPage() {
   }, [email, password, updateCookie])
 
   const handleGoogleLogin = useCallback(async () => {
-    setIsLoading(true)
+    setIsSigningIn(true)
 
     const provider = new GoogleAuthProvider()
     provider.setDefaultLanguage(i18n.language)
@@ -86,14 +86,14 @@ export default function LoginPage() {
     try {
       await signInWithRedirect(auth, provider)
     } catch (error: any) {
-      setIsLoading(false)
       const errorMessage = error.message
       toast.error(errorMessage, {
         toastId: 'error-google-login',
       })
+    } finally {
+      setIsSigningIn(false)
     }
-    setIsLoading(false)
-  }, [i18n.language, setIsLoading])
+  }, [i18n.language, setIsSigningIn])
 
   const handleUserPassSignUp = useCallback(async () => {
     setIsLoading(true)

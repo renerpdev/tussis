@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
@@ -21,20 +22,25 @@ export default defineConfig({
     viteTsConfigPaths({
       root: '../../',
     }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: {
+        enabled: true,
+      },
+    }),
   ],
 
   define: {
     LAST_DEPLOY_DATE: `"${new Date(Date.now())}"`,
   },
 
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [
-  //    viteTsConfigPaths({
-  //      root: '../../',
-  //    }),
-  //  ],
-  // },
+  worker: {
+    plugins: [
+      viteTsConfigPaths({
+        root: '../../',
+      }),
+    ],
+  },
 
   test: {
     globals: true,
