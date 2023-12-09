@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   getIdTokenResult,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithRedirect,
 } from '@firebase/auth'
@@ -109,6 +110,17 @@ export default function LoginPage() {
     setIsLoading(false)
   }, [email, password, tAccount])
 
+  const handleResetPassword = useCallback(async () => {
+    try {
+      await sendPasswordResetEmail(auth, email)
+      toast.success(t('reset-password-email-sent'))
+    } catch (error: any) {
+      toast.error(error.message, {
+        toastId: 'error-reset-password',
+      })
+    }
+  }, [email, t])
+
   useEffect(() => {
     setIsLoadingTemplate(true)
     fetchAndActivate(remoteConfig)
@@ -183,6 +195,14 @@ export default function LoginPage() {
               >
                 {t('login-button')}
               </Button>
+              <button>
+                <span
+                  className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-400 cursor-pointer"
+                  onClick={handleResetPassword}
+                >
+                  {t('forgot-password')}
+                </span>
+              </button>
             </>
           )}
           {isNonVerifiedUserSignUpActive && (

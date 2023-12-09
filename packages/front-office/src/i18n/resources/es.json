@@ -112,7 +112,9 @@
       "password": "Contraseña",
       "google-login-button": "Iniciar con Google",
       "login-button": "Iniciar sesión",
-      "register-button": "Crear cuenta"
+      "register-button": "Crear cuenta",
+      "forgot-password": "¿Olvidaste tu contraseña?",
+      "reset-password-email-sent": "Correo de restablecimiento de contraseña enviado correctamente. Por favor revise su bandeja de entrada e inicie sesión nuevamente."
     },
     "root": {
       "banner-message": "Necesitas verificar tu cuenta para poder disfrutar de los servicios de Tussis. Por favor dirígite a <a href='{{url}}' style='text-decoration:underline'>Mi cuenta</a> y confirma tu email.",
