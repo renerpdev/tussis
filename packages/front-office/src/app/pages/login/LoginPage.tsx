@@ -9,7 +9,8 @@ import {
   signInWithRedirect,
 } from '@firebase/auth'
 import { Button, Input, Spinner } from '@nextui-org/react'
-import { useCallback, useState } from 'react'
+import { fetchAndActivate, getValue } from 'firebase/remote-config'
+import { useCallback, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { FaGoogle } from 'react-icons/fa'
@@ -17,6 +18,7 @@ import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 import auth from '../../firebase/auth'
+import remoteConfig from '../../firebase/remote-config'
 import usePersistStore from '../../usePersistStore'
 
 export default function LoginPage() {
@@ -32,6 +34,9 @@ export default function LoginPage() {
   const { t: tAccount } = useTranslation('translation', {
     keyPrefix: 'pages.my-account',
   })
+  const [isGoogleLoginActive, setIsGoogleLoginActive] = useState(false)
+  const [isUserPassLoginActive, setIsUserPassLoginActive] = useState(false)
+  const [isNonVerifiedUserSignUpActive, setIsNonVerifiedUserSignUpActive] = useState(false)
 
   const updateCookie = useCallback(
     (user: User, tokenResult: IdTokenResult) => {
@@ -101,7 +106,21 @@ export default function LoginPage() {
       })
     }
     setIsLoading(false)
-  }, [email, password, t])
+  }, [email, password, tAccount])
+
+  useEffect(() => {
+    fetchAndActivate(remoteConfig)
+      .then(() => {
+        setIsNonVerifiedUserSignUpActive(
+          getValue(remoteConfig, 'create_non_verified_users')._value === 'true',
+        )
+        setIsGoogleLoginActive(getValue(remoteConfig, 'login_with_google')._value === 'true')
+        setIsUserPassLoginActive(getValue(remoteConfig, 'login_with_password')._value === 'true')
+      })
+      .catch(error => {
+        toast.error(error.message)
+      })
+  }, [])
 
   return (
     <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative">
@@ -116,63 +135,71 @@ export default function LoginPage() {
           {t('title')}
         </h2>
         <div className="w-full flex flex-col gap-3">
-          <Input
-            id="email"
-            autoFocus
-            type="email"
-            onValueChange={setEmail}
-            label={t('email')}
-            classNames={{
-              inputWrapper: 'dark:bg-gray-500',
-              input: 'focus:ring-transparent dark:focus:ring-transparent',
-            }}
-          />
-          <Input
-            id="pass"
-            onValueChange={setPassword}
-            label={t('password')}
-            classNames={{
-              inputWrapper: 'dark:bg-gray-500',
-              input: 'focus:ring-transparent dark:focus:ring-transparent',
-            }}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+          {isUserPassLoginActive && (
+            <>
+              <Input
+                id="email"
+                autoFocus
+                type="email"
+                onValueChange={setEmail}
+                label={t('email')}
+                classNames={{
+                  inputWrapper: 'dark:bg-gray-500',
+                  input: 'focus:ring-transparent dark:focus:ring-transparent',
+                }}
+              />
+              <Input
+                id="pass"
+                onValueChange={setPassword}
+                label={t('password')}
+                classNames={{
+                  inputWrapper: 'dark:bg-gray-500',
+                  input: 'focus:ring-transparent dark:focus:ring-transparent',
+                }}
+                endContent={
+                  <button
+                    className="focus:outline-none"
+                    type="button"
+                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                  >
+                    {isPasswordVisible ? (
+                      <HiEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                    ) : (
+                      <HiEye className="text-2xl text-default-400 pointer-events-none" />
+                    )}
+                  </button>
+                }
+                type={isPasswordVisible ? 'text' : 'password'}
+              />
+              <Button
+                className="bg-cyan-600 border-1 hover:bg-cyan-500 text-white hover:text-white w-full"
+                type="submit"
+                onClick={handleUserPassLogin}
               >
-                {isPasswordVisible ? (
-                  <HiEyeOff className="text-2xl text-default-400 pointer-events-none" />
-                ) : (
-                  <HiEye className="text-2xl text-default-400 pointer-events-none" />
-                )}
-              </button>
-            }
-            type={isPasswordVisible ? 'text' : 'password'}
-          />
-          <Button
-            className="bg-cyan-600 border-1 hover:bg-cyan-500 text-white hover:text-white w-full"
-            type="submit"
-            onClick={handleUserPassLogin}
-          >
-            {t('login-button')}
-          </Button>
-          <Button
-            className="bg-transparent border-2 border-cyan-600 hover:bg-cyan-500 text-cyan-600 hover:text-white w-full"
-            type="submit"
-            onClick={handleUserPassSignUp}
-          >
-            {t('register-button')}
-          </Button>
+                {t('login-button')}
+              </Button>
+            </>
+          )}
+          {isNonVerifiedUserSignUpActive && (
+            <Button
+              className="bg-transparent border-2 border-cyan-600 hover:bg-cyan-500 text-cyan-600 hover:text-white w-full"
+              type="submit"
+              onClick={handleUserPassSignUp}
+            >
+              {t('register-button')}
+            </Button>
+          )}
         </div>
         <div className="h-2 border-b-1 border-b-cyan-800 border-dashed opacity-40 w-full my-5 d-block" />
-        <Button
-          className="w-full bg-green-500 dark:bg-cyan-600 border-0 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-white hover:text-white mx-auto"
-          type="button"
-          onClick={handleGoogleLogin}
-        >
-          <FaGoogle className="inline-block" /> {t('google-login-button')}
-        </Button>
+        {isGoogleLoginActive && (
+          <Button
+            className="w-full bg-green-500 dark:bg-cyan-600 border-0 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-white hover:text-white mx-auto"
+            type="button"
+            onClick={handleGoogleLogin}
+          >
+            <FaGoogle className="inline-block" /> {t('google-login-button')}
+          </Button>
+        )}
 
         {(isLoading || isSigningIn) && (
           <div className="text-center h-full z-50 fixed left-0 top-0 flex flex-col justify-center items-center w-full bg-gray-400 bg-opacity-50 overflow-hidden">
