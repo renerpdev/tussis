@@ -7,6 +7,7 @@ const defaultConfig = {
   create_non_verified_users: false,
   login_with_google: true,
   login_with_password: true,
+  display_reset_password: true,
 }
 
 remoteConfig.defaultConfig = defaultConfig

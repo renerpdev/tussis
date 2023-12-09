@@ -39,6 +39,7 @@ export default function LoginPage() {
   const [isGoogleLoginActive, setIsGoogleLoginActive] = useState(false)
   const [isUserPassLoginActive, setIsUserPassLoginActive] = useState(false)
   const [isNonVerifiedUserSignUpActive, setIsNonVerifiedUserSignUpActive] = useState(false)
+  const [isDisplayForgotPasswordActive, setIsDisplayForgotPasswordActive] = useState(false)
 
   const updateCookie = useCallback(
     (user: User, tokenResult: IdTokenResult) => {
@@ -75,7 +76,7 @@ export default function LoginPage() {
   }, [email, password, updateCookie])
 
   const handleGoogleLogin = useCallback(async () => {
-    setIsSigningIn(true)
+    setIsLoading(true)
 
     const provider = new GoogleAuthProvider()
     provider.setDefaultLanguage(i18n.language)
@@ -85,14 +86,14 @@ export default function LoginPage() {
     try {
       await signInWithRedirect(auth, provider)
     } catch (error: any) {
-      setIsSigningIn(false)
+      setIsLoading(false)
       const errorMessage = error.message
       toast.error(errorMessage, {
         toastId: 'error-google-login',
       })
     }
     setIsLoading(false)
-  }, [i18n.language, setIsSigningIn])
+  }, [i18n.language, setIsLoading])
 
   const handleUserPassSignUp = useCallback(async () => {
     setIsLoading(true)
@@ -111,6 +112,7 @@ export default function LoginPage() {
   }, [email, password, tAccount])
 
   const handleResetPassword = useCallback(async () => {
+    setIsLoading(true)
     try {
       await sendPasswordResetEmail(auth, email)
       toast.success(t('reset-password-email-sent'))
@@ -118,6 +120,8 @@ export default function LoginPage() {
       toast.error(error.message, {
         toastId: 'error-reset-password',
       })
+    } finally {
+      setIsLoading(false)
     }
   }, [email, t])
 
@@ -130,6 +134,9 @@ export default function LoginPage() {
         )
         setIsGoogleLoginActive(getValue(remoteConfig, 'login_with_google')._value === 'true')
         setIsUserPassLoginActive(getValue(remoteConfig, 'login_with_password')._value === 'true')
+        setIsDisplayForgotPasswordActive(
+          getValue(remoteConfig, 'display_reset_password')._value === 'true',
+        )
       })
       .catch(error => {
         toast.error(error.message)
@@ -195,15 +202,15 @@ export default function LoginPage() {
               >
                 {t('login-button')}
               </Button>
-              <button>
-                <span
-                  className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-400 cursor-pointer"
-                  onClick={handleResetPassword}
-                >
-                  {t('forgot-password')}
-                </span>
-              </button>
             </>
+          )}
+          {isDisplayForgotPasswordActive && (
+            <button
+              className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-400 cursor-pointer"
+              onClick={handleResetPassword}
+            >
+              {t('forgot-password')}
+            </button>
           )}
           {isNonVerifiedUserSignUpActive && (
             <Button
