@@ -1,9 +1,6 @@
 import {
   GoogleAuthProvider,
-  IdTokenResult,
-  User,
   createUserWithEmailAndPassword,
-  getIdTokenResult,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -12,12 +9,10 @@ import {
 import { Button, Input, Spinner } from '@nextui-org/react'
 import { fetchAndActivate, getValue } from 'firebase/remote-config'
 import { useCallback, useEffect, useState } from 'react'
-import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { FaGoogle } from 'react-icons/fa'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import { AUTH_COOKIE_NAME } from '../../../shared/utils'
 import auth from '../../firebase/auth'
 import remoteConfig from '../../firebase/remote-config'
 import usePersistStore from '../../usePersistStore'
@@ -28,7 +23,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [, setCookie] = useCookies([AUTH_COOKIE_NAME])
   const { isSigningIn, setIsSigningIn } = usePersistStore()
   const { t, i18n } = useTranslation('translation', {
     keyPrefix: 'pages.login',
@@ -41,31 +35,11 @@ export default function LoginPage() {
   const [isNonVerifiedUserSignUpActive, setIsNonVerifiedUserSignUpActive] = useState(false)
   const [isDisplayForgotPasswordActive, setIsDisplayForgotPasswordActive] = useState(false)
 
-  const updateCookie = useCallback(
-    (user: User, tokenResult: IdTokenResult) => {
-      const cookieValue = {
-        user: {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          role: tokenResult?.claims.role,
-          emailVerified: user.emailVerified,
-        },
-        accessToken: tokenResult?.token,
-      }
-      setCookie(AUTH_COOKIE_NAME, cookieValue, { path: '/' })
-    },
-    [setCookie],
-  )
-
   const handleUserPassLogin = useCallback(async () => {
     setIsLoading(true)
 
     try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password)
-      const tokenResult = await getIdTokenResult(userCred.user)
-      updateCookie(userCred.user, tokenResult)
+      await signInWithEmailAndPassword(auth, email, password)
     } catch (error: any) {
       const errorMessage = error.message
       toast.error(errorMessage, {
@@ -73,7 +47,7 @@ export default function LoginPage() {
       })
     }
     setIsLoading(false)
-  }, [email, password, updateCookie])
+  }, [email, password])
 
   const handleGoogleLogin = useCallback(async () => {
     setIsSigningIn(true)
@@ -129,14 +103,15 @@ export default function LoginPage() {
     setIsLoadingTemplate(true)
     fetchAndActivate(remoteConfig)
       .then(() => {
-        setIsNonVerifiedUserSignUpActive(
-          getValue(remoteConfig, 'create_non_verified_users')._value === 'true',
-        )
-        setIsGoogleLoginActive(getValue(remoteConfig, 'login_with_google')._value === 'true')
-        setIsUserPassLoginActive(getValue(remoteConfig, 'login_with_password')._value === 'true')
-        setIsDisplayForgotPasswordActive(
-          getValue(remoteConfig, 'display_reset_password')._value === 'true',
-        )
+        const nonVerifiedUserSignUpActiveValue = getValue(remoteConfig, 'create_non_verified_users')
+        const googleLoginActiveValue = getValue(remoteConfig, 'login_with_google')
+        const userPassLoginActiveValue = getValue(remoteConfig, 'login_with_password')
+        const displayForgotPasswordActiveValue = getValue(remoteConfig, 'display_reset_password')
+
+        setIsNonVerifiedUserSignUpActive(nonVerifiedUserSignUpActiveValue.asBoolean())
+        setIsDisplayForgotPasswordActive(displayForgotPasswordActiveValue.asBoolean())
+        setIsGoogleLoginActive(googleLoginActiveValue.asBoolean())
+        setIsUserPassLoginActive(userPassLoginActiveValue.asBoolean())
       })
       .catch(error => {
         toast.error(error.message)
@@ -147,14 +122,14 @@ export default function LoginPage() {
   }, [])
 
   return (
-    <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative">
+    <div className="h-[100dvh] flex flex-col items-center gap-2 bg-cyan-50 dark:bg-gray-800 pt-[10vh] relative px-4">
       <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
         {/* this is just to load Tailwind classnames */}
         <span className="text-cyan-800 dark:text-cyan-600 d-none" />
         {/* end */}
         <div dangerouslySetInnerHTML={{ __html: t('welcome') }} />
       </h1>
-      <div className="py-8 px-6 border-cyan-600 border-1 shadow-lg shadow-cyan-200 bg-white dark:bg-transparent w-full max-w-[20rem] flex flex-col items-center justify-center">
+      <div className="py-8 px-6 border-cyan-600 border-1 shadow-lg shadow-cyan-200 bg-white dark:bg-transparent w-full max-w-[25rem] flex flex-col items-center justify-center">
         <h2 className="mb-4 text-xl md:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-white pb-2 text-center">
           {t('title')}
         </h2>
@@ -163,7 +138,6 @@ export default function LoginPage() {
             <>
               <Input
                 id="email"
-                autoFocus
                 type="email"
                 onValueChange={setEmail}
                 label={t('email')}
@@ -196,7 +170,7 @@ export default function LoginPage() {
                 type={isPasswordVisible ? 'text' : 'password'}
               />
               <Button
-                className="bg-cyan-600 border-1 hover:bg-cyan-500 text-white hover:text-white w-full"
+                className="bg-cyan-600 py-6 border-1 hover:bg-cyan-500 text-white hover:text-white w-full"
                 type="submit"
                 onClick={handleUserPassLogin}
               >
@@ -214,7 +188,7 @@ export default function LoginPage() {
           )}
           {isNonVerifiedUserSignUpActive && (
             <Button
-              className="bg-transparent border-2 border-cyan-600 hover:bg-cyan-500 text-cyan-600 hover:text-white w-full"
+              className="bg-transparent py-6 border-2 border-cyan-600 hover:bg-cyan-500 text-cyan-600 hover:text-white w-full"
               type="submit"
               onClick={handleUserPassSignUp}
             >
@@ -225,7 +199,7 @@ export default function LoginPage() {
         <div className="h-2 border-b-1 border-b-cyan-800 border-dashed opacity-40 w-full my-5 d-block" />
         {isGoogleLoginActive && (
           <Button
-            className="w-full bg-green-500 dark:bg-cyan-600 border-0 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-white hover:text-white mx-auto"
+            className="w-full py-6 bg-white dark:bg-cyan-600 hover:bg-cyan-500 dark:hover:bg-cyan-400 border-2 border-green-500 shadow-lg text-green-500 dark:text-white hover:text-white mx-auto"
             type="button"
             onClick={handleGoogleLogin}
           >

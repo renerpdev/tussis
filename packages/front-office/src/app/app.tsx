@@ -1,4 +1,4 @@
-import { getAuth } from '@firebase/auth'
+import { getAuth, getIdTokenResult } from '@firebase/auth'
 import { Spinner } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es-us.js'
@@ -8,6 +8,7 @@ import { PropsWithChildren, ReactElement, Suspense, lazy, useEffect, useMemo } f
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { AUTH_COOKIE_NAME } from '../shared/utils'
 import { ErrorPage, RootPage } from './pages'
 import LoginPage from './pages/login/LoginPage'
@@ -63,24 +64,35 @@ const App = () => {
     getAuth().useDeviceLanguage()
 
     const unsubscribe = getAuth().onAuthStateChanged(user => {
-      // here we hide the spinner
-      setIsSigningIn(false)
-
       if (user) {
-        const cookieValue = {
-          user: {
-            uid: user.uid,
-            displayName: user.displayName,
-            email: user.email,
-            photoURL: user.photoURL,
-            role: JSON.parse(user.reloadUserInfo?.customAttributes || '{}').role,
-            emailVerified: user.emailVerified,
-          },
-          accessToken: user.accessToken,
-        }
-        setCookie(AUTH_COOKIE_NAME, cookieValue, { path: '/' })
+        setIsSigningIn(true)
+        getIdTokenResult(user)
+          .then(tokenResult => {
+            const cookieValue = {
+              user: {
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                role: tokenResult?.claims.role,
+                emailVerified: user.emailVerified,
+              },
+              accessToken: tokenResult?.token,
+            }
+
+            setCookie(AUTH_COOKIE_NAME, cookieValue, { path: '/' })
+          })
+          .catch(error => {
+            toast.error(error.message, {
+              toastId: 'error-auth',
+            })
+          })
+          .finally(() => {
+            setIsSigningIn(false)
+          })
       } else {
         setCookie(AUTH_COOKIE_NAME, null, { path: '/' })
+        setIsSigningIn(false)
       }
     })
 
